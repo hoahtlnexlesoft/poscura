@@ -278,6 +278,8 @@
     frame = nf;
   }
   window.poscuraGo = function (path) { go(path); };
+  // which simulated device the reviewer is looking at (read by the comment kit)
+  window.poscuraDevice = function () { var d = view(); return { name: d.name, size: d.w + "×" + d.h + " " + d.unit }; };
   function markActive(path) {
     document.querySelectorAll("#screens button").forEach(function (b) { b.classList.toggle("on", b.dataset.path === path); });
   }
@@ -323,6 +325,6 @@
   go(state.path || "/", true);
 })();
 </script>
-<script src="review/config.js?v=1"></script><script src="review/review.js?v=8" defer></script>
+<script src="review/config.js?v=1"></script><script src="review/review.js?v=9" defer></script>
 </body>
 </html>

@@ -66,7 +66,11 @@ function PostureMonitor() {
 
       <section className="rounded-2xl border border-border bg-gradient-to-br from-card via-background to-background overflow-hidden fold:col-start-1">
         {!running ? (
-          <div className="h-[clamp(320px,calc(100dvh-250px),680px)] relative flex flex-col items-center justify-center gap-3 px-4 text-center">
+          <div className="flex justify-center bg-[#04070d]">
+          <div
+            className="relative aspect-[9/16] max-w-full flex flex-col items-center justify-center gap-3 px-4 text-center bg-gradient-to-b from-card via-background to-background"
+            style={{ width: "min(100%, calc(max(320px, min(100dvh - 250px, 680px)) * 9 / 16))" }}
+          >
             <button
               onClick={() => setShowCameraSetting(true)}
               className="absolute top-3 left-3 inline-flex items-center gap-1 px-2 py-1 rounded-md bg-background/80 backdrop-blur-sm border border-border text-[10px] text-muted-foreground"
@@ -82,6 +86,7 @@ function PostureMonitor() {
               className="mt-2 px-6 py-3 rounded-full bg-gradient-to-r from-primary to-secondary text-primary-foreground font-semibold text-sm flex items-center gap-2 shadow-lg glow-primary">
               <Play className="h-4 w-4 fill-current" /> Start monitoring
             </button>
+          </div>
           </div>
         ) : (
           <LivePostureView timeLeft={`${mm}:${ss}`} onEnd={handleStop} />

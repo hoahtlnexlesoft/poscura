@@ -202,7 +202,12 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
   return (
     <div>
       {/* ---------- live view ---------- */}
-      <div className="relative h-[clamp(320px,calc(100dvh-290px),660px)] overflow-hidden bg-[#070b14]">
+      {/* 9:16 camera frame, sized by the screen height so the status bar stays in view */}
+      <div className="flex justify-center bg-[#04070d]">
+      <div
+        className="relative aspect-[9/16] max-w-full overflow-hidden bg-[#070b14]"
+        style={{ width: "min(100%, calc(max(320px, min(100dvh - 290px, 660px)) * 9 / 16))" }}
+      >
         {/* state tint */}
         <div
           className="absolute inset-0 transition-opacity duration-700"
@@ -215,7 +220,7 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
           }}
         />
 
-        <svg viewBox="40 60 300 395" preserveAspectRatio="xMidYMax meet" className="absolute inset-0 h-full w-full" role="img" aria-label="Seated posture with angle lines">
+        <svg viewBox="86 60 222 395" preserveAspectRatio="xMidYMax slice" className="absolute inset-0 h-full w-full" role="img" aria-label="Seated posture with angle lines">
           <defs>
             <radialGradient id="lp-room" cx="50%" cy="45%" r="45%">
               <stop offset="0" stopColor="#1b2840" />
@@ -373,6 +378,7 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
             </div>
           </>
         )}
+      </div>
       </div>
 
       {/* ---------- status bar ---------- */}
