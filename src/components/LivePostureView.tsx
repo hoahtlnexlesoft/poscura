@@ -1,0 +1,425 @@
+import { useEffect, useMemo, useRef, useState } from "react";
+import { AlertTriangle, CheckCircle2, Clock, Eye, Square } from "lucide-react";
+import { ScoreGauge } from "@/components/ScoreGauge";
+import { cn } from "@/lib/utils";
+
+/* ------------------------------------------------------------------------
+ * Live posture view (demo): a seated person at a desk, seen from the side,
+ * with angle lines, coaching banners and a Good / Adjust / Poor status bar.
+ * There is no real pose detection yet — the view cycles through a scripted
+ * sequence so the screen can be reviewed end to end.
+ * ---------------------------------------------------------------------- */
+
+type Level = "good" | "adjust" | "poor";
+type Pose = { lean: number; neck: number; shrug: number };
+
+interface Phase {
+  key: string;
+  level: Level;
+  /** coaching banner (none while posture is simply good) */
+  banner?: { tone: "warn" | "bad" | "ok"; kicker?: string; title: string; note?: string };
+  status: { word: string; note: string };
+  pose: Pose;
+  score: number;
+  /** which angle line is flagged */
+  flag?: "shoulders" | "torso";
+  ms: number;
+}
+
+const PHASES: Phase[] = [
+  {
+    key: "poor", level: "poor", flag: "torso", score: 54, ms: 7000,
+    pose: { lean: 32, neck: 48, shrug: 2 },
+    banner: { tone: "bad", kicker: "Spine & Torso · Leaning forward 32°", title: "Sit back so the chair supports your lower back." },
+    status: { word: "Poor", note: "Leaning forward 32°" },
+  },
+  {
+    key: "fixed-1", level: "good", score: 76, ms: 4000,
+    pose: { lean: 5, neck: 13, shrug: 0 },
+    banner: { tone: "ok", title: "Better. Keep it there.", note: "Corrected in 5 s." },
+    status: { word: "Good", note: "Keep it up." },
+  },
+  {
+    key: "good", level: "good", score: 82, ms: 7000,
+    pose: { lean: 4, neck: 12, shrug: 0 },
+    status: { word: "Good", note: "Keep it up." },
+  },
+  {
+    key: "adjust", level: "adjust", flag: "shoulders", score: 70, ms: 6000,
+    pose: { lean: 7, neck: 15, shrug: 12 },
+    banner: { tone: "warn", kicker: "Shoulders & Upper Back · Shoulders raised 14°", title: "Let your shoulders drop away from your ears." },
+    status: { word: "Adjust", note: "Shoulders raised 14°" },
+  },
+  {
+    key: "fixed-2", level: "good", score: 78, ms: 4000,
+    pose: { lean: 5, neck: 13, shrug: 0 },
+    banner: { tone: "ok", title: "Better. Keep it there.", note: "Corrected in 5 s." },
+    status: { word: "Good", note: "Keep it up." },
+  },
+];
+
+const LEVEL_TEXT: Record<Level, string> = { good: "text-success", adjust: "text-warning", poor: "text-destructive" };
+
+/* ---------------- geometry helpers ---------------- */
+type V = { x: number; y: number };
+const rad = (d: number) => (d * Math.PI) / 180;
+const add = (a: V, b: V): V => ({ x: a.x + b.x, y: a.y + b.y });
+const mul = (a: V, k: number): V => ({ x: a.x * k, y: a.y * k });
+/** "up" along a body segment leaning forward (to the left) by `a` degrees */
+const up = (a: number): V => ({ x: -Math.sin(rad(a)), y: -Math.cos(rad(a)) });
+/** "forward" (toward the desk) for a segment leaning by `a` degrees */
+const fwd = (a: number): V => ({ x: -Math.cos(rad(a)), y: Math.sin(rad(a)) });
+const dist = (a: V, b: V) => Math.hypot(a.x - b.x, a.y - b.y);
+
+/** two-bone IK: elbow position for shoulder s, wrist w, bone lengths l1 & l2 (elbow bends down) */
+function elbow(s: V, w: V, l1: number, l2: number): V {
+  const d = Math.min(Math.max(dist(s, w), Math.abs(l1 - l2) + 1), l1 + l2 - 0.5);
+  const a = (l1 * l1 - l2 * l2 + d * d) / (2 * d);
+  const h = Math.sqrt(Math.max(0, l1 * l1 - a * a));
+  const ux = (w.x - s.x) / d, uy = (w.y - s.y) / d;
+  const p = { x: s.x + ux * a, y: s.y + uy * a };
+  const e1 = { x: p.x - uy * h, y: p.y + ux * h };
+  const e2 = { x: p.x + uy * h, y: p.y - ux * h };
+  return e1.y > e2.y ? e1 : e2;
+}
+
+/** smooth closed path through points (Catmull-Rom → cubic Bézier) */
+function smooth(pts: V[]): string {
+  const n = pts.length;
+  let d = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+  for (let i = 0; i < n; i++) {
+    const p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+    const c1 = { x: p1.x + (p2.x - p0.x) / 6, y: p1.y + (p2.y - p0.y) / 6 };
+    const c2 = { x: p2.x - (p3.x - p1.x) / 6, y: p2.y - (p3.y - p1.y) / 6 };
+    d += ` C ${c1.x.toFixed(1)} ${c1.y.toFixed(1)}, ${c2.x.toFixed(1)} ${c2.y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+  }
+  return d + " Z";
+}
+
+/* fixed anchors of the scene (viewBox 360 × 640, person faces left) */
+const HIP: V = { x: 236, y: 430 };
+const KNEE: V = { x: 156, y: 440 };
+const ANKLE: V = { x: 150, y: 584 };
+const TOE: V = { x: 118, y: 597 };
+const WRIST: V = { x: 112, y: 357 };
+
+function body(p: Pose) {
+  const a1 = p.lean * 0.55, a2 = p.lean * 1.45; // lower / upper spine (upper curls more when slouching)
+  const mid = add(HIP, mul(up(a1), 80));
+  const c7 = add(mid, mul(up(a2), 80));
+  const shoulder = add(add(c7, add(mul(fwd(a2), 15), mul(up(a2), -17))), { x: 0, y: -p.shrug });
+  const neckTop = add(c7, mul(up(p.neck), 28));
+  const head = add(neckTop, add(mul(up(p.neck), 26), mul(fwd(p.neck), 4)));
+  const ear = add(head, add(mul(fwd(p.neck), -9), mul(up(p.neck), -3))); // ear sits toward the back of the head
+  const elb = elbow(shoulder, WRIST, 78, 74);
+
+  const hunch = p.lean * 0.3;
+  const torso = smooth([
+    add(HIP, { x: 24, y: 12 }), // seat, back
+    add(HIP, add(mul(fwd(a1), -24), mul(up(a1), 18))),
+    add(mid, mul(fwd((a1 + a2) / 2), -(23 + hunch * 0.6))),
+    add(mid, add(mul(up(a2), 46), mul(fwd(a2), -(22 + hunch)))), // upper back curve
+    add(c7, add(mul(fwd(a2), -8), mul(up(a2), -2))),
+    add(c7, add(mul(fwd(a2), 8), { x: 0, y: -p.shrug * 0.7 })), // trapezius (rises with shrug)
+    add(shoulder, add(mul(fwd(a2), 13), mul(up(a2), -6))), // front of shoulder
+    add(mid, add(mul(up(a2), 40), mul(fwd(a2), 28))), // chest
+    add(mid, mul(fwd((a1 + a2) / 2), 27)), // waist front
+    add(HIP, add(mul(fwd(a1), 31), mul(up(a1), 10))), // belly
+    add(HIP, { x: -26, y: 16 }), // lap
+  ]);
+  return { mid, c7, shoulder, neckTop, head, ear, elb, torso, a2 };
+}
+
+/* ---------------- component ---------------- */
+export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: () => void }) {
+  const [phaseIdx, setPhaseIdx] = useState(0);
+  const phase = PHASES[phaseIdx];
+  const [showLines, setShowLines] = useState(true);
+
+  // advance through the scripted phases
+  useEffect(() => {
+    const t = setTimeout(() => setPhaseIdx((i) => (i + 1) % PHASES.length), phase.ms);
+    return () => clearTimeout(t);
+  }, [phaseIdx, phase.ms]);
+
+  // animate pose + score toward the current phase
+  const [pose, setPose] = useState<Pose>(PHASES[0].pose);
+  const [score, setScore] = useState(PHASES[0].score);
+  const target = useRef({ pose: phase.pose, score: phase.score });
+  target.current = { pose: phase.pose, score: phase.score };
+  useEffect(() => {
+    const reduce = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    let raf = 0, last = performance.now();
+    const cur = { ...PHASES[0].pose, score: PHASES[0].score };
+    const tick = (now: number) => {
+      const k = reduce ? 1 : Math.min(1, ((now - last) / 1000) * 2.6);
+      last = now;
+      const t = target.current;
+      cur.lean += (t.pose.lean - cur.lean) * k;
+      cur.neck += (t.pose.neck - cur.neck) * k;
+      cur.shrug += (t.pose.shrug - cur.shrug) * k;
+      cur.score += (t.score - cur.score) * k;
+      setPose({ lean: cur.lean, neck: cur.neck, shrug: cur.shrug });
+      setScore(Math.round(cur.score));
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  // session average, sampled every second
+  const samples = useRef({ sum: 0, n: 0 });
+  const [avg, setAvg] = useState(PHASES[0].score);
+  const scoreRef = useRef(score);
+  scoreRef.current = score;
+  useEffect(() => {
+    const t = setInterval(() => {
+      samples.current.sum += scoreRef.current;
+      samples.current.n += 1;
+      setAvg(Math.round(samples.current.sum / samples.current.n));
+    }, 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  const b = useMemo(() => body(pose), [pose]);
+  const torsoDeg = Math.round(pose.lean);
+  const neckDeg = Math.round(pose.neck);
+
+  const lineColor = (f: Phase["flag"]) =>
+    phase.flag === f ? (phase.level === "poor" ? "var(--color-destructive)" : "var(--color-warning)") : "var(--color-primary)";
+
+  return (
+    <div>
+      {/* ---------- live view ---------- */}
+      <div className="relative aspect-[9/16] overflow-hidden bg-[#070b14]">
+        {/* state tint */}
+        <div
+          className="absolute inset-0 transition-opacity duration-700"
+          style={{
+            opacity: phase.level === "good" ? 0 : 1,
+            background:
+              phase.level === "poor"
+                ? "radial-gradient(120% 80% at 50% 45%, color-mix(in oklab, var(--color-destructive) 30%, transparent), transparent 70%)"
+                : "radial-gradient(120% 80% at 50% 45%, color-mix(in oklab, var(--color-warning) 22%, transparent), transparent 70%)",
+          }}
+        />
+
+        <svg viewBox="0 0 360 640" className="absolute inset-0 h-full w-full" role="img" aria-label="Seated posture with angle lines">
+          <defs>
+            <radialGradient id="lp-room" cx="45%" cy="38%" r="75%">
+              <stop offset="0" stopColor="#1b2840" />
+              <stop offset="1" stopColor="#070b14" />
+            </radialGradient>
+            <linearGradient id="lp-skin" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stopColor="#f0c3a3" />
+              <stop offset="1" stopColor="#c98d6c" />
+            </linearGradient>
+            <linearGradient id="lp-top" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stopColor="#d6404a" />
+              <stop offset="1" stopColor="#8f1d29" />
+            </linearGradient>
+            <linearGradient id="lp-pants" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#2b3954" />
+              <stop offset="1" stopColor="#18213a" />
+            </linearGradient>
+            <linearGradient id="lp-hair" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stopColor="#3a2a22" />
+              <stop offset="1" stopColor="#1a120e" />
+            </linearGradient>
+            <linearGradient id="lp-screen" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stopColor="#8ec1ff" stopOpacity="0" />
+              <stop offset="1" stopColor="#8ec1ff" stopOpacity="0.35" />
+            </linearGradient>
+            <filter id="lp-soft" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="6" />
+            </filter>
+            <filter id="lp-glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="3" result="b" />
+              <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+          </defs>
+
+          {/* room */}
+          <rect width="360" height="640" fill="url(#lp-room)" />
+          <g opacity="0.5" filter="url(#lp-soft)">
+            <rect x="196" y="70" width="120" height="150" rx="6" fill="#22324e" />
+            <rect x="40" y="96" width="110" height="70" rx="6" fill="#1c2a44" />
+          </g>
+          <rect x="0" y="600" width="360" height="40" fill="#0a0f1a" />
+          <ellipse cx="200" cy="604" rx="130" ry="10" fill="#000" opacity="0.45" filter="url(#lp-soft)" />
+
+          {/* chair */}
+          <g fill="#151d2e" stroke="#26324a" strokeWidth="1.5">
+            <path d="M 284 452 L 300 300 Q 304 286 316 290 L 318 296 L 306 452 Z" />
+            <rect x="186" y="444" width="112" height="14" rx="7" />
+            <rect x="238" y="458" width="10" height="112" />
+            <path d="M 186 590 L 300 590 L 296 580 L 190 580 Z" />
+          </g>
+
+          {/* desk + laptop */}
+          <g>
+            <rect x="-10" y="372" width="182" height="11" rx="2" fill="#2a3448" />
+            <rect x="12" y="383" width="8" height="217" fill="#1d2536" />
+            <rect x="150" y="383" width="8" height="217" fill="#1d2536" />
+            <path d="M 34 300 L 44 366 L 50 366 L 40 298 Z" fill="#9aa7bd" />
+            <path d="M 44 304 L 160 360 L 160 366 L 46 362 Z" fill="url(#lp-screen)" opacity="0.6" />
+            <rect x="44" y="364" width="98" height="8" rx="2" fill="#b7c2d4" />
+          </g>
+
+          {/* far arm (behind the body) */}
+          <path d={`M ${b.shoulder.x + 6} ${b.shoulder.y + 4} L ${b.elb.x + 8} ${b.elb.y - 2} L ${WRIST.x + 12} ${WRIST.y - 4}`}
+            fill="none" stroke="#a0626b" strokeOpacity="0.55" strokeWidth="15" strokeLinecap="round" strokeLinejoin="round" />
+
+          {/* legs */}
+          <path d={`M ${HIP.x} ${HIP.y + 6} L ${KNEE.x} ${KNEE.y}`} stroke="url(#lp-pants)" strokeWidth="38" strokeLinecap="round" />
+          <path d={`M ${KNEE.x} ${KNEE.y} L ${ANKLE.x} ${ANKLE.y}`} stroke="url(#lp-pants)" strokeWidth="26" strokeLinecap="round" />
+          <path d={`M ${ANKLE.x + 6} ${ANKLE.y + 4} L ${TOE.x} ${TOE.y}`} stroke="#0e121b" strokeWidth="14" strokeLinecap="round" />
+
+          {/* torso */}
+          <path d={b.torso} fill="url(#lp-top)" />
+          <path d={b.torso} fill="none" stroke="#ff8a8f" strokeOpacity="0.18" strokeWidth="2" />
+
+          {/* neck + head */}
+          <path d={`M ${b.c7.x - 2} ${b.c7.y + 4} L ${b.neckTop.x} ${b.neckTop.y}`} stroke="url(#lp-skin)" strokeWidth="17" strokeLinecap="round" />
+          <g transform={`translate(${b.head.x} ${b.head.y}) rotate(${-pose.neck * 0.75})`}>
+            <path d="M 14 -16 C 30 -12 32 6 20 14 L 10 4 Z" fill="url(#lp-hair)" />
+            <ellipse cx="0" cy="0" rx="23" ry="27" fill="url(#lp-skin)" />
+            <path d="M -22 -6 C -28 -2 -28 4 -23 6 Z" fill="#d79f80" />
+            <path d="M -21 13 C -16 22 -6 26 4 24" stroke="#b9805f" strokeOpacity="0.5" strokeWidth="2" fill="none" />
+            <path d="M -24 -10 C -24 -30 2 -36 18 -24 C 26 -16 26 -2 22 6 C 16 -4 6 -10 -2 -12 C -10 -14 -18 -14 -24 -10 Z" fill="url(#lp-hair)" />
+            <circle cx="24" cy="-22" r="10" fill="url(#lp-hair)" />
+            <ellipse cx="6" cy="2" rx="4" ry="6" fill="#c48868" />
+          </g>
+
+          {/* near arm */}
+          <path d={`M ${b.shoulder.x} ${b.shoulder.y} L ${b.elb.x} ${b.elb.y}`} stroke="url(#lp-top)" strokeWidth="18" strokeLinecap="round" />
+          <path d={`M ${b.elb.x} ${b.elb.y} L ${WRIST.x} ${WRIST.y}`} stroke="url(#lp-skin)" strokeWidth="13" strokeLinecap="round" />
+          <ellipse cx={WRIST.x - 9} cy={WRIST.y + 2} rx="11" ry="6" fill="url(#lp-skin)" />
+
+          {/* ---------- angle lines ---------- */}
+          <g className="transition-opacity duration-300" opacity={showLines ? 1 : 0}>
+            {/* vertical references */}
+            <line x1={HIP.x} y1={HIP.y} x2={HIP.x} y2={HIP.y - 170} stroke="#fff" strokeOpacity="0.28" strokeDasharray="4 5" />
+            <line x1={b.c7.x} y1={b.c7.y} x2={b.c7.x} y2={b.c7.y - 70} stroke="#fff" strokeOpacity="0.28" strokeDasharray="4 5" />
+
+            {/* torso + neck + thigh */}
+            <line x1={HIP.x} y1={HIP.y} x2={b.c7.x} y2={b.c7.y} stroke={lineColor("torso")} strokeWidth="3.5" strokeLinecap="round" filter="url(#lp-glow)" />
+            <line x1={b.c7.x} y1={b.c7.y} x2={b.ear.x} y2={b.ear.y} stroke="var(--color-primary)" strokeWidth="3.5" strokeLinecap="round" filter="url(#lp-glow)" />
+            <line x1={b.c7.x} y1={b.c7.y} x2={b.shoulder.x} y2={b.shoulder.y} stroke={lineColor("shoulders")} strokeWidth="3.5" strokeLinecap="round" filter="url(#lp-glow)" />
+            <line x1={HIP.x} y1={HIP.y} x2={KNEE.x} y2={KNEE.y} stroke="var(--color-primary)" strokeOpacity="0.7" strokeWidth="3" strokeLinecap="round" />
+
+            {/* joints */}
+            {[
+              { p: b.ear, c: "var(--color-primary)", hot: false },
+              { p: b.c7, c: "var(--color-primary)", hot: false },
+              { p: b.shoulder, c: lineColor("shoulders"), hot: phase.flag === "shoulders" },
+              { p: HIP, c: lineColor("torso"), hot: phase.flag === "torso" },
+              { p: KNEE, c: "var(--color-primary)", hot: false },
+            ].map((j, i) => (
+              <g key={i}>
+                {j.hot && <circle cx={j.p.x} cy={j.p.y} r="15" fill={j.c} opacity="0.22" />}
+                <circle cx={j.p.x} cy={j.p.y} r="6.5" fill="#0b1220" stroke={j.c} strokeWidth="3" />
+              </g>
+            ))}
+
+            {/* labels */}
+            <g fontSize="10" fontFamily="Quicksand, sans-serif" fill="#cfd8ea" opacity="0.75">
+              <text x={b.c7.x + 10} y={b.c7.y + 4}>C7</text>
+              <text x={HIP.x + 12} y={HIP.y + 4}>Mid hip</text>
+            </g>
+
+            {/* angle values */}
+            <AngleBadge x={(HIP.x + b.c7.x) / 2 + 16} y={(HIP.y + b.c7.y) / 2} value={torsoDeg} color={lineColor("torso")} big={phase.flag === "torso"} />
+            <AngleBadge x={Math.max(b.ear.x, b.c7.x) + 14} y={(b.ear.y + b.c7.y) / 2} value={neckDeg} color="var(--color-primary)" />
+            {phase.flag === "shoulders" && (
+              <AngleBadge x={b.shoulder.x - 50} y={b.shoulder.y + 8} value={14} color={lineColor("shoulders")} big />
+            )}
+          </g>
+        </svg>
+
+        {/* top: live pill + coaching banner */}
+        <div className="absolute inset-x-3 top-3 space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-destructive/40 bg-destructive/20 px-2.5 py-1 text-[11px] font-medium text-destructive backdrop-blur-sm">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-destructive" /> Live monitoring
+            </span>
+            <span className="text-[11px] text-muted-foreground">Tilt 10°</span>
+          </div>
+          {phase.banner && <CoachBanner key={phase.key} {...phase.banner} />}
+        </div>
+
+        {/* angle lines toggle */}
+        <button
+          type="button"
+          onClick={() => setShowLines((v) => !v)}
+          className="absolute bottom-3 right-3 rounded-full border border-white/15 bg-black/55 px-3 py-1.5 text-[11px] font-medium text-white/90 backdrop-blur-md"
+        >
+          {showLines ? "Hide angle lines" : "Show angle lines"}
+        </button>
+      </div>
+
+      {/* ---------- status bar ---------- */}
+      <div className="space-y-3 border-t border-border p-4">
+        <div className="flex items-center gap-3">
+          <ScoreGauge value={score} size={70} />
+          <div className="min-w-0 flex-1">
+            <div className={cn("text-2xl font-semibold leading-none transition-colors", LEVEL_TEXT[phase.level])}>{phase.status.word}</div>
+            <div className="mt-1 truncate text-[11px] text-muted-foreground">{phase.status.note}</div>
+          </div>
+          <div className="flex flex-col items-end gap-1.5">
+            <span className="inline-flex items-center gap-1 rounded-full bg-muted/60 px-2.5 py-1 text-[11px] tabular-nums">
+              <Clock className="h-3 w-3 text-muted-foreground" /> {timeLeft}
+              <span className="text-muted-foreground">left</span>
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-muted/60 px-2.5 py-1 text-[11px]">
+              <span className="text-muted-foreground">Avg</span> <b className="tabular-nums">{avg}</b>
+            </span>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={onEnd}
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-secondary py-3 text-sm font-semibold text-primary-foreground shadow-lg glow-primary"
+        >
+          <Square className="h-3.5 w-3.5 fill-current" /> End session
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function AngleBadge({ x, y, value, color, big }: { x: number; y: number; value: number; color: string; big?: boolean }) {
+  return (
+    <text
+      x={x}
+      y={y}
+      fontFamily="Quicksand, sans-serif"
+      fontWeight="700"
+      fontSize={big ? 22 : 14}
+      fill={color}
+      stroke="#070b14"
+      strokeWidth="3"
+      paintOrder="stroke"
+    >
+      {value}°
+    </text>
+  );
+}
+
+function CoachBanner({ tone, kicker, title, note }: NonNullable<Phase["banner"]>) {
+  const styles = {
+    warn: { box: "border-warning/80 bg-black/70", icon: <Eye className="h-5 w-5 text-warning" />, kicker: "text-warning" },
+    bad: { box: "border-destructive/80 bg-black/70", icon: <AlertTriangle className="h-5 w-5 text-destructive" />, kicker: "text-destructive" },
+    ok: { box: "border-success/80 bg-black/70", icon: <CheckCircle2 className="h-5 w-5 text-success" />, kicker: "text-success" },
+  }[tone];
+  return (
+    <div className={cn("flex items-start gap-3 rounded-2xl border-2 px-3.5 py-3 backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-300", styles.box)}>
+      <div className="mt-0.5 shrink-0">{styles.icon}</div>
+      <div className="min-w-0">
+        {kicker && <div className={cn("text-[9.5px] font-semibold uppercase tracking-wide", styles.kicker)}>{kicker}</div>}
+        <div className="text-[15px] font-semibold leading-snug text-white">{title}</div>
+        {note && <div className="mt-0.5 text-[11px] text-white/60">{note}</div>}
+      </div>
+    </div>
+  );
+}

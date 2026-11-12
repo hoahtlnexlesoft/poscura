@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Square, Play, Camera, Activity, Settings } from "lucide-react";
+import { Play, Camera, Activity, Settings } from "lucide-react";
 import { ScoreGauge } from "@/components/ScoreGauge";
 import { DiscomfortDialog } from "@/components/DiscomfortDialog";
 import { SessionReport } from "@/components/SessionReport";
 import { MonitoringTimeLeft } from "@/components/MonitoringTimeLeft";
 import { CameraSettingDialog } from "@/components/CameraSettingDialog";
+import { LivePostureView } from "@/components/LivePostureView";
 
 export const Route = createFileRoute("/posture-monitor")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -83,27 +84,7 @@ function PostureMonitor() {
             </button>
           </div>
         ) : (
-          <div>
-            <div className="aspect-[9/16] bg-gradient-to-br from-muted via-card to-background flex items-center justify-center">
-              <div className="text-center">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-destructive/20 border border-destructive/40 text-destructive text-xs font-medium animate-pulse">
-                  <span className="h-2 w-2 rounded-full bg-destructive" /> Live monitoring
-                </div>
-                <div className="mt-3 text-xs text-muted-foreground">Tilt 10°</div>
-              </div>
-            </div>
-            <div className="flex items-center justify-between gap-3 p-4 border-t border-border">
-              <ScoreGauge value={40} size={70} />
-              <button onClick={handleStop}
-                className="px-6 py-2.5 rounded-full bg-destructive text-destructive-foreground text-sm font-medium flex items-center gap-2 shadow-lg">
-                <Square className="h-3.5 w-3.5 fill-current" /> Stop
-              </button>
-              <div className="flex items-center gap-1.5 whitespace-nowrap">
-                <span className="text-[10px] text-muted-foreground">Time left</span>
-                <span className="text-lg font-bold tabular-nums">{mm}:{ss}</span>
-              </div>
-            </div>
-          </div>
+          <LivePostureView timeLeft={`${mm}:${ss}`} onEnd={handleStop} />
         )}
       </section>
 
