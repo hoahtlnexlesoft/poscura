@@ -144,7 +144,7 @@ function body(p: Pose) {
 export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: () => void }) {
   const [phaseIdx, setPhaseIdx] = useState(0);
   const phase = PHASES[phaseIdx];
-  const [showLines, setShowLines] = useState(true);
+  const showLines = true; // angle lines are always shown
 
   // advance through the scripted phases
   useEffect(() => {
@@ -215,7 +215,7 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
           }}
         />
 
-        <svg viewBox="0 150 360 466" className="absolute inset-0 h-full w-full" role="img" aria-label="Seated posture with angle lines">
+        <svg viewBox="0 0 360 616" preserveAspectRatio="xMidYMax meet" className="absolute inset-0 h-full w-full" role="img" aria-label="Seated posture with angle lines">
           <defs>
             <radialGradient id="lp-room" cx="50%" cy="45%" r="45%">
               <stop offset="0" stopColor="#1b2840" />
@@ -346,31 +346,11 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
           </g>
         </svg>
 
-        {/* top row: live indicator + angle lines toggle */}
-        <div className="absolute inset-x-3.5 top-3 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-[11px] font-medium text-white/70">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-60" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-destructive" />
-            </span>
-            Live
-            <span className="text-white/30">·</span>
-            <span className="text-white/50">Tilt 10°</span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setShowLines((v) => !v)}
-            className="rounded-full border border-white/12 bg-black/45 px-2.5 py-1 text-[10.5px] font-medium text-white/80 backdrop-blur-md"
-          >
-            {showLines ? "Hide angle lines" : "Show angle lines"}
-          </button>
-        </div>
-
-        {/* coaching card sits over the legs, so head and back stay in view */}
+        {/* coaching card over the empty room above the head */}
         {phase.banner && (
           <>
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#070b14]/90 via-[#070b14]/50 to-transparent" />
-            <div className="absolute inset-x-3 bottom-3">
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-[#070b14]/80 to-transparent" />
+            <div className="absolute inset-x-3 top-3">
               <CoachBanner key={phase.key} {...phase.banner} />
             </div>
           </>
@@ -481,7 +461,7 @@ function CoachBanner({ tone, kicker, title, note, more, fixed }: NonNullable<Pha
   }
   return (
     <div
-      className="relative flex items-start gap-2.5 rounded-2xl bg-black/75 px-3.5 py-3 backdrop-blur-md animate-in fade-in slide-in-from-bottom-2 duration-300"
+      className="relative flex items-start gap-2.5 rounded-2xl bg-black/75 px-3.5 py-3 backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-300"
       style={{
         boxShadow: `0 12px 32px -14px color-mix(in oklab, ${t.color} 55%, transparent)`,
       }}
