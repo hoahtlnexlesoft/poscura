@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 import {
   Heart, MessageCircle, Share2, BadgeCheck, Send, X,
   Facebook, Twitter, Linkedin, MessageSquare, Link2, ImageIcon, Smile,
-  Search, SlidersHorizontal, Check,
+  Search, SlidersHorizontal, Check, Hash, Flame, Clock3, Layers,
 } from "lucide-react";
 
 const FILTERS = ["All Feeds", "Expert Advice", "Milestone", "Question", "Posture Tip", "Success Story"];
@@ -125,7 +126,14 @@ function CommunityPage() {
   if (sortBy === "popular") filtered = [...filtered].sort((a, b) => b.likes - a.likes);
 
   return (
-    <div className="space-y-3 pb-20 fold:max-w-[680px] fold:mx-auto">
+    <div className="pb-20 fold:mx-auto fold:grid fold:max-w-[980px] fold:grid-cols-[220px_minmax(0,1fr)] fold:items-start fold:gap-6 fold:pb-6">
+      <CommunitySide
+        posts={posts}
+        category={category} setCategory={setCategory}
+        sortBy={sortBy} setSortBy={setSortBy}
+        selectedTags={selectedTags} setSelectedTags={setSelectedTags}
+      />
+      <div className="space-y-3 fold:col-start-2 fold:row-start-1">
       <div className="sticky top-14 -mx-4 px-4 py-2 z-20 bg-background/80 backdrop-blur-xl border-b border-border/50 space-y-2">
         <div className="flex items-center gap-2">
           <h1 className="text-xl font-bold flex-1">Community</h1>
@@ -140,7 +148,7 @@ function CommunityPage() {
           >
             <Search className="h-4 w-4" />
           </button>
-          <div className="relative">
+          <div className="relative fold:hidden">
             <button
               onClick={() => setFilterOpen((o) => !o)}
               aria-label="Filter"
@@ -243,6 +251,7 @@ function CommunityPage() {
           </footer>
         </article>
       ))}
+      </div>
       </div>
 
       {commentPost && (
@@ -440,5 +449,94 @@ function FilterPanel({
           className="w-full py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold">Apply</button>
       </div>
     </>
+  );
+}
+
+/** Foldable-only side pane: feeds with counts, sort, trending tags. */
+function CommunitySide({
+  posts, category, setCategory, sortBy, setSortBy, selectedTags, setSelectedTags,
+}: {
+  posts: Post[];
+  category: string; setCategory: (c: string) => void;
+  sortBy: SortKey; setSortBy: (s: SortKey) => void;
+  selectedTags: string[]; setSelectedTags: (t: string[]) => void;
+}) {
+  const count = (f: string) => (f === "All Feeds" ? posts.length : posts.filter((p) => p.category === f).length);
+  const tagCount = (t: string) =>
+    posts.filter((p) => (p.hashtags || []).some((h) => h.toLowerCase() === t.toLowerCase()) || p.text.toLowerCase().includes(t.toLowerCase())).length;
+  const tags = [...POPULAR_TAGS].sort((a, b) => tagCount(b) - tagCount(a));
+  const toggleTag = (t: string) =>
+    setSelectedTags(selectedTags.includes(t) ? selectedTags.filter((x) => x !== t) : [...selectedTags, t]);
+  return (
+    <aside className="hidden fold:sticky fold:top-[72px] fold:col-start-1 fold:row-start-1 fold:block fold:space-y-3">
+      <section className="glass-card p-2">
+        <div className="flex items-center gap-1.5 px-2.5 pb-1.5 pt-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+          <Layers className="h-3.5 w-3.5" /> Feeds
+        </div>
+        <nav className="space-y-0.5">
+          {FILTERS.map((f) => {
+            const on = category === f;
+            return (
+              <button
+                key={f}
+                onClick={() => setCategory(f)}
+                className={cn(
+                  "relative flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-left text-[13px] transition",
+                  on ? "bg-primary/12 font-semibold text-foreground" : "text-muted-foreground hover:bg-muted/40 hover:text-foreground",
+                )}
+              >
+                {on && <span className="absolute inset-y-2 left-0 w-[3px] rounded-r-full bg-primary" />}
+                {f}
+                <span className={cn("text-[11px] tabular-nums", on ? "text-primary" : "text-muted-foreground/70")}>{count(f)}</span>
+              </button>
+            );
+          })}
+        </nav>
+      </section>
+
+      <section className="glass-card p-3">
+        <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">Sort</div>
+        <div className="grid grid-cols-2 gap-1 rounded-lg bg-muted/40 p-1">
+          {([["recent", "Recent", Clock3], ["popular", "Popular", Flame]] as const).map(([k, l, I]) => (
+            <button
+              key={k}
+              onClick={() => setSortBy(k)}
+              className={cn(
+                "flex h-8 items-center justify-center gap-1.5 rounded-md text-xs font-medium transition",
+                sortBy === k ? "bg-background text-foreground shadow" : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              <I className="h-3.5 w-3.5" /> {l}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="glass-card p-3">
+        <div className="mb-2 flex items-center justify-between">
+          <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground"><Hash className="h-3.5 w-3.5" /> Trending</span>
+          {selectedTags.length > 0 && (
+            <button onClick={() => setSelectedTags([])} className="text-[11px] font-medium text-primary hover:underline">Clear</button>
+          )}
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {tags.map((t) => {
+            const on = selectedTags.includes(t);
+            return (
+              <button
+                key={t}
+                onClick={() => toggleTag(t)}
+                className={cn(
+                  "rounded-full border px-2.5 py-1 text-[11.5px] font-medium transition",
+                  on ? "border-primary/60 bg-primary/15 text-primary" : "border-border text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {t}
+              </button>
+            );
+          })}
+        </div>
+      </section>
+    </aside>
   );
 }

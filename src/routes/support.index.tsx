@@ -92,13 +92,14 @@ function SupportPage() {
         <h1 className="text-base font-semibold">FAQs</h1>
       </header>
 
-      <div className="relative p-4 pt-6 flex-1 fold:px-6 fold:pt-8">
+      <div className="relative p-4 pt-6 flex-1 fold:mx-auto fold:w-full fold:max-w-[1000px] fold:px-6 fold:pt-8">
         <div aria-hidden className="pointer-events-none absolute -top-10 -left-10 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
-        <div className="relative">
+        <div className="relative fold:grid fold:grid-cols-[minmax(0,290px)_minmax(0,1fr)] fold:items-start fold:gap-8">
+          <div className="fold:sticky fold:top-[72px]">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-primary">
             <span className="h-1.5 w-1.5 rounded-full bg-secondary" /> Help center
           </span>
-          <h2 className="mt-3 text-[26px] font-bold leading-tight tracking-tight fold:text-[32px]">
+          <h2 className="mt-3 text-[26px] font-bold leading-tight tracking-tight fold:text-[30px]">
             Frequently{" "}
             <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Asked Questions</span>
           </h2>
@@ -106,7 +107,7 @@ function SupportPage() {
             Everything you need to know about Poscura — your AI-powered posture coach.
           </p>
 
-          <div className="mt-5 flex max-w-[500px] items-center gap-2 rounded-xl border border-border bg-card/60 px-3 h-10 focus-within:border-primary/50 transition-colors">
+          <div className="mt-5 flex max-w-[500px] fold:max-w-none items-center gap-2 rounded-xl border border-border bg-card/60 px-3 h-10 focus-within:border-primary/50 transition-colors">
             <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
             <input
               value={q}
@@ -119,24 +120,30 @@ function SupportPage() {
             )}
           </div>
 
-          <div className="-mx-4 mt-5 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden fold:mx-0 fold:flex-wrap fold:px-0">
+          <div className="-mx-4 mt-5 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden fold:mx-0 fold:flex-col fold:gap-0.5 fold:overflow-visible fold:px-0">
             {TOPICS.map((t) => (
               <button
                 key={t.id}
                 onClick={() => setTopic(t.id)}
                 className={cn(
-                  "shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors",
+                  "shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors fold:relative fold:flex fold:items-center fold:justify-between fold:rounded-lg fold:border-0 fold:px-3 fold:py-2.5 fold:text-left fold:text-[13px]",
                   topic === t.id
-                    ? "border-transparent bg-gradient-to-r from-primary to-secondary text-white"
-                    : "border-border bg-card/60 text-muted-foreground hover:text-foreground",
+                    ? "border-transparent bg-gradient-to-r from-primary to-secondary text-white fold:bg-none fold:bg-primary/12 fold:font-semibold fold:text-foreground"
+                    : "border-border bg-card/60 text-muted-foreground hover:text-foreground fold:bg-transparent fold:hover:bg-muted/40",
                 )}
               >
+                {topic === t.id && <span className="absolute inset-y-2 left-0 hidden w-[3px] rounded-r-full bg-primary fold:block" />}
                 {t.label}
+                <span className={cn("ml-2 hidden text-[11px] tabular-nums fold:inline", topic === t.id ? "text-primary" : "text-muted-foreground/70")}>
+                  {t.id === "all" ? faqs.length : faqs.filter((f) => f.topic === t.id).length}
+                </span>
               </button>
             ))}
           </div>
 
-          <div className="mt-4 border-t border-border pt-4">
+          </div>
+
+          <div className="mt-4 border-t border-border pt-4 fold:mt-0 fold:border-0 fold:pt-0">
             {list.length === 0 ? (
               <p className="py-10 text-center text-sm text-muted-foreground">No questions match your search.</p>
             ) : (

@@ -115,8 +115,8 @@ function AuthGate() {
     return <div className="min-h-screen bg-background" />;
   }
 
-  const hideTopBar = location.pathname === "/account" || location.pathname === "/settings" || location.pathname === "/support";
   const isOnboarding = location.pathname === "/onboarding";
+  const hideTopBar = isOnboarding || location.pathname === "/account" || location.pathname === "/settings" || location.pathname === "/support";
   return (
     <div className={`flex flex-col min-h-screen w-full bg-background text-foreground ${isOnboarding ? "" : "rail:pr-[92px]"}`}>
       {!hideTopBar && <MobileTopBar />}
