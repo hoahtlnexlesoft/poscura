@@ -14,9 +14,6 @@ type Item = {
 };
 
 const SEED: Item[] = [
-  { id: "1", category: "posture", title: "Posture alert", body: "Slouching for 15 minutes. Reset!", time: "2m", ago: "2 minutes ago", unread: true,
-    detail: "You've been leaning forward for the last 15 minutes. Sit back, let your shoulders drop and bring your ears over your shoulders.",
-    action: { label: "Open Posture Monitor", to: "/posture-monitor" } },
   { id: "2", category: "workout", title: "Workout reminder", body: "Mobility session in 5 min.", time: "20m", ago: "20 minutes ago", unread: true,
     detail: "Your neck mobility session starts in 5 minutes. It takes about 8 minutes and needs no equipment.",
     action: { label: "Go to Workout", to: "/workout" } },
