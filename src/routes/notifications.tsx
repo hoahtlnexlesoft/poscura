@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { ChevronLeft, Bell, Activity, Dumbbell, Users, AlertTriangle, FileText, ArrowRight, CheckCheck, BellOff } from "lucide-react";
+import { ChevronLeft, Bell, Activity, Dumbbell, Users, AlertTriangle, FileText, CheckCheck, BellOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/notifications")({ component: NotificationsPage });
@@ -14,6 +14,9 @@ type Item = {
 };
 
 const SEED: Item[] = [
+  { id: "1", category: "posture", title: "Posture alert", body: "Slouching for 15 minutes. Reset!", time: "2m", ago: "2 minutes ago", unread: true,
+    detail: "You've been leaning forward for the last 15 minutes. Sit back, let your shoulders drop and bring your ears over your shoulders.",
+    action: { label: "Open Posture Monitor", to: "/posture-monitor" } },
   { id: "2", category: "workout", title: "Workout reminder", body: "Mobility session in 5 min.", time: "20m", ago: "20 minutes ago", unread: true,
     detail: "Your neck mobility session starts in 5 minutes. It takes about 8 minutes and needs no equipment.",
     action: { label: "Go to Workout", to: "/workout" } },
@@ -40,23 +43,18 @@ function NotificationsPage() {
   const navigate = useNavigate();
   const [items, setItems] = useState(SEED);
   const [tab, setTab] = useState<"all" | "unread">("all");
-  const [sel, setSel] = useState(SEED[0].id);
   const unread = items.filter((n) => n.unread).length;
   const list = tab === "unread" ? items.filter((n) => n.unread) : items;
-  const current = items.find((n) => n.id === sel) ?? items[0];
 
   const markRead = (id: string) => setItems((xs) => xs.map((x) => (x.id === id ? { ...x, unread: false } : x)));
-  const isFold = () => typeof window !== "undefined" && window.matchMedia("(min-width: 600px)").matches;
 
   const open = (n: Item) => {
     markRead(n.id);
-    setSel(n.id);
-    // phones go straight to the target; foldables show the detail pane
-    if (!isFold()) navigate({ to: n.action.to, search: n.action.search as never });
+    navigate({ to: n.action.to, search: n.action.search as never });
   };
 
   return (
-    <div className="fold:mx-auto fold:max-w-[980px]">
+    <div className="fold:max-w-[640px]">
       <div className="flex items-center justify-between">
         <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
           <ChevronLeft className="h-4 w-4" /> Back
@@ -77,7 +75,7 @@ function NotificationsPage() {
         </button>
       </div>
 
-      <div className="mt-4 fold:grid fold:grid-cols-[minmax(0,340px)_minmax(0,1fr)] land:grid-cols-2 fold:items-start fold:gap-5 land:gap-x-6">
+      <div className="mt-4">
         {/* list */}
         <section>
           <div className="mb-3 inline-flex rounded-xl bg-muted/40 p-1">
@@ -106,17 +104,13 @@ function NotificationsPage() {
           ) : (
             <div className="glass-card overflow-hidden p-1.5">
               {list.map((n) => {
-                const m = META[n.category]; const Icon = m.icon; const on = n.id === current.id;
+                const m = META[n.category]; const Icon = m.icon;
                 return (
                   <button
                     key={n.id}
                     onClick={() => open(n)}
-                    className={cn(
-                      "relative flex w-full items-start gap-3 rounded-xl p-3 text-left transition",
-                      on ? "fold:bg-primary/10" : "hover:bg-muted/30",
-                    )}
+                    className="relative flex w-full items-start gap-3 rounded-xl p-3 text-left transition hover:bg-muted/30"
                   >
-                    {on && <span className="absolute inset-y-3 left-0 hidden w-[3px] rounded-r-full bg-primary fold:block" />}
                     <span className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-full border", m.tone)}>
                       <Icon className="h-4 w-4" />
                     </span>
@@ -137,39 +131,6 @@ function NotificationsPage() {
           )}
         </section>
 
-        {/* detail (foldables) */}
-        <section className="hidden fold:sticky fold:top-[72px] fold:mt-11 fold:block">
-          <Detail n={current} />
-        </section>
-      </div>
-    </div>
-  );
-}
-
-function Detail({ n }: { n: Item }) {
-  const m = META[n.category]; const Icon = m.icon;
-  return (
-    <div key={n.id} className="glass-card relative overflow-hidden p-6 animate-in fade-in duration-200">
-      <div aria-hidden className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-primary/10 blur-3xl" />
-      <div className="relative">
-        <div className="flex items-center gap-3">
-          <span className={cn("flex h-12 w-12 items-center justify-center rounded-2xl border", m.tone)}>
-            <Icon className="h-5 w-5" />
-          </span>
-          <div>
-            <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">{m.label}</div>
-            <div className="text-xs text-muted-foreground">{n.ago}</div>
-          </div>
-        </div>
-        <h2 className="mt-5 text-xl font-bold tracking-tight">{n.title}</h2>
-        <p className="mt-2 max-w-[460px] text-sm leading-relaxed text-muted-foreground">{n.detail}</p>
-        <Link
-          to={n.action.to}
-          search={n.action.search as never}
-          className="mt-6 inline-flex h-11 items-center gap-2 rounded-xl bg-gradient-to-r from-primary to-secondary px-5 text-sm font-semibold text-white shadow-[0_10px_30px_-12px] shadow-primary transition hover:opacity-95"
-        >
-          {n.action.label} <ArrowRight className="h-4 w-4" />
-        </Link>
       </div>
     </div>
   );
