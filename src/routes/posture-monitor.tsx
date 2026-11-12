@@ -69,7 +69,7 @@ function PostureMonitor() {
   ];
 
   return (
-    <div data-fit-bound className="space-y-4 fold:grid fold:grid-cols-[auto_minmax(0,1fr)] land:grid-cols-2 fold:grid-rows-[auto_1fr] land:gap-x-6 fold:gap-5 fold:space-y-0 fold:items-stretch">
+    <div data-fit-bound className="space-y-4 fold:grid fold:grid-cols-[auto_minmax(0,1fr)] fold:grid-rows-[auto_1fr] fold:gap-5 fold:space-y-0 fold:items-stretch">
       <div className="fold:col-start-2 fold:row-start-1 fold:self-start"><MonitoringTimeLeft /></div>
 
 
