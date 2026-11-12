@@ -44,7 +44,21 @@ function WorkoutPage() {
     const w = TODAYS_WORKOUTS.find((x) => x.name === view.name);
     return <ExerciseIntro name={view.name} session={(w?.done ?? 0) + 1} sessions={w?.sessions ?? 1} onBack={() => setView({ kind: "list" })} onStart={() => setView({ kind: "session", name: view.name })} />;
   }
-  if (view.kind === "session") return <WorkoutSession workoutName={view.name} onClose={() => setView({ kind: "list" })} onFinish={(url) => setView({ kind: "assessment", name: view.name, recordedUrl: url })} />;
+  if (view.kind === "session") {
+    const idx = TODAYS_WORKOUTS.findIndex((x) => x.name === view.name);
+    const w = TODAYS_WORKOUTS[idx];
+    const next = idx >= 0 ? TODAYS_WORKOUTS[idx + 1] : undefined;
+    return (
+      <WorkoutSession
+        workoutName={view.name}
+        session={(w?.done ?? 0) + 1}
+        sessions={w?.sessions ?? 1}
+        onClose={() => setView({ kind: "list" })}
+        onFinish={(url) => setView({ kind: "assessment", name: view.name, recordedUrl: url })}
+        onNext={next ? () => setView({ kind: "intro", name: next.name }) : undefined}
+      />
+    );
+  }
   if (view.kind === "assessment") return <WorkoutAssessment workoutName={view.name} recordedVideoUrl={view.recordedUrl} onClose={() => setView({ kind: "list" })} />;
   if (view.kind === "exercise") return <ExerciseDetail exerciseName={view.name} badge="Completed" onClose={() => setView({ kind: "list" })} />;
   if (view.kind === "program") return <WorkoutProgramDetail onClose={() => setView({ kind: "list" })} onStartSession={(name) => setView({ kind: "intro", name })} />;

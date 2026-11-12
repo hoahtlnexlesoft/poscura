@@ -1,3 +1,4 @@
+import { useImmersive } from "@/hooks/useImmersive";
 import { useState } from "react";
 import { Armchair, ChevronLeft, Play, ShieldCheck, SkipForward, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -15,6 +16,7 @@ export function ExerciseIntro({
   name, session = 1, sessions = 1, onBack, onStart,
 }: { name: string; session?: number; sessions?: number; onBack: () => void; onStart: () => void }) {
   const g = guideFor(name);
+  useImmersive();
   const [tab, setTab] = useState<Tab>("steps");
   const items = g[tab];
 
@@ -125,7 +127,7 @@ function Info({ icon, label, value }: { icon: React.ReactNode; label: string; va
 }
 
 /** Looping demo of the movement, styled as a video. */
-function Figure({ motion }: { motion: Motion }) {
+export function Figure({ motion, light = false }: { motion: Motion; light?: boolean }) {
   const D = "5s";
   const head = {
     tilt: <animateTransform attributeName="transform" type="rotate" additive="sum" values="0;-22;0;22;0" dur={D} repeatCount="indefinite" />,
@@ -142,17 +144,21 @@ function Figure({ motion }: { motion: Motion }) {
       : null;
   return (
     <>
-      <svg viewBox="0 0 200 125" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 h-full w-full" aria-hidden>
+      <svg viewBox={light ? "56 18 88 112" : "0 0 200 125"} preserveAspectRatio={light ? "xMidYMax meet" : "xMidYMid slice"} className="absolute inset-0 h-full w-full" aria-hidden>
         <defs>
           <linearGradient id="ei-skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#f0c3a3" /><stop offset="1" stopColor="#c98d6c" /></linearGradient>
           <linearGradient id="ei-tee" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#8a4644" /><stop offset="1" stopColor="#4f2526" /></linearGradient>
           <linearGradient id="ei-hair" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#7a5640" /><stop offset="1" stopColor="#3e2a1e" /></linearGradient>
         </defs>
         {/* back wall + chair back */}
-        <rect x="0" y="0" width="200" height="125" fill="#0c1628" />
-        <rect x="30" y="18" width="46" height="30" rx="2" fill="#16284a" opacity="0.7" />
-        <rect x="132" y="22" width="40" height="22" rx="2" fill="#16284a" opacity="0.5" />
-        <rect x="64" y="70" width="72" height="60" rx="10" fill="#141c2c" />
+        {!light && (
+          <>
+            <rect x="0" y="0" width="200" height="125" fill="#0c1628" />
+            <rect x="30" y="18" width="46" height="30" rx="2" fill="#16284a" opacity="0.7" />
+            <rect x="132" y="22" width="40" height="22" rx="2" fill="#16284a" opacity="0.5" />
+          </>
+        )}
+        <rect x="64" y="70" width="72" height="60" rx="10" fill={light ? "#2a7fa6" : "#141c2c"} opacity={light ? 0.35 : 1} />
         {/* torso */}
         <g transform="translate(100 0)">
           {motion === "twist" && <animateTransform attributeName="transform" type="scale" additive="sum" values="1 1;0.78 1;1 1;0.78 1;1 1" dur={D} repeatCount="indefinite" />}
@@ -188,6 +194,7 @@ function Figure({ motion }: { motion: Motion }) {
           </g>
         </g>
       </svg>
+      {!light && (<>
       {/* video chrome */}
       <span className="absolute left-3 top-3 rounded-full bg-black/50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-white/80 backdrop-blur">Demo</span>
       <div className="absolute inset-x-3 bottom-3 flex items-center gap-2.5">
@@ -198,6 +205,7 @@ function Figure({ motion }: { motion: Motion }) {
         <span className="text-[10.5px] tabular-nums text-white/80">0:05</span>
       </div>
       <style>{"@keyframes ei-progress{from{transform:scaleX(0)}to{transform:scaleX(1)}}"}</style>
+      </>)}
     </>
   );
 }
