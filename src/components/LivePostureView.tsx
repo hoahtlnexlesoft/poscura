@@ -200,7 +200,7 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
   return (
     <div>
       {/* ---------- live view ---------- */}
-      <div className="relative aspect-[9/16] overflow-hidden bg-[#070b14]">
+      <div className="relative h-[clamp(300px,calc(100dvh-330px),620px)] overflow-hidden bg-[#070b14]">
         {/* state tint */}
         <div
           className="absolute inset-0 transition-opacity duration-700"
@@ -213,9 +213,9 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
           }}
         />
 
-        <svg viewBox="0 0 360 640" className="absolute inset-0 h-full w-full" role="img" aria-label="Seated posture with angle lines">
+        <svg viewBox="0 150 360 466" className="absolute inset-0 h-full w-full" role="img" aria-label="Seated posture with angle lines">
           <defs>
-            <radialGradient id="lp-room" cx="45%" cy="38%" r="75%">
+            <radialGradient id="lp-room" cx="50%" cy="45%" r="45%">
               <stop offset="0" stopColor="#1b2840" />
               <stop offset="1" stopColor="#070b14" />
             </radialGradient>
@@ -249,12 +249,12 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
           </defs>
 
           {/* room */}
-          <rect width="360" height="640" fill="url(#lp-room)" />
+          <rect x="-400" y="0" width="1160" height="640" fill="url(#lp-room)" />
           <g opacity="0.5" filter="url(#lp-soft)">
             <rect x="196" y="70" width="120" height="150" rx="6" fill="#22324e" />
             <rect x="40" y="96" width="110" height="70" rx="6" fill="#1c2a44" />
           </g>
-          <rect x="0" y="600" width="360" height="40" fill="#0a0f1a" />
+          <rect x="-400" y="600" width="1160" height="400" fill="#0a0f1a" />
           <ellipse cx="200" cy="604" rx="130" ry="10" fill="#000" opacity="0.45" filter="url(#lp-soft)" />
 
           {/* chair */}
@@ -346,58 +346,60 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
           </g>
         </svg>
 
-        {/* top: live pill + coaching banner */}
-        <div className="absolute inset-x-3.5 top-3.5 space-y-3">
+        {/* top row: live indicator + angle lines toggle */}
+        <div className="absolute inset-x-3.5 top-3 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 text-[11px] font-medium text-white/70">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-60" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-destructive" />
             </span>
-            Live monitoring
+            Live
             <span className="text-white/30">·</span>
             <span className="text-white/50">Tilt 10°</span>
           </div>
-          {phase.banner && <CoachBanner key={phase.key} {...phase.banner} />}
+          <button
+            type="button"
+            onClick={() => setShowLines((v) => !v)}
+            className="rounded-full border border-white/12 bg-black/45 px-2.5 py-1 text-[10.5px] font-medium text-white/80 backdrop-blur-md"
+          >
+            {showLines ? "Hide angle lines" : "Show angle lines"}
+          </button>
         </div>
 
-        {/* angle lines toggle */}
-        <button
-          type="button"
-          onClick={() => setShowLines((v) => !v)}
-          className="absolute bottom-3 right-3 rounded-full border border-white/15 bg-black/55 px-3 py-1.5 text-[11px] font-medium text-white/90 backdrop-blur-md"
-        >
-          {showLines ? "Hide angle lines" : "Show angle lines"}
-        </button>
+        {/* coaching card sits over the legs, so head and back stay in view */}
+        {phase.banner && (
+          <>
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#070b14]/90 via-[#070b14]/50 to-transparent" />
+            <div className="absolute inset-x-3 bottom-3">
+              <CoachBanner key={phase.key} {...phase.banner} />
+            </div>
+          </>
+        )}
       </div>
 
       {/* ---------- status bar ---------- */}
-      <div className="space-y-3.5 border-t border-border bg-gradient-to-b from-card/60 to-transparent px-4 pb-4 pt-3.5">
-        <div className="flex items-center gap-3.5">
+      <div className="space-y-3 border-t border-white/[0.06] px-4 pb-4 pt-3">
+        <div className="flex items-center gap-3">
           <SegmentGauge value={score} level={phase.level} />
           <div className="min-w-0 flex-1">
-            <div className={cn("text-[26px] font-semibold leading-none tracking-tight transition-colors", LEVEL_TEXT[phase.level])}>{phase.status.word}</div>
-            <div className="mt-1.5 truncate text-[11.5px] text-muted-foreground">{phase.status.note}</div>
-          </div>
-          <span className="inline-flex shrink-0 items-center gap-1 self-start rounded-full bg-muted/60 px-2.5 py-1.5 text-[11.5px]">
-            <span className="text-muted-foreground">Avg</span> <b className="tabular-nums">{avg}</b>
-          </span>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={onEnd}
-            className="flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-b from-[#ff5a5f] to-[#e0313a] text-[15px] font-semibold text-white shadow-[0_10px_24px_-10px_rgba(240,60,70,.8)] transition active:scale-[.98]"
-          >
-            <Square className="h-3.5 w-3.5 fill-current" /> Stop
-          </button>
-          <div className="shrink-0 text-right leading-none">
-            <div className="text-[9.5px] font-medium uppercase tracking-[0.08em] text-muted-foreground">Time left</div>
-            <div className="mt-1 flex items-center justify-end gap-1 text-[22px] font-semibold tabular-nums">
-              <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-              {timeLeft}
+            <div className="flex items-baseline gap-2">
+              <span className={cn("text-[22px] font-semibold leading-none tracking-tight transition-colors", LEVEL_TEXT[phase.level])}>{phase.status.word}</span>
+              <span className="text-[11px] text-muted-foreground">Avg <b className="font-semibold text-foreground tabular-nums">{avg}</b></span>
             </div>
+            <div className="mt-1 line-clamp-2 text-[11px] leading-snug text-muted-foreground">{phase.status.note}</div>
+          </div>
+          <div className="shrink-0 border-l border-white/[0.08] pl-3 text-right leading-none">
+            <div className="text-[9px] font-medium uppercase tracking-[0.1em] text-muted-foreground">Time left</div>
+            <div className="mt-1.5 text-[20px] font-semibold tabular-nums">{timeLeft}</div>
           </div>
         </div>
+        <button
+          type="button"
+          onClick={onEnd}
+          className="flex h-10 w-full items-center justify-center gap-2 rounded-full border border-destructive/45 bg-destructive/12 text-[13.5px] font-semibold text-destructive transition hover:bg-destructive/20 active:scale-[.99]"
+        >
+          <Square className="h-3 w-3 fill-current" /> Stop
+        </button>
       </div>
     </div>
   );
@@ -407,25 +409,21 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
 function SegmentGauge({ value, level }: { value: number; level: Level }) {
   const n = 10, filled = Math.round((Math.max(0, Math.min(100, value)) / 100) * n);
   const color = level === "good" ? "var(--color-success)" : level === "adjust" ? "var(--color-warning)" : "var(--color-destructive)";
-  const cx = 44, cy = 42, r = 34, gap = 3.2; // degrees between segments
-  const seg = (i: number) => {
-    const a0 = 180 + (i * 180) / n + gap / 2, a1 = 180 + ((i + 1) * 180) / n - gap / 2;
+  const cx = 34, cy = 34, r = 29, gap = 4;
+  const seg = (k: number) => {
+    const a0 = 180 + (k * 180) / n + gap / 2, a1 = 180 + ((k + 1) * 180) / n - gap / 2;
     const p = (a: number) => [cx + r * Math.cos(rad(a)), cy + r * Math.sin(rad(a))];
     const [x0, y0] = p(a0), [x1, y1] = p(a1);
     return `M ${x0.toFixed(2)} ${y0.toFixed(2)} A ${r} ${r} 0 0 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
   };
   return (
-    <div className="relative h-[54px] w-[88px] shrink-0">
-      <svg viewBox="0 0 88 50" className="h-[50px] w-[88px]" aria-hidden>
-        {Array.from({ length: n }, (_, i) => (
-          <path key={i} d={seg(i)} fill="none" strokeWidth="9" strokeLinecap="butt"
-            stroke={i < filled ? color : "var(--color-muted)"} style={{ transition: "stroke 400ms ease" }} />
+    <div className="relative h-[40px] w-[68px] shrink-0" aria-label={`Score ${value} of 100`}>
+      <svg viewBox="0 0 68 38" className="h-[38px] w-[68px]" aria-hidden>
+        {Array.from({ length: n }, (_, k) => (
+          <path key={k} d={seg(k)} fill="none" strokeWidth="6" stroke={k < filled ? color : "var(--color-muted)"} style={{ transition: "stroke 400ms ease" }} />
         ))}
       </svg>
-      <div className="absolute inset-x-0 bottom-0 text-center leading-none">
-        <span className="text-[22px] font-bold tabular-nums">{value}</span>
-        <span className="text-[11px] text-muted-foreground">/100</span>
-      </div>
+      <div className="absolute inset-x-0 bottom-0 text-center text-[17px] font-bold leading-none tabular-nums">{value}</div>
     </div>
   );
 }
@@ -457,20 +455,20 @@ function CoachBanner({ tone, kicker, title, note, more, fixed }: NonNullable<Pha
   const Icon = t.icon;
   return (
     <div
-      className="flex items-start gap-3 rounded-[18px] border-[1.5px] bg-black/75 px-4 py-3.5 backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-300"
+      className="flex items-start gap-2.5 rounded-2xl border-[1.5px] bg-black/75 px-3.5 py-3 backdrop-blur-md animate-in fade-in slide-in-from-bottom-2 duration-300"
       style={{
         borderColor: `color-mix(in oklab, ${t.color} 85%, transparent)`,
         boxShadow: `0 12px 32px -14px color-mix(in oklab, ${t.color} 55%, transparent)`,
       }}
     >
-      <Icon className="mt-[3px] h-[22px] w-[22px] shrink-0" style={{ color: t.color }} strokeWidth={1.9} />
+      <Icon className="mt-[2px] h-5 w-5 shrink-0" style={{ color: t.color }} strokeWidth={1.9} />
       <div className="min-w-0">
         {kicker && (
           <div className="text-[9.5px] font-medium uppercase leading-tight tracking-[0.04em]" style={{ color: t.color }}>
             {kicker}
           </div>
         )}
-        <div className={cn("text-[19px] font-normal leading-[1.25] tracking-[-0.005em] text-white", kicker && "mt-1")}>{title}</div>
+        <div className={cn("text-[clamp(15px,2.1dvh,18px)] font-normal leading-[1.25] tracking-[-0.005em] text-white", kicker && "mt-1")}>{title}</div>
         {note && <div className="mt-1 text-[11.5px] text-white/55">{note}</div>}
         {more && <div className="mt-1.5 text-[11.5px] text-white/80">{more}</div>}
         {fixed && (
