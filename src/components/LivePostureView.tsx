@@ -215,7 +215,7 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
           }}
         />
 
-        <svg viewBox="0 0 360 616" preserveAspectRatio="xMidYMax meet" className="absolute inset-0 h-full w-full" role="img" aria-label="Seated posture with angle lines">
+        <svg viewBox="40 60 300 395" preserveAspectRatio="xMidYMax meet" className="absolute inset-0 h-full w-full" role="img" aria-label="Seated posture with angle lines">
           <defs>
             <radialGradient id="lp-room" cx="50%" cy="45%" r="45%">
               <stop offset="0" stopColor="#1b2840" />
@@ -252,10 +252,28 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
 
           {/* room */}
           <rect x="-400" y="0" width="1160" height="640" fill="url(#lp-room)" />
-          <g opacity="0.5" filter="url(#lp-soft)">
-            <rect x="196" y="70" width="120" height="150" rx="6" fill="#22324e" />
-            <rect x="40" y="96" width="110" height="70" rx="6" fill="#1c2a44" />
+          {/* ceiling with light panels (seen at an angle, like a desk camera) */}
+          <path d="M -400 0 L 760 0 L 760 150 L -400 190 Z" fill="#141c2c" />
+          <g fill="#dfe8f6">
+            <path d="M 70 92 L 132 88 L 128 104 L 64 108 Z" opacity="0.55" />
+            <path d="M 196 82 L 262 78 L 262 93 L 194 97 Z" opacity="0.5" />
+            <path d="M 300 74 L 360 71 L 362 85 L 300 88 Z" opacity="0.4" />
+            <path d="M 0 126 L 46 123 L 40 136 L -8 139 Z" opacity="0.35" />
+            <path d="M 150 128 L 206 125 L 204 137 L 146 140 Z" opacity="0.32" />
           </g>
+          <g filter="url(#lp-soft)" opacity="0.45">
+            <ellipse cx="98" cy="98" rx="40" ry="10" fill="#9fc2ff" />
+            <ellipse cx="228" cy="88" rx="40" ry="10" fill="#9fc2ff" />
+          </g>
+          {/* back wall: blurred posters, a window strip and a desk partition */}
+          <g filter="url(#lp-soft)" opacity="0.7">
+            <rect x="150" y="196" width="150" height="70" rx="4" fill="#1d3a6b" />
+            <rect x="160" y="208" width="64" height="8" rx="3" fill="#7fa8e6" opacity="0.5" />
+            <rect x="160" y="224" width="96" height="6" rx="3" fill="#7fa8e6" opacity="0.35" />
+            <rect x="-60" y="190" width="150" height="56" rx="4" fill="#2b3f5e" />
+            <rect x="310" y="186" width="90" height="90" rx="4" fill="#24324a" />
+          </g>
+          <rect x="-400" y="300" width="1160" height="22" fill="#1a2335" opacity="0.9" />
           <rect x="-400" y="600" width="1160" height="400" fill="#0a0f1a" />
           <ellipse cx="200" cy="604" rx="130" ry="10" fill="#000" opacity="0.45" filter="url(#lp-soft)" />
 
