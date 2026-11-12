@@ -56,7 +56,7 @@ function WorkoutPage() {
         <p className="text-xs text-muted-foreground mt-0.5">Personalized routines from your posture data.</p>
       </div>
 
-      <section className="glass-card p-4 space-y-3 fold:col-start-1 fold:row-start-2 fold:row-span-2">
+      <section className="glass-card p-4 space-y-3 fold:col-start-1 fold:row-start-2">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           <div className="flex items-center gap-2">
             <Dumbbell className="h-4 w-4 text-primary" />
@@ -98,7 +98,8 @@ function WorkoutPage() {
         </div>
       </section>
 
-      <section className="glass-card p-4 fold:col-start-2 fold:row-start-2">
+      <div className="space-y-4 fold:col-start-2 fold:row-start-2">
+      <section className="glass-card p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-primary" />
@@ -133,7 +134,7 @@ function WorkoutPage() {
         </button>
       </section>
 
-      <section className="glass-card p-4 fold:col-start-2 fold:row-start-3">
+      <section className="glass-card p-4">
         <div className="flex items-center gap-2 mb-3">
           <Dumbbell className="h-4 w-4 text-secondary" />
           <h2 className="text-sm font-semibold">History</h2>
@@ -151,6 +152,7 @@ function WorkoutPage() {
           ))}
         </div>
       </section>
+      </div>
     </div>
   );
 }
