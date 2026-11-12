@@ -222,20 +222,20 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
               <stop offset="1" stopColor="#c98d6c" />
             </linearGradient>
             <linearGradient id="lp-top" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stopColor="#9a3240" />
-              <stop offset="1" stopColor="#5e1a24" />
+              <stop offset="0" stopColor="#8a4644" />
+              <stop offset="1" stopColor="#4f2526" />
             </linearGradient>
             <linearGradient id="lp-pants" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#87303b" />
-              <stop offset="1" stopColor="#561821" />
+              <stop offset="0" stopColor="#2c2f36" />
+              <stop offset="1" stopColor="#15171b" />
             </linearGradient>
             <linearGradient id="lp-shade" x1="1" y1="0" x2="0" y2="0">
               <stop offset="0" stopColor="#000" stopOpacity="0.28" />
               <stop offset="0.45" stopColor="#000" stopOpacity="0" />
             </linearGradient>
             <linearGradient id="lp-hair" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stopColor="#3b2c24" />
-              <stop offset="1" stopColor="#1c1410" />
+              <stop offset="0" stopColor="#7a5640" />
+              <stop offset="1" stopColor="#3e2a1e" />
             </linearGradient>
             <linearGradient id="lp-screen" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0" stopColor="#8ec1ff" stopOpacity="0" />
@@ -283,8 +283,8 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
             <rect x="236" y="500" width="13" height="26" rx="3" fill="#2a2f38" />
             <path d="M 242 572 L 194 590 M 243 572 L 292 590 M 243 572 L 250 594" stroke="#2a2f38" strokeWidth="7" strokeLinecap="round" />
             <circle cx="194" cy="594" r="5" fill="#1b1f26" /><circle cx="292" cy="594" r="5" fill="#1b1f26" /><circle cx="250" cy="598" r="5" fill="#1b1f26" />
-            <path d="M 184 446 C 190 436 212 440 240 440 C 268 440 290 432 300 440 C 306 450 298 464 280 466 C 254 470 214 470 196 464 C 184 460 180 452 184 446 Z" fill="#e8e1d2" />
-            <path d="M 188 458 C 214 466 262 467 296 452" stroke="#b9b09d" strokeWidth="2" fill="none" />
+            <rect x="186" y="440" width="116" height="26" rx="13" fill="#cdbfa9" />
+            <rect x="190" y="456" width="108" height="10" rx="5" fill="#a89a84" />
           </g>
 
           {/* desk + monitor */}
@@ -304,7 +304,7 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
           {/* shirt shading along the back */}
           <path d={b.torso} fill="url(#lp-shade)" />
           {/* loose tee: soft folds across the back and above the waist */}
-          <g stroke="#3a0e15" strokeOpacity="0.28" strokeWidth="2" fill="none" strokeLinecap="round">
+          <g stroke="#2e1515" strokeOpacity="0.28" strokeWidth="2" fill="none" strokeLinecap="round">
             <path d={`M ${b.mid.x + 14} ${b.mid.y - 30} q -8 14 -2 30`} />
             <path d={`M ${b.mid.x - 6} ${b.mid.y + 26} q 14 8 30 4`} />
             <path d={`M ${b.mid.x - 14} ${b.mid.y + 40} q 16 6 34 0`} />
@@ -314,36 +314,40 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
           <path d={`M ${KNEE.x - 8} ${KNEE.y - 6} C ${KNEE.x - 16} ${KNEE.y + 40}, ${ANKLE.x - 12} ${ANKLE.y - 50}, ${ANKLE.x - 7} ${ANKLE.y - 4} L ${ANKLE.x + 9} ${ANKLE.y - 4} C ${ANKLE.x + 14} ${ANKLE.y - 60}, ${KNEE.x + 26} ${KNEE.y + 30}, ${KNEE.x + 16} ${KNEE.y - 8} Z`} fill="url(#lp-skin)" />
           <path d={`M ${HIP.x + 4} ${HIP.y + 4} L ${KNEE.x} ${KNEE.y}`} stroke="url(#lp-skin)" strokeWidth="38" strokeLinecap="round" />
           <path d={`M ${HIP.x + 6} ${HIP.y + 2} L ${HIP.x + (KNEE.x - HIP.x) * 0.8} ${HIP.y + (KNEE.y - HIP.y) * 0.8}`} stroke="url(#lp-pants)" strokeWidth="46" strokeLinecap="round" />
-          <path d={`M ${HIP.x + (KNEE.x - HIP.x) * 0.8 - 2} ${HIP.y + (KNEE.y - HIP.y) * 0.8 - 22} L ${HIP.x + (KNEE.x - HIP.x) * 0.8 + 3} ${HIP.y + (KNEE.y - HIP.y) * 0.8 + 22}`} stroke="#4a121a" strokeOpacity="0.5" strokeWidth="2" />
-          <path d={`M ${HIP.x - 20} ${HIP.y - 4} Q ${HIP.x - 50} ${HIP.y + 6} ${HIP.x - 66} ${HIP.y + 2}`} stroke="#4a121a" strokeOpacity="0.35" strokeWidth="2" fill="none" />
-          <path d={`M ${HIP.x + 18} ${HIP.y - 12} Q ${HIP.x - 10} ${HIP.y - 18} ${HIP.x - 38} ${HIP.y - 8}`} stroke="#3a0e15" strokeOpacity="0.55" strokeWidth="3" fill="none" strokeLinecap="round" />
+          <path d={`M ${HIP.x + (KNEE.x - HIP.x) * 0.8 - 2} ${HIP.y + (KNEE.y - HIP.y) * 0.8 - 22} L ${HIP.x + (KNEE.x - HIP.x) * 0.8 + 3} ${HIP.y + (KNEE.y - HIP.y) * 0.8 + 22}`} stroke="#2e1515" strokeOpacity="0.5" strokeWidth="2" />
+          <path d={`M ${HIP.x - 20} ${HIP.y - 4} Q ${HIP.x - 50} ${HIP.y + 6} ${HIP.x - 66} ${HIP.y + 2}`} stroke="#2e1515" strokeOpacity="0.35" strokeWidth="2" fill="none" />
+          <path d={`M ${HIP.x + 18} ${HIP.y - 12} Q ${HIP.x - 10} ${HIP.y - 18} ${HIP.x - 38} ${HIP.y - 8}`} stroke="#2e1515" strokeOpacity="0.55" strokeWidth="3" fill="none" strokeLinecap="round" />
           <rect x={ANKLE.x - 8} y={ANKLE.y - 10} width="18" height="12" rx="3" fill="#e9ebef" />
           <path d={`M ${ANKLE.x + 12} ${ANKLE.y - 2} C ${ANKLE.x - 2} ${ANKLE.y - 6}, ${TOE.x - 8} ${TOE.y - 8}, ${TOE.x - 10} ${TOE.y + 1} L ${ANKLE.x + 13} ${ANKLE.y + 13} Z`} fill="#c9ccd3" />
           <path d={`M ${TOE.x - 10} ${TOE.y + 1} L ${ANKLE.x + 13} ${ANKLE.y + 13}`} stroke="#8a8f99" strokeWidth="3" />
 
           {/* neck */}
           <path d={`M ${b.c7.x - 3} ${b.c7.y + 6} L ${b.neckTop.x} ${b.neckTop.y}`} stroke="url(#lp-skin)" strokeWidth="23" strokeLinecap="round" />
-          <path d={`M ${b.c7.x - 14} ${b.c7.y + 4} Q ${b.c7.x - 4} ${b.c7.y + 12} ${b.c7.x + 8} ${b.c7.y + 2}`} stroke="#4a121a" strokeWidth="5" fill="none" strokeLinecap="round" />
+          <path d={`M ${b.c7.x - 14} ${b.c7.y + 4} Q ${b.c7.x - 4} ${b.c7.y + 12} ${b.c7.x + 8} ${b.c7.y + 2}`} stroke="#2e1515" strokeWidth="5" fill="none" strokeLinecap="round" />
 
           {/* head — side profile facing the desk */}
           <g transform={`translate(${b.head.x} ${b.head.y}) rotate(${-pose.neck * 0.6})`}>
             <path
-              d="M 2 -30 C 16 -30 25 -19 25 -5 C 25 7 20 15 13 20 L 4 23 C -2 27 -9 28 -14 26 C -18 25 -20 22 -19 19 C -21 17 -21 15 -19.5 13.5 C -21.5 12 -21.5 10 -20 8.5 C -21 7 -21.5 5.5 -22 4.5 C -25 3.5 -28 1.5 -27.5 -0.5 C -27 -3 -23.5 -6 -22 -9 C -23 -12 -23 -16 -21.5 -21 C -18 -27 -9 -30 2 -30 Z"
+              d="M 4 -30 C 18 -30 26 -19 26 -5 C 26 7 21 15 14 20 L 6 19 C 0 22 -6 25 -12 25.5 C -16 25.5 -19.5 24 -20 21 C -20.5 19 -20 17.5 -19.2 16 C -20.6 15 -21 13.8 -20.4 12.6 C -21.4 11.6 -21.8 10.2 -21.2 9 C -21.5 8 -21.7 7.2 -22 6.6 C -25.5 5.6 -29 4.4 -29.2 2.6 C -29 0 -26 -3 -24.6 -6.5 C -25.4 -8.4 -25.6 -10 -25 -11.6 C -24.4 -16 -23.6 -21 -21.6 -24.6 C -17.6 -29.6 -7 -31.5 4 -30 Z"
               fill="url(#lp-skin)"
             />
-            {/* jaw & cheek shading */}
-            <path d="M 10 18 C 2 22 -8 24 -14 22" stroke="#b3785a" strokeOpacity="0.35" strokeWidth="2" fill="none" />
+            {/* jawline and cheek shading */}
+            <path d="M 9 13 C 3 19 -5 23 -13 24" stroke="#a96f52" strokeOpacity="0.45" strokeWidth="1.8" fill="none" />
+            <path d="M 12 8 C 6 18 -4 24 -13 25 C -17 25 -19.5 23 -19.6 20 C -12 21 -2 18 6 10 Z" fill="#4a3427" opacity="0.12" />
             {/* ear */}
-            <ellipse cx="9" cy="0" rx="5" ry="7.5" fill="#e3ad8c" />
-            <path d="M 10 -4 C 7 -3 7 3 10 4" stroke="#b9805f" strokeWidth="1.4" fill="none" />
-            {/* stubble along the jaw and chin */}
-            <path d="M 12 14 C 6 22 -4 26 -14 26 C -18 25 -20 22 -19 19 C -14 21 -6 20 2 16 C 6 12 10 8 12 4 Z" fill="#3a2a22" opacity="0.18" />
-            {/* eye, brow, lips */}
-            <path d="M -18 -6 C -16 -7.8 -13 -7.8 -11.5 -6.2 C -13 -5 -16 -5 -18 -6 Z" fill="#2a1c17" />
-            <path d="M -20.5 -11.5 C -17 -14 -13 -13.8 -9.5 -12.4" stroke="#2e211b" strokeWidth="2.2" fill="none" strokeLinecap="round" />
-            <path d="M -20.5 11 C -18.8 11.6 -17.4 11.6 -16.4 11" stroke="#9a5c4c" strokeWidth="1.3" fill="none" strokeLinecap="round" />
-            {/* short cropped hair, sideburn in front of the ear */}
-            <path d="M -21 -18 C -20 -28 -8 -35 6 -34 C 20 -33 28 -22 27 -8 C 26.5 0 25 6 22 10 C 21 4 18 -2 15 -5 C 13 -8 8 -11 4 -11 L 3 -2 C 1 -3 0 -8 -1 -12 C -7 -15 -14 -16 -21 -18 Z" fill="url(#lp-hair)" />
+            <ellipse cx="9" cy="0" rx="5.2" ry="7.8" fill="#e2a988" />
+            <path d="M 10.5 -4.5 C 7 -3.5 7 3 10.5 4.5" stroke="#b47a5b" strokeWidth="1.4" fill="none" />
+            {/* eye, brow, nostril, mouth */}
+            <path d="M -19 -5.4 C -17 -7 -14 -7 -12.5 -5.6 C -14 -4.4 -17 -4.4 -19 -5.4 Z" fill="#2a1c17" />
+            <path d="M -23 -10.6 C -19.5 -13 -14.5 -13 -10 -11.4" stroke="#4a3222" strokeWidth="2.6" fill="none" strokeLinecap="round" />
+            <path d="M -25.5 4.2 C -24 4.8 -23 4.6 -22.4 3.8" stroke="#b47a5b" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+            <path d="M -21 12.2 C -19.4 12.8 -18 12.7 -17 12.1" stroke="#9a5c4c" strokeWidth="1.3" fill="none" strokeLinecap="round" />
+            {/* short tousled hair, sideburn in front of the ear */}
+            <path
+              d="M -23 -20 C -26 -26 -23 -33 -16 -35 C -14 -39 -6 -40 -1 -38 C 4 -41 13 -40 17 -36 C 24 -34 28 -26 27.5 -16 C 27.5 -8 26.5 -1 23.5 5 C 22.5 -1 20 -5 15.6 -7.4 C 12.5 -9.6 8 -11 4.6 -11 L 4 -2 C 2 -3.5 1.2 -9 0.4 -13.5 C -6 -16.4 -14 -17.2 -23 -20 Z"
+              fill="url(#lp-hair)"
+            />
+            <path d="M -15 -33 C -10 -35 -5 -34 -1 -31 M 3 -36 C 8 -36 12 -34 15 -30" stroke="#a37a5c" strokeOpacity="0.45" strokeWidth="1.6" fill="none" strokeLinecap="round" />
           </g>
 
           {/* near arm: hand resting on the thigh */}
@@ -351,7 +355,7 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
           <path d={`M ${b.elb.x} ${b.elb.y} L ${b.wrist.x} ${b.wrist.y}`} stroke="url(#lp-skin)" strokeWidth="16" strokeLinecap="round" />
           {/* short t-shirt sleeve over the upper arm */}
           <path d={`M ${b.shoulder.x} ${b.shoulder.y - 2} L ${b.shoulder.x + (b.elb.x - b.shoulder.x) * 0.5} ${b.shoulder.y + (b.elb.y - b.shoulder.y) * 0.5}`} stroke="url(#lp-top)" strokeWidth="27" strokeLinecap="round" />
-          <path d={`M ${b.shoulder.x + (b.elb.x - b.shoulder.x) * 0.47} ${b.shoulder.y + (b.elb.y - b.shoulder.y) * 0.47} L ${b.shoulder.x + (b.elb.x - b.shoulder.x) * 0.52} ${b.shoulder.y + (b.elb.y - b.shoulder.y) * 0.52}`} stroke="#4a121a" strokeOpacity="0.6" strokeWidth="27" />
+          <path d={`M ${b.shoulder.x + (b.elb.x - b.shoulder.x) * 0.47} ${b.shoulder.y + (b.elb.y - b.shoulder.y) * 0.47} L ${b.shoulder.x + (b.elb.x - b.shoulder.x) * 0.52} ${b.shoulder.y + (b.elb.y - b.shoulder.y) * 0.52}`} stroke="#2e1515" strokeOpacity="0.6" strokeWidth="27" />
           <path d={`M ${b.wrist.x + 4} ${b.wrist.y - 6} C ${b.wrist.x - 10} ${b.wrist.y - 8}, ${b.wrist.x - 24} ${b.wrist.y - 3}, ${b.wrist.x - 25} ${b.wrist.y + 3} C ${b.wrist.x - 22} ${b.wrist.y + 8}, ${b.wrist.x - 6} ${b.wrist.y + 9}, ${b.wrist.x + 4} ${b.wrist.y + 6} Z`} fill="url(#lp-skin)" />
 
           {/* ---------- angle lines (same marks as the running app) ---------- */}
