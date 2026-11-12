@@ -59,6 +59,14 @@
   .tools button { font:inherit; font-size:13px; font-weight:600; color:var(--muted); background:transparent; border:1px solid #263047; border-radius:10px; padding:7px 12px; cursor:pointer; }
   .tools button:hover { color:var(--text); border-color:var(--accent); }
 
+  /* slim scrollbars to match the dark viewer */
+  @supports not selector(::-webkit-scrollbar) { * { scrollbar-width:thin; scrollbar-color:rgba(238,242,250,.16) transparent; } }
+  ::-webkit-scrollbar-button { display:none; }
+  ::-webkit-scrollbar { width:8px; height:8px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { border:2px solid transparent; border-radius:999px; background-clip:padding-box; background-color:rgba(238,242,250,.16); }
+  ::-webkit-scrollbar-thumb:hover { background-color:rgba(238,242,250,.3); }
+  ::-webkit-scrollbar-corner { background:transparent; }
   /* room for the comment rail on the right edge */
   .right { padding-right:118px; }
   /* ---------- small screens ---------- */
