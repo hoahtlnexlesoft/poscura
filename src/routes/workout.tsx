@@ -87,7 +87,7 @@ function WorkoutPage() {
             return (
               <div key={w.name} className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
                 <div className="min-w-0 flex-1">
-                  <h3 className="truncate text-sm font-semibold">{w.name}</h3>
+                  <h3 className="text-sm font-semibold leading-snug">{w.name}</h3>
                   <div className="mt-0.5 text-[11px] text-muted-foreground">Scheduled at {TODAY_TIME}</div>
                   <div className="mt-1.5 flex flex-wrap items-center gap-2">
                     <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-medium ${completed ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive"}`}>

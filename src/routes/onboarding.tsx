@@ -43,9 +43,9 @@ function OnboardingPage() {
   };
 
   return (
-    <div className="relative mx-auto w-full pb-24 fold:grid fold:max-w-[980px] fold:grid-cols-[minmax(240px,0.8fr)_1.4fr] land:grid-cols-2 fold:items-start fold:gap-8 fold:pb-6">
+    <div className="relative mx-auto w-full pb-24 fold:grid fold:max-w-[980px] fold:grid-cols-[minmax(240px,0.8fr)_1.4fr] land:grid-cols-2 fold:items-start fold:gap-8 land:gap-x-6 fold:pb-6">
       {/* ---------- side / header ---------- */}
-      <aside className="fold:sticky fold:top-4">
+      <aside className="fold:sticky fold:top-4 fold:glass-card fold:p-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img src={logo} alt="" className="h-8 w-8" />
@@ -61,7 +61,7 @@ function OnboardingPage() {
           ))}
         </div>
 
-        <h1 className="mt-5 text-[26px] font-bold leading-tight tracking-tight fold:mt-8 fold:text-[30px]">
+        <h1 className="mt-5 text-[26px] font-bold leading-tight tracking-tight fold:mt-6 fold:text-[28px]">
           {step === 1 ? (
             <>Welcome to <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Poscura</span></>
           ) : (
@@ -73,7 +73,7 @@ function OnboardingPage() {
         </p>
 
         {/* stepper (foldable) */}
-        <ol className="mt-8 hidden space-y-1 fold:block">
+        <ol className="mt-6 hidden space-y-1 fold:block">
           {STEPS.map((s, i) => {
             const n = i + 1, done = n < step, on = n === step;
             return (
