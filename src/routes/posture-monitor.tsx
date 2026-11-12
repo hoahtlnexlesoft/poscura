@@ -63,7 +63,7 @@ function PostureMonitor() {
 
   return (
     <div data-fit-bound className="space-y-4 fold:grid fold:grid-cols-[auto_minmax(0,340px)] fold:grid-rows-[auto_1fr] fold:justify-center fold:gap-5 fold:space-y-0 fold:items-stretch">
-      {!running && <div className="fold:col-start-2 fold:row-start-1 fold:self-start"><MonitoringTimeLeft /></div>}
+      <div className="fold:col-start-2 fold:row-start-1 fold:self-start"><MonitoringTimeLeft /></div>
 
 
       <section className="rounded-2xl border border-border bg-gradient-to-br from-card via-background to-background overflow-hidden fold:col-start-1 fold:row-start-1 fold:row-span-2 fold:w-fit fold:self-start">
@@ -98,7 +98,7 @@ function PostureMonitor() {
         )}
       </section>
 
-      <section className={`glass-card p-4 fold:col-start-2 fold:flex fold:flex-col ${running ? "fold:row-start-1 fold:row-span-2" : "fold:row-start-2"}`}>
+      <section className="glass-card p-4 fold:col-start-2 fold:row-start-2 fold:flex fold:flex-col">
         <div className="flex items-center gap-2 mb-3">
           <Activity className="h-4 w-4 text-primary" />
           <h2 className="text-sm font-semibold">History</h2>

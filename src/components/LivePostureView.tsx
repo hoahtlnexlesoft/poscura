@@ -105,6 +105,13 @@ function smooth(pts: V[]): string {
   return d + " Z";
 }
 
+/** hand direction: halfway between the forearm and pointing straight ahead (toward the knee) */
+function handAngle(elb: V, wrist: V): number {
+  const fore = (Math.atan2(wrist.y - elb.y, wrist.x - elb.x) * 180) / Math.PI;
+  const f = fore < 0 ? fore + 360 : fore;
+  return f * 0.45 + 180 * 0.55;
+}
+
 /* fixed anchors of the scene (viewBox 360 × 640, person faces left) */
 const HIP: V = { x: 236, y: 430 };
 const KNEE: V = { x: 156, y: 440 };
@@ -122,7 +129,7 @@ function body(p: Pose) {
   // tragus: the ear point drawn in the head's own (rotated) frame
   const th = rad(-p.neck * 0.6);
   const ear = add(head, { x: 7 * Math.cos(th) - 1 * Math.sin(th), y: 7 * Math.sin(th) + 1 * Math.cos(th) });
-  const wrist = add(WRIST, { x: -p.lean * 0.95, y: p.lean * 0.12 }); // leaning forward slides the hand toward the knee
+  const wrist = add(WRIST, { x: -p.lean * 0.6, y: p.lean * 0.1 }); // leaning forward slides the hand toward the knee
   const elb = elbow(shoulder, wrist, 74, 72);
 
   const hunch = p.lean * 0.3;
@@ -356,7 +363,16 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
           {/* short t-shirt sleeve over the upper arm */}
           <path d={`M ${b.shoulder.x} ${b.shoulder.y - 2} L ${b.shoulder.x + (b.elb.x - b.shoulder.x) * 0.5} ${b.shoulder.y + (b.elb.y - b.shoulder.y) * 0.5}`} stroke="url(#lp-top)" strokeWidth="27" strokeLinecap="round" />
           <path d={`M ${b.shoulder.x + (b.elb.x - b.shoulder.x) * 0.47} ${b.shoulder.y + (b.elb.y - b.shoulder.y) * 0.47} L ${b.shoulder.x + (b.elb.x - b.shoulder.x) * 0.52} ${b.shoulder.y + (b.elb.y - b.shoulder.y) * 0.52}`} stroke="#2e1515" strokeOpacity="0.6" strokeWidth="27" />
-          <path d={`M ${b.wrist.x + 4} ${b.wrist.y - 6} C ${b.wrist.x - 10} ${b.wrist.y - 8}, ${b.wrist.x - 24} ${b.wrist.y - 3}, ${b.wrist.x - 25} ${b.wrist.y + 3} C ${b.wrist.x - 22} ${b.wrist.y + 8}, ${b.wrist.x - 6} ${b.wrist.y + 9}, ${b.wrist.x + 4} ${b.wrist.y + 6} Z`} fill="url(#lp-skin)" />
+          {/* hand resting on the thigh: back of the hand, fingers draping over the thigh, thumb on the inside */}
+          <g transform={`translate(${b.wrist.x} ${b.wrist.y}) rotate(${handAngle(b.elb, b.wrist)}) scale(1.15 -1.15)`}>
+            <path d="M -3 -7 C 7 -9.5 17 -9.5 24 -7.5 C 30.5 -5.5 34.5 -1 35.5 4 C 36 7.2 33.6 9 31.2 7.4 C 29.4 4.6 27.4 2.6 23.6 2 C 16.5 3.4 8.5 5.6 0.5 6.4 C -3.5 4.6 -4.6 -3.6 -3 -7 Z" fill="url(#lp-skin)" />
+            <path d="M 6 3.6 C 12 7.4 18.5 9 22.6 6.8 C 23.6 5 21 3 15.6 2.2 Z" fill="#d09574" />
+            <g stroke="#b47a5b" strokeOpacity="0.55" strokeWidth="1.1" fill="none" strokeLinecap="round">
+              <path d="M 24.5 -6.6 C 29 -4.5 31.6 -0.6 32.4 4.6" />
+              <path d="M 23.2 -3.2 C 26.8 -1.6 28.8 1.4 29.6 5.6" />
+            </g>
+            <path d="M 17 -8.6 C 19.5 -8.9 21.5 -8.7 23.5 -8" stroke="#f6d3bb" strokeOpacity="0.6" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+          </g>
 
           {/* ---------- angle lines (same marks as the running app) ---------- */}
           <g className="transition-opacity duration-300" opacity={showLines ? 1 : 0}>
