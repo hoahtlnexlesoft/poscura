@@ -419,9 +419,7 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
       <div ref={statusRef} className="@container border-t border-white/[0.06]">
         <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 px-4 py-3 @max-[360px]:px-3">
           <div className="min-w-0">
-            <div className="text-[9px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
-              Avg score <b className="font-semibold text-foreground tabular-nums">{avg}</b>
-            </div>
+            <div className="text-[9px] font-medium uppercase tracking-[0.1em] text-muted-foreground">Posture now</div>
             <div className={cn("mt-1.5 text-[20px] font-semibold leading-none tracking-tight transition-colors", LEVEL_TEXT[phase.level])}>{phase.status.word}</div>
             <div className="mt-1 truncate text-[11px] text-muted-foreground @max-[400px]:hidden!">{phase.status.note}</div>
           </div>
@@ -437,6 +435,7 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
           <div className="text-right leading-none">
             <div className="text-[9px] font-medium uppercase tracking-[0.1em] text-muted-foreground">Time left</div>
             <div className="mt-1.5 text-[20px] font-semibold tabular-nums">{timeLeft}</div>
+            <div className="mt-1 text-[11px] text-muted-foreground">Session avg <b className="font-semibold text-foreground tabular-nums">{avg}</b></div>
           </div>
         </div>
       </div>
