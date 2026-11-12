@@ -481,12 +481,15 @@ function CoachBanner({ tone, kicker, title, note, more, fixed }: NonNullable<Pha
   }
   return (
     <div
-      className="flex items-start gap-2.5 rounded-2xl border-[1.5px] border-dashed bg-black/75 px-3.5 py-3 backdrop-blur-md animate-in fade-in slide-in-from-bottom-2 duration-300"
+      className="relative flex items-start gap-2.5 rounded-2xl bg-black/75 px-3.5 py-3 backdrop-blur-md animate-in fade-in slide-in-from-bottom-2 duration-300"
       style={{
-        borderColor: `color-mix(in oklab, ${t.color} 85%, transparent)`,
         boxShadow: `0 12px 32px -14px color-mix(in oklab, ${t.color} 55%, transparent)`,
       }}
     >
+      <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden>
+        <rect x="0.5" y="0.5" rx="15.5" fill="none" stroke={t.color} strokeOpacity="0.9" strokeWidth="1"
+          strokeDasharray="2 6" strokeLinecap="round" style={{ width: "calc(100% - 1px)", height: "calc(100% - 1px)" }} />
+      </svg>
       <Icon className="mt-[2px] h-5 w-5 shrink-0" style={{ color: t.color }} strokeWidth={1.9} />
       <div className="min-w-0">
         {kicker && (
