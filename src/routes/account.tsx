@@ -268,7 +268,7 @@ function AccountPage() {
             </TabsList>
           </div>
           <TabsContent value="info" className="space-y-4 mt-4 fold:space-y-0 fold:columns-2 fold:gap-4 fold:[&>*]:break-inside-avoid fold:[&>*]:mb-4"><AccountInfo /></TabsContent>
-          <TabsContent value="subscription" className="space-y-4 mt-4 fold:space-y-0 fold:columns-2 fold:gap-4 fold:[&>*]:break-inside-avoid fold:[&>*]:mb-4"><SubscriptionTab /></TabsContent>
+          <TabsContent value="subscription" className="space-y-4 mt-4 fold:grid fold:grid-cols-2 fold:gap-4 fold:space-y-0"><SubscriptionTab /></TabsContent>
           <TabsContent value="invite" className="space-y-4 mt-4 fold:space-y-0 fold:columns-2 fold:gap-4 fold:[&>*]:break-inside-avoid fold:[&>*]:mb-4"><InviteTab /></TabsContent>
         </Tabs>
       </div>
@@ -276,9 +276,9 @@ function AccountPage() {
   );
 }
 
-function Section({ title, action, children, id }: { title: string; action?: React.ReactNode; children: React.ReactNode; id?: string }) {
+function Section({ title, action, children, id, className }: { title: string; action?: React.ReactNode; children: React.ReactNode; id?: string; className?: string }) {
   return (
-    <section id={id} className="glass-card p-4">
+    <section id={id} className={cn("glass-card p-4", className)}>
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-sm font-semibold">{title}</h2>
         {action}
@@ -452,7 +452,7 @@ function SubscriptionTab() {
 
   return (
     <>
-      <Section title="Current Plan">
+      <Section title="Current Plan" className="fold:col-start-1 fold:row-start-1">
         <div className="flex items-center justify-between">
           <div>
             <div className="text-base font-bold">Freemium</div>
@@ -462,7 +462,7 @@ function SubscriptionTab() {
         </div>
       </Section>
 
-      <Section title="Usage This Month">
+      <Section title="Usage This Month" className="fold:col-start-2 fold:row-start-1">
         <div className="grid grid-cols-3 gap-2 text-xs">
           <Stat label="Monitoring Hours" value="0.1/5.0" />
           <Stat label="Workout Sessions" value="2/15" />
@@ -470,7 +470,9 @@ function SubscriptionTab() {
         </div>
       </Section>
 
-      <SubscriptionHistorySection />
+      <SubscriptionHistorySection className="fold:col-start-1 fold:row-start-3" />
+
+      <div className="space-y-4 fold:col-start-2 fold:row-start-3">
 
       <Section
         title="Add-ons"
@@ -511,7 +513,9 @@ function SubscriptionTab() {
         </ul>
       </Section>
 
-      <section id="upgrade-your-plan" className="glass-card p-4 fold:[column-span:all]">
+      </div>
+
+      <section id="upgrade-your-plan" className="glass-card p-4 fold:col-span-2 fold:row-start-2 fold:p-5">
         <h2 className="mb-4 text-sm font-semibold">Upgrade Your Plan</h2>
         <PlanPicker />
       </section>
@@ -536,11 +540,11 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-function SubscriptionHistorySection() {
+function SubscriptionHistorySection({ className }: { className?: string }) {
   const [expanded, setExpanded] = useState(false);
   const items = expanded ? SUB_HISTORY : SUB_HISTORY.slice(0, 3);
   return (
-    <Section title="Subscription History">
+    <Section title="Subscription History" className={className}>
       <ul className="space-y-2">
         {items.map((it, i) => (
           <li key={i} className="flex items-center justify-between rounded-lg border border-dashed border-border p-2.5">
