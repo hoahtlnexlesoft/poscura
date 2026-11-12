@@ -100,8 +100,8 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext }:
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 land:grid land:grid-cols-2 land:items-start land:gap-x-6 land:gap-y-4 land:space-y-0">
+      <div className="flex items-center justify-between land:col-span-2">
         <button onClick={onClose} className="inline-flex items-center gap-1 text-sm text-muted-foreground">
           <ChevronLeft className="h-4 w-4" /> Details
         </button>
@@ -111,7 +111,7 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext }:
         </div>
       </div>
 
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex items-center gap-2 flex-wrap land:col-span-2">
         <h1 className="text-xl font-bold flex-1">{exerciseName}</h1>
         <span className="text-[11px] px-2 py-0.5 rounded-full bg-primary text-primary-foreground font-medium">{badge}</span>
         <button onClick={() => setShareOpen(true)} aria-label="Share" className="h-9 w-9 rounded-lg border border-border bg-card flex items-center justify-center text-primary">
@@ -192,6 +192,7 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext }:
         </div>
       )}
 
+      <div className="space-y-4 land:sticky land:top-[72px]">
       <section className="rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-transparent p-4">
         <div className="flex items-center gap-2 mb-3">
           <TrendingUp className="h-4 w-4 text-primary" />
@@ -227,6 +228,9 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext }:
         </div>
       </section>
 
+      </div>
+
+      <div className="space-y-4">
       <section className="glass-card p-4">
         <button onClick={() => setChartOpen((v) => !v)} className="w-full flex items-center justify-between">
           <h2 className="font-semibold text-sm">Accuracy Over Time</h2>
@@ -315,6 +319,7 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext }:
           </>
         )}
       </section>
+      </div>
     </div>
   );
 }

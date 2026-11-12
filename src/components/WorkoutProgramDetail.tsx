@@ -95,8 +95,8 @@ export function WorkoutProgramDetail({ onClose, onStartSession }: Props) {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 land:grid land:grid-cols-2 land:items-start land:gap-x-6 land:gap-y-4 land:space-y-0">
+      <div className="flex items-center justify-between land:col-span-2">
         <button onClick={onClose} className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground">
           <ChevronLeft className="h-4 w-4" /> Workout
         </button>
@@ -110,7 +110,7 @@ export function WorkoutProgramDetail({ onClose, onStartSession }: Props) {
         </div>
       </div>
 
-      <section className="glass-card p-4 space-y-4">
+      <section className="glass-card p-4 space-y-4 land:sticky land:top-[72px]">
         <div className="space-y-2">
           <div className="flex items-start justify-between gap-2">
             <h1 className="text-lg font-bold">Shoulder &amp; Neck Relief</h1>
@@ -150,6 +150,7 @@ export function WorkoutProgramDetail({ onClose, onStartSession }: Props) {
         </div>
       </section>
 
+      <div className="space-y-4">
       <section className="glass-card p-4 space-y-3">
         <div className="flex items-center gap-2">
           <button onClick={() => setTab("today")}
@@ -244,6 +245,7 @@ export function WorkoutProgramDetail({ onClose, onStartSession }: Props) {
           ))}
         </div>
       </section>
+      </div>
 
       {rescheduleOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setRescheduleOpen(false)}>
