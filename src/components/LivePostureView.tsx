@@ -89,7 +89,7 @@ function elbow(s: V, w: V, l1: number, l2: number): V {
   const p = { x: s.x + ux * a, y: s.y + uy * a };
   const e1 = { x: p.x - uy * h, y: p.y + ux * h };
   const e2 = { x: p.x + uy * h, y: p.y - ux * h };
-  return e1.y > e2.y ? e1 : e2;
+  return e1.x > e2.x ? e1 : e2; // elbow points back, as when resting hands on the thighs
 }
 
 /** smooth closed path through points (Catmull-Rom → cubic Bézier) */
@@ -122,7 +122,8 @@ function body(p: Pose) {
   // tragus: the ear point drawn in the head's own (rotated) frame
   const th = rad(-p.neck * 0.6);
   const ear = add(head, { x: 7 * Math.cos(th) - 1 * Math.sin(th), y: 7 * Math.sin(th) + 1 * Math.cos(th) });
-  const elb = elbow(shoulder, WRIST, 74, 72);
+  const wrist = add(WRIST, { x: -p.lean * 0.95, y: p.lean * 0.12 }); // leaning forward slides the hand toward the knee
+  const elb = elbow(shoulder, wrist, 74, 72);
 
   const hunch = p.lean * 0.3;
   const torso = smooth([
@@ -140,7 +141,7 @@ function body(p: Pose) {
   ]);
   const rs = add(shoulder, add(mul(up(a2), 13), mul(fwd(a2), -2)));
   const ls = add(shoulder, add(mul(up(a2), -15), mul(fwd(a2), 4)));
-  return { mid, c7, shoulder, rs, ls, neckTop, head, ear, elb, torso, a2 };
+  return { mid, c7, shoulder, rs, ls, neckTop, head, ear, elb, wrist, torso, a2 };
 }
 
 /* ---------------- component ---------------- */
@@ -166,14 +167,19 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
     const reduce = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     let raf = 0, last = performance.now();
     const cur = { ...PHASES[0].pose, score: PHASES[0].score };
+    const vel = { lean: 0, neck: 0, shrug: 0 };
+    const W = 3.2; // spring stiffness (rad/s): ~1 s to settle, eases in and out
     const tick = (now: number) => {
-      const k = reduce ? 1 : Math.min(1, ((now - last) / 1000) * 2.6);
+      const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       const t = target.current;
-      cur.lean += (t.pose.lean - cur.lean) * k;
-      cur.neck += (t.pose.neck - cur.neck) * k;
-      cur.shrug += (t.pose.shrug - cur.shrug) * k;
-      cur.score += (t.score - cur.score) * k;
+      (["lean", "neck", "shrug"] as const).forEach((key) => {
+        if (reduce) { cur[key] = t.pose[key]; return; }
+        const acc = W * W * (t.pose[key] - cur[key]) - 2 * W * vel[key]; // critically damped
+        vel[key] += acc * dt;
+        cur[key] += vel[key] * dt;
+      });
+      cur.score += (t.score - cur.score) * Math.min(1, dt * 2.5);
       setPose({ lean: cur.lean, neck: cur.neck, shrug: cur.shrug });
       setScore(Math.round(cur.score));
       raf = requestAnimationFrame(tick);
@@ -292,10 +298,6 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
             <rect x="6" y="268" width="110" height="72" rx="2" fill="url(#lp-screen)" opacity="0.7" />
           </g>
 
-          {/* far arm (behind the body) */}
-          <path d={`M ${b.shoulder.x + 6} ${b.shoulder.y + 4} L ${b.elb.x + 8} ${b.elb.y - 2} L ${WRIST.x + 12} ${WRIST.y - 4}`}
-            fill="none" stroke="#9c6a55" strokeOpacity="0.6" strokeWidth="15" strokeLinecap="round" strokeLinejoin="round" />
-
           {/* torso (shirt) */}
           <path d={b.torso} fill="url(#lp-top)" />
           <path d={b.torso} fill="none" stroke="#ff9aa0" strokeOpacity="0.16" strokeWidth="1.5" />
@@ -346,11 +348,11 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
 
           {/* near arm: hand resting on the thigh */}
           <path d={`M ${b.shoulder.x} ${b.shoulder.y} L ${b.elb.x} ${b.elb.y}`} stroke="url(#lp-skin)" strokeWidth="19" strokeLinecap="round" />
-          <path d={`M ${b.elb.x} ${b.elb.y} L ${WRIST.x} ${WRIST.y}`} stroke="url(#lp-skin)" strokeWidth="16" strokeLinecap="round" />
+          <path d={`M ${b.elb.x} ${b.elb.y} L ${b.wrist.x} ${b.wrist.y}`} stroke="url(#lp-skin)" strokeWidth="16" strokeLinecap="round" />
           {/* short t-shirt sleeve over the upper arm */}
           <path d={`M ${b.shoulder.x} ${b.shoulder.y - 2} L ${b.shoulder.x + (b.elb.x - b.shoulder.x) * 0.5} ${b.shoulder.y + (b.elb.y - b.shoulder.y) * 0.5}`} stroke="url(#lp-top)" strokeWidth="27" strokeLinecap="round" />
           <path d={`M ${b.shoulder.x + (b.elb.x - b.shoulder.x) * 0.47} ${b.shoulder.y + (b.elb.y - b.shoulder.y) * 0.47} L ${b.shoulder.x + (b.elb.x - b.shoulder.x) * 0.52} ${b.shoulder.y + (b.elb.y - b.shoulder.y) * 0.52}`} stroke="#4a121a" strokeOpacity="0.6" strokeWidth="27" />
-          <path d={`M ${WRIST.x + 4} ${WRIST.y - 6} C ${WRIST.x - 10} ${WRIST.y - 8}, ${WRIST.x - 24} ${WRIST.y - 3}, ${WRIST.x - 25} ${WRIST.y + 3} C ${WRIST.x - 22} ${WRIST.y + 8}, ${WRIST.x - 6} ${WRIST.y + 9}, ${WRIST.x + 4} ${WRIST.y + 6} Z`} fill="url(#lp-skin)" />
+          <path d={`M ${b.wrist.x + 4} ${b.wrist.y - 6} C ${b.wrist.x - 10} ${b.wrist.y - 8}, ${b.wrist.x - 24} ${b.wrist.y - 3}, ${b.wrist.x - 25} ${b.wrist.y + 3} C ${b.wrist.x - 22} ${b.wrist.y + 8}, ${b.wrist.x - 6} ${b.wrist.y + 9}, ${b.wrist.x + 4} ${b.wrist.y + 6} Z`} fill="url(#lp-skin)" />
 
           {/* ---------- angle lines (same marks as the running app) ---------- */}
           <g className="transition-opacity duration-300" opacity={showLines ? 1 : 0}>
