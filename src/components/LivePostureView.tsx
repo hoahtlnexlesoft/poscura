@@ -156,7 +156,9 @@ function body(p: Pose) {
 }
 
 /* ---------------- component ---------------- */
-export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: () => void }) {
+export type LiveReading = { neck: number; shoulders: number; torso: number; level: Level; flags: Area[] };
+
+export function LivePostureView({ timeLeft, onEnd, onReading }: { timeLeft: string; onEnd: () => void; onReading?: (r: LiveReading) => void }) {
   const statusRef = useRef<HTMLDivElement>(null);
   const { wrapRef, box } = useFitFrame(statusRef);
   const [phaseIdx, setPhaseIdx] = useState(0);
@@ -218,6 +220,12 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
   const neckDeg = Math.round(pose.neck - pose.lean); // head forward, measured against the torso
 
   const flagged = (a: Area) => !!phase.flags?.includes(a);
+  const shoulderDeg = flagged("shoulders") ? 14 : Math.max(0, Math.round(pose.shrug));
+  const flagKey = (phase.flags ?? []).join(",");
+  useEffect(() => {
+    onReading?.({ neck: neckDeg, shoulders: shoulderDeg, torso: torsoDeg, level: phase.level, flags: phase.flags ?? [] });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [neckDeg, shoulderDeg, torsoDeg, phase.level, flagKey]);
   const lineColor = (a: Area) =>
     flagged(a) ? (phase.level === "poor" ? "var(--color-destructive)" : "var(--color-warning)") : "var(--color-primary)";
 
@@ -307,6 +315,13 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
             <rect x="40" y="368" width="44" height="5" rx="2" fill="#3a4357" />
             <rect x="0" y="262" width="122" height="84" rx="4" fill="#0d1320" stroke="#3a4357" strokeWidth="3" />
             <rect x="6" y="268" width="110" height="72" rx="2" fill="url(#lp-screen)" opacity="0.7" />
+          </g>
+
+          {/* far arm: behind the body and in shade, hand on the far knee */}
+          <g transform="translate(-9 -7)">
+            <path d={`M ${b.shoulder.x + 4} ${b.shoulder.y} L ${b.elb.x + 4} ${b.elb.y} L ${b.wrist.x} ${b.wrist.y}`} fill="none" stroke="#a0694f" strokeWidth="15" strokeLinecap="round" strokeLinejoin="round" />
+            <path d={`M ${b.shoulder.x + 4} ${b.shoulder.y - 2} L ${b.shoulder.x + 4 + (b.elb.x - b.shoulder.x) * 0.5} ${b.shoulder.y + (b.elb.y - b.shoulder.y) * 0.5}`} stroke="#4a2424" strokeWidth="24" strokeLinecap="round" />
+            <ellipse cx={b.wrist.x - 12} cy={b.wrist.y + 2} rx="13" ry="7" fill="#a0694f" />
           </g>
 
           {/* torso (shirt) */}

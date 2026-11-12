@@ -47,7 +47,7 @@ export function ExerciseIntro({
           <div className="relative mt-4 aspect-[16/10] overflow-hidden rounded-2xl border border-border bg-[radial-gradient(60%_70%_at_50%_45%,#11223f,#05080f)]">
             <Figure motion={g.motion} />
           </div>
-          <p className="mt-2 text-xs text-muted-foreground">Animation for now. The demo video is coming.</p>
+          <p className="mt-2 text-xs text-muted-foreground">Preview loop · the full demo video is coming.</p>
 
           <div className="mt-3 grid grid-cols-3 gap-2">
             {[["A day", g.perDay], ["Each session", g.reps], ["Hold", g.hold]].map(([l, v]) => (
@@ -124,37 +124,80 @@ function Info({ icon, label, value }: { icon: React.ReactNode; label: string; va
   );
 }
 
-/** Simple looping line figure showing the movement. */
+/** Looping demo of the movement, styled as a video. */
 function Figure({ motion }: { motion: Motion }) {
-  // scale animations pivot on x = 100 by wrapping in translate(100 ·) … translate(-100 ·)
-  const headAnim = {
-    tilt: <animateTransform attributeName="transform" type="rotate" additive="sum" values="0;-24;0;24;0" dur="5s" repeatCount="indefinite" />,
-    nod: <animateTransform attributeName="transform" type="translate" additive="sum" values="0 0;0 5;0 0" dur="2.6s" repeatCount="indefinite" />,
-    turn: <animateTransform attributeName="transform" type="scale" additive="sum" values="1 1;0.55 1;1 1;0.55 1;1 1" dur="5s" repeatCount="indefinite" />,
-    lookdown: <animateTransform attributeName="transform" type="rotate" additive="sum" values="0;0;20;20;0" keyTimes="0;0.15;0.45;0.8;1" dur="5s" repeatCount="indefinite" />,
-    twist: null,
+  const D = "5s";
+  const head = {
+    tilt: <animateTransform attributeName="transform" type="rotate" additive="sum" values="0;-22;0;22;0" dur={D} repeatCount="indefinite" />,
+    nod: <animateTransform attributeName="transform" type="translate" additive="sum" values="0 0;0 4;0 0" dur="2.6s" repeatCount="indefinite" />,
+    turn: <animateTransform attributeName="transform" type="scale" additive="sum" values="1 1;0.8 1;1 1;0.8 1;1 1" dur={D} repeatCount="indefinite" />,
+    lookdown: <animateTransform attributeName="transform" type="translate" additive="sum" values="0 0;0 0;0 9;0 9;0 0" keyTimes="0;0.15;0.45;0.8;1" dur={D} repeatCount="indefinite" />,
+    twist: <animateTransform attributeName="transform" type="scale" additive="sum" values="1 1;0.82 1;1 1;0.82 1;1 1" dur={D} repeatCount="indefinite" />,
   }[motion];
+  // the face slides sideways when the head turns
+  const face = motion === "turn"
+    ? <animateTransform attributeName="transform" type="translate" values="0 0;-6 0;0 0;6 0;0 0" dur={D} repeatCount="indefinite" />
+    : motion === "lookdown"
+      ? <animateTransform attributeName="transform" type="translate" values="0 0;0 0;0 5;0 5;0 0" keyTimes="0;0.15;0.45;0.8;1" dur={D} repeatCount="indefinite" />
+      : null;
   return (
-    <svg viewBox="0 0 200 125" className="absolute inset-0 h-full w-full" aria-hidden>
-      <g stroke="#6fb3ff" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" fill="none">
-        {/* torso + arms */}
+    <>
+      <svg viewBox="0 0 200 125" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 h-full w-full" aria-hidden>
+        <defs>
+          <linearGradient id="ei-skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#f0c3a3" /><stop offset="1" stopColor="#c98d6c" /></linearGradient>
+          <linearGradient id="ei-tee" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#8a4644" /><stop offset="1" stopColor="#4f2526" /></linearGradient>
+          <linearGradient id="ei-hair" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#7a5640" /><stop offset="1" stopColor="#3e2a1e" /></linearGradient>
+        </defs>
+        {/* back wall + chair back */}
+        <rect x="0" y="0" width="200" height="125" fill="#0c1628" />
+        <rect x="30" y="18" width="46" height="30" rx="2" fill="#16284a" opacity="0.7" />
+        <rect x="132" y="22" width="40" height="22" rx="2" fill="#16284a" opacity="0.5" />
+        <rect x="64" y="70" width="72" height="60" rx="10" fill="#141c2c" />
+        {/* torso */}
         <g transform="translate(100 0)">
-          {motion === "twist" && (
-            <animateTransform attributeName="transform" type="scale" additive="sum" values="1 1;0.45 1;1 1;0.45 1;1 1" dur="5s" repeatCount="indefinite" />
-          )}
-          <path transform="translate(-100 0)" d="M100 62 V100 M78 66 H122 M78 66 L74 92 M122 66 L126 92" />
-        </g>
-        {/* hips + legs on the seat */}
-        <path d="M86 100 H114 M86 100 L84 116 M114 100 L116 116" />
-        {/* head, pivoting at the base of the neck */}
-        <g transform="translate(100 62)">
-          {headAnim}
-          <g transform="translate(-100 -62)">
-            <circle cx="100" cy="46" r="10" />
-            <path d="M100 56 V62" />
+          {motion === "twist" && <animateTransform attributeName="transform" type="scale" additive="sum" values="1 1;0.78 1;1 1;0.78 1;1 1" dur={D} repeatCount="indefinite" />}
+          <g transform="translate(-100 0)">
+            <path d="M70 86 C70 76 80 72 92 70 L108 70 C120 72 130 76 130 86 L134 128 L66 128 Z" fill="url(#ei-tee)" />
+            {motion === "twist" ? (
+              <path d="M76 98 C88 106 112 106 124 98" stroke="url(#ei-skin)" strokeWidth="8" strokeLinecap="round" fill="none" />
+            ) : (
+              <>
+                <path d="M70 86 L66 128" stroke="url(#ei-skin)" strokeWidth="8" strokeLinecap="round" />
+                <path d="M130 86 L134 128" stroke="url(#ei-skin)" strokeWidth="8" strokeLinecap="round" />
+              </>
+            )}
           </g>
         </g>
-      </g>
-    </svg>
+        {/* head pivots at the base of the neck */}
+        <g transform="translate(100 72)">
+          {head}
+          <g transform="translate(-100 -72)">
+            <rect x="94" y="56" width="12" height="16" rx="5" fill="#c98d6c" />
+            <ellipse cx="85" cy="47" rx="3" ry="5" fill="#d9a07e" />
+            <ellipse cx="115" cy="47" rx="3" ry="5" fill="#d9a07e" />
+            <ellipse cx="100" cy="45" rx="14" ry="17" fill="url(#ei-skin)" />
+            <g>
+              {face}
+              <ellipse cx="94.5" cy="45" rx="1.6" ry="1.1" fill="#2a1c17" />
+              <ellipse cx="105.5" cy="45" rx="1.6" ry="1.1" fill="#2a1c17" />
+              <path d="M91.5 41.5 Q94.5 40 97.5 41.5 M102.5 41.5 Q105.5 40 108.5 41.5" stroke="#4a3222" strokeWidth="1.3" fill="none" strokeLinecap="round" />
+              <path d="M100 46 L99 51 L101.5 51.5" stroke="#b47a5b" strokeWidth="1" fill="none" strokeLinecap="round" />
+              <path d="M96.5 55 Q100 56.5 103.5 55" stroke="#9a5c4c" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+            </g>
+            <path d="M86 42 C85 30 93 25 101 26 C110 26 116 32 114.5 42 C112 36 106 33 100 34 C94 33 89 36 86 42 Z" fill="url(#ei-hair)" />
+          </g>
+        </g>
+      </svg>
+      {/* video chrome */}
+      <span className="absolute left-3 top-3 rounded-full bg-black/50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-white/80 backdrop-blur">Demo</span>
+      <div className="absolute inset-x-3 bottom-3 flex items-center gap-2.5">
+        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-black/50 backdrop-blur"><Play className="ml-px h-3 w-3 fill-white text-white" /></span>
+        <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/20">
+          <div className="h-full w-full origin-left rounded-full bg-white/85 [animation:ei-progress_5s_linear_infinite]" />
+        </div>
+        <span className="text-[10.5px] tabular-nums text-white/80">0:05</span>
+      </div>
+      <style>{"@keyframes ei-progress{from{transform:scaleX(0)}to{transform:scaleX(1)}}"}</style>
+    </>
   );
 }
