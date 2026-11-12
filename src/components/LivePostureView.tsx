@@ -105,6 +105,14 @@ function smooth(pts: V[]): string {
   return d + " Z";
 }
 
+/** tapered limb from a (width wa) to b (width wb) with round ends, as a closed path */
+function limb(a: V, b: V, wa: number, wb: number): string {
+  const dx = b.x - a.x, dy = b.y - a.y, L = Math.hypot(dx, dy) || 1;
+  const nx = -dy / L, ny = dx / L, ra = wa / 2, rb = wb / 2;
+  const p = (q: V, r: number, k: number) => `${(q.x + nx * r * k).toFixed(1)} ${(q.y + ny * r * k).toFixed(1)}`;
+  return `M ${p(a, ra, 1)} L ${p(b, rb, 1)} A ${rb} ${rb} 0 0 1 ${p(b, rb, -1)} L ${p(a, ra, -1)} A ${ra} ${ra} 0 0 1 ${p(a, ra, 1)} Z`;
+}
+
 /** hand direction: halfway between the forearm and pointing straight ahead (toward the knee) */
 function handAngle(elb: V, wrist: V): number {
   const fore = (Math.atan2(wrist.y - elb.y, wrist.x - elb.x) * 180) / Math.PI;
@@ -317,11 +325,11 @@ export function LivePostureView({ timeLeft, onEnd, onReading }: { timeLeft: stri
             <rect x="6" y="268" width="110" height="72" rx="2" fill="url(#lp-screen)" opacity="0.7" />
           </g>
 
-          {/* far arm: behind the body and in shade, hand on the far knee */}
+          {/* far arm: behind the body, a shade darker, hand on the far knee */}
           <g transform="translate(-9 -7)">
-            <path d={`M ${b.shoulder.x + 4} ${b.shoulder.y} L ${b.elb.x + 4} ${b.elb.y} L ${b.wrist.x} ${b.wrist.y}`} fill="none" stroke="#a0694f" strokeWidth="15" strokeLinecap="round" strokeLinejoin="round" />
-            <path d={`M ${b.shoulder.x + 4} ${b.shoulder.y - 2} L ${b.shoulder.x + 4 + (b.elb.x - b.shoulder.x) * 0.5} ${b.shoulder.y + (b.elb.y - b.shoulder.y) * 0.5}`} stroke="#4a2424" strokeWidth="24" strokeLinecap="round" />
-            <ellipse cx={b.wrist.x - 12} cy={b.wrist.y + 2} rx="13" ry="7" fill="#a0694f" />
+            <path d={limb({ x: b.shoulder.x + 4, y: b.shoulder.y }, { x: b.elb.x + 4, y: b.elb.y }, 18, 15)} fill="#b8805f" />
+            <path d={limb({ x: b.elb.x + 4, y: b.elb.y }, b.wrist, 15, 11)} fill="#b8805f" />
+            <ellipse cx={b.wrist.x - 13} cy={b.wrist.y + 2} rx="14" ry="7.5" fill="#b8805f" />
           </g>
 
           {/* torso (shirt) */}
@@ -379,14 +387,24 @@ export function LivePostureView({ timeLeft, onEnd, onReading }: { timeLeft: stri
               d="M -23 -20 C -26 -26 -23 -33 -16 -35 C -14 -39 -6 -40 -1 -38 C 4 -41 13 -40 17 -36 C 24 -34 28 -26 27.5 -16 C 27.5 -8 26.5 -1 23.5 5 C 22.5 -1 20 -5 15.6 -7.4 C 12.5 -9.6 8 -11 4.6 -11 L 4 -2 C 2 -3.5 1.2 -9 0.4 -13.5 C -6 -16.4 -14 -17.2 -23 -20 Z"
               fill="url(#lp-hair)"
             />
+            {/* fringe flicks and crown volume */}
+            <path d="M -23 -20 C -26 -17 -26 -13 -23.5 -11 C -23 -15 -21.5 -17.5 -19 -19 Z" fill="url(#lp-hair)" />
+            <path d="M -18 -35 C -14 -41 -6 -42 -2 -39 C -8 -39.5 -13 -38 -18 -35 Z M 4 -40 C 10 -43 18 -41 21 -36 C 15 -39 9 -39.5 4 -40 Z" fill="#5c3f2c" />
+            <g stroke="#2e1f16" strokeOpacity="0.5" strokeWidth="1.2" fill="none" strokeLinecap="round">
+              <path d="M -10 -30 C -5 -27 0 -26 5 -27" />
+              <path d="M 8 -31 C 14 -27 18 -21 20 -14" />
+              <path d="M 14 -34 C 20 -29 24 -22 24.5 -14" />
+            </g>
             <path d="M -15 -33 C -10 -35 -5 -34 -1 -31 M 3 -36 C 8 -36 12 -34 15 -30" stroke="#a37a5c" strokeOpacity="0.45" strokeWidth="1.6" fill="none" strokeLinecap="round" />
           </g>
 
           {/* near arm: hand resting on the thigh */}
-          <path d={`M ${b.shoulder.x} ${b.shoulder.y} L ${b.elb.x} ${b.elb.y}`} stroke="url(#lp-skin)" strokeWidth="19" strokeLinecap="round" />
-          <path d={`M ${b.elb.x} ${b.elb.y} L ${b.wrist.x} ${b.wrist.y}`} stroke="url(#lp-skin)" strokeWidth="16" strokeLinecap="round" />
+          {/* upper arm (bicep), forearm tapering to the wrist */}
+          <path d={limb(b.shoulder, b.elb, 20, 16)} fill="url(#lp-skin)" />
+          <path d={limb(b.elb, b.wrist, 16.5, 11.5)} fill="url(#lp-skin)" />
+          <path d={`M ${b.elb.x + 2} ${b.elb.y + 6} L ${b.wrist.x + 2} ${b.wrist.y + 5}`} stroke="#a96f52" strokeOpacity="0.45" strokeWidth="3" strokeLinecap="round" />
           {/* short t-shirt sleeve over the upper arm */}
-          <path d={`M ${b.shoulder.x} ${b.shoulder.y - 2} L ${b.shoulder.x + (b.elb.x - b.shoulder.x) * 0.5} ${b.shoulder.y + (b.elb.y - b.shoulder.y) * 0.5}`} stroke="url(#lp-top)" strokeWidth="27" strokeLinecap="round" />
+          <path d={limb({ x: b.shoulder.x, y: b.shoulder.y - 3 }, { x: b.shoulder.x + (b.elb.x - b.shoulder.x) * 0.52, y: b.shoulder.y + (b.elb.y - b.shoulder.y) * 0.52 }, 28, 24)} fill="url(#lp-top)" />
           <path d={`M ${b.shoulder.x + (b.elb.x - b.shoulder.x) * 0.47} ${b.shoulder.y + (b.elb.y - b.shoulder.y) * 0.47} L ${b.shoulder.x + (b.elb.x - b.shoulder.x) * 0.52} ${b.shoulder.y + (b.elb.y - b.shoulder.y) * 0.52}`} stroke="#2e1515" strokeOpacity="0.6" strokeWidth="27" />
           {/* hand resting on the thigh: back of the hand, fingers draping over the thigh, thumb on the inside */}
           <g transform={`translate(${b.wrist.x} ${b.wrist.y}) rotate(${handAngle(b.elb, b.wrist)}) scale(1.15 -1.15)`}>

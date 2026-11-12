@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Play, Camera, Activity, Settings, RotateCw, ScanLine } from "lucide-react";
+import { Play, Camera, Activity, Settings, RotateCw } from "lucide-react";
 import { ScoreGauge } from "@/components/ScoreGauge";
 import { DiscomfortDialog } from "@/components/DiscomfortDialog";
 import { SessionReport } from "@/components/SessionReport";
 import { MonitoringTimeLeft } from "@/components/MonitoringTimeLeft";
 import { CameraSettingDialog } from "@/components/CameraSettingDialog";
-import { LivePostureView, type LiveReading } from "@/components/LivePostureView";
+import { LivePostureView } from "@/components/LivePostureView";
 import { useFitFrame } from "@/hooks/useFitFrame";
 
 export const Route = createFileRoute("/posture-monitor")({
@@ -22,7 +22,6 @@ function PostureMonitor() {
   const search = Route.useSearch() as { report?: string };
   const [running, setRunning] = useState(false);
   const startFooter = useRef<HTMLDivElement>(null);
-  const [reading, setReading] = useState<LiveReading | null>(null);
   const [reloading, setReloading] = useState(false);
   const reloadHistory = () => {
     setReloading(true);
@@ -119,12 +118,11 @@ function PostureMonitor() {
           </div>
           </>
         ) : (
-          <LivePostureView timeLeft={`${mm}:${ss}`} onEnd={handleStop} onReading={setReading} />
+          <LivePostureView timeLeft={`${mm}:${ss}`} onEnd={handleStop} />
         )}
       </section>
 
       <div className="space-y-4 fold:col-start-2 fold:row-start-2 fold:self-start">
-      {running && reading && <LiveReadings r={reading} />}
       <section className="glass-card p-4">
         <div className="flex items-center gap-2 mb-3">
           <Activity className="h-4 w-4 text-primary" />
@@ -165,45 +163,3 @@ function PostureMonitor() {
   );
 }
 
-const AREAS = [
-  { key: "neck", flag: "neck", label: "Head & Neck", hint: "Head forward", limit: 15 },
-  { key: "shoulders", flag: "shoulders", label: "Shoulders", hint: "Shoulders raised", limit: 10 },
-  { key: "torso", flag: "torso", label: "Spine & Torso", hint: "Leaning forward", limit: 15 },
-] as const;
-
-/** What the camera is reading right now, one row per body area. */
-function LiveReadings({ r }: { r: LiveReading }) {
-  return (
-    <section className="glass-card p-4">
-      <div className="mb-3 flex items-center gap-2">
-        <ScanLine className="h-4 w-4 text-primary" />
-        <h2 className="text-sm font-semibold">Live readings</h2>
-        <span className="ml-auto inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-success" /> Tracking
-        </span>
-      </div>
-      <div className="space-y-2">
-        {AREAS.map((a) => {
-          const v = r[a.key];
-          const hot = r.flags.includes(a.flag);
-          const tone = !hot ? "text-success" : r.level === "poor" ? "text-destructive" : "text-warning";
-          const bar = !hot ? "bg-success" : r.level === "poor" ? "bg-destructive" : "bg-warning";
-          return (
-            <div key={a.key} className="rounded-xl border border-border bg-card/60 px-3 py-2.5">
-              <div className="flex items-baseline justify-between gap-2">
-                <span className="text-[13px] font-medium">{a.label}</span>
-                <span className={`text-[17px] font-semibold tabular-nums transition-colors ${tone}`}>{v}°</span>
-              </div>
-              <div className="mt-1.5 flex items-center gap-2">
-                <div className="h-1 flex-1 overflow-hidden rounded-full bg-muted">
-                  <div className={`h-full rounded-full transition-all duration-500 ${bar}`} style={{ width: `${Math.min(100, (v / 40) * 100)}%` }} />
-                </div>
-                <span className="w-[92px] shrink-0 truncate text-right text-[10.5px] text-muted-foreground">{hot ? a.hint : `OK · under ${a.limit}°`}</span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
