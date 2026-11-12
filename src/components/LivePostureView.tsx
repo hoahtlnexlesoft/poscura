@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AlertTriangle, Check, CheckCircle2, Clock, Eye, Square } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useFitFrame } from "@/hooks/useFitFrame";
 
 /* ------------------------------------------------------------------------
  * Live posture view (demo): a seated person at a desk, seen from the side,
@@ -142,6 +143,8 @@ function body(p: Pose) {
 
 /* ---------------- component ---------------- */
 export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: () => void }) {
+  const statusRef = useRef<HTMLDivElement>(null);
+  const { wrapRef, box } = useFitFrame(statusRef);
   const [phaseIdx, setPhaseIdx] = useState(0);
   const phase = PHASES[phaseIdx];
   const showLines = true; // angle lines are always shown
@@ -203,10 +206,10 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
     <div>
       {/* ---------- live view ---------- */}
       {/* 9:16 camera frame, sized by the screen height so the status bar stays in view */}
-      <div className="flex justify-center bg-[#04070d]">
+      <div ref={wrapRef} className="flex justify-center bg-[#04070d]">
       <div
-        className="relative aspect-[9/16] max-w-full overflow-hidden bg-[#070b14]"
-        style={{ width: "min(100%, calc(max(320px, min(100dvh - 290px, 660px)) * 9 / 16))" }}
+        className="@container relative aspect-[9/16] max-w-full overflow-hidden bg-[#070b14]"
+        style={box ? { width: box.w, height: box.h } : { width: "min(100%, calc(max(320px, 100dvh - 290px) * 9 / 16))" }}
       >
         {/* state tint */}
         <div
@@ -382,7 +385,7 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
       </div>
 
       {/* ---------- status bar ---------- */}
-      <div className="space-y-3 border-t border-white/[0.06] px-4 pb-4 pt-3">
+      <div ref={statusRef} className="space-y-3 border-t border-white/[0.06] px-4 pb-4 pt-3">
         <div className="flex items-center gap-3">
           <SegmentGauge value={score} level={phase.level} />
           <div className="min-w-0 flex-1">
@@ -477,8 +480,8 @@ function CoachBanner({ tone, kicker, title, note, more, fixed }: NonNullable<Pha
           <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-success text-success-foreground">
             <Check className="h-4 w-4" strokeWidth={3} />
           </span>
-          <span className="truncate text-[14px] font-medium text-white">{title}</span>
-          {note && <span className="hidden shrink-0 text-[11.5px] text-white/55 min-[360px]:inline">{note}</span>}
+          <span className="shrink-0 whitespace-nowrap text-[14px] font-medium text-white">{title}</span>
+          {note && <span className="min-w-0 truncate text-[11.5px] text-white/55">{note}</span>}
         </div>
       </div>
     );
@@ -494,14 +497,14 @@ function CoachBanner({ tone, kicker, title, note, more, fixed }: NonNullable<Pha
         <rect x="0.5" y="0.5" rx="15.5" fill="none" stroke={t.color} strokeOpacity="0.9" strokeWidth="1"
           strokeDasharray="2 6" strokeLinecap="round" style={{ width: "calc(100% - 1px)", height: "calc(100% - 1px)" }} />
       </svg>
-      <Icon className="mt-[2px] h-5 w-5 shrink-0" style={{ color: t.color }} strokeWidth={1.9} />
+      <Icon className="mt-[2px] h-5 w-5 shrink-0 @max-[300px]:hidden!" style={{ color: t.color }} strokeWidth={1.9} />
       <div className="min-w-0">
         {kicker && (
-          <div className="text-[9.5px] font-medium uppercase leading-tight tracking-[0.04em]" style={{ color: t.color }}>
+          <div className="text-[9.5px] font-medium uppercase leading-tight tracking-[0.04em] @max-[300px]:hidden!" style={{ color: t.color }}>
             {kicker}
           </div>
         )}
-        <div className={cn("text-[clamp(15px,2.1dvh,18px)] font-normal leading-[1.25] tracking-[-0.005em] text-white", kicker && "mt-1")}>{title}</div>
+        <div className={cn("text-[clamp(15px,2.1dvh,18px)] @max-[300px]:text-[13.5px]! @max-[300px]:leading-snug! font-normal leading-[1.25] tracking-[-0.005em] text-white", kicker && "mt-1 @max-[300px]:mt-0!")}>{title}</div>
         {note && <div className="mt-1 text-[11.5px] text-white/55">{note}</div>}
         {more && <div className="mt-1.5 text-[11.5px] text-white/80">{more}</div>}
         {fixed && (

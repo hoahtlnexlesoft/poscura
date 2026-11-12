@@ -7,6 +7,7 @@ import { SessionReport } from "@/components/SessionReport";
 import { MonitoringTimeLeft } from "@/components/MonitoringTimeLeft";
 import { CameraSettingDialog } from "@/components/CameraSettingDialog";
 import { LivePostureView } from "@/components/LivePostureView";
+import { useFitFrame } from "@/hooks/useFitFrame";
 
 export const Route = createFileRoute("/posture-monitor")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -20,6 +21,7 @@ const SESSION_SECONDS = 40 * 60;
 function PostureMonitor() {
   const search = Route.useSearch() as { report?: string };
   const [running, setRunning] = useState(false);
+  const startFit = useFitFrame();
   const [remaining, setRemaining] = useState(SESSION_SECONDS);
   const [showDiscomfort, setShowDiscomfort] = useState(false);
   const [showReport, setShowReport] = useState(search.report === "1");
@@ -66,10 +68,10 @@ function PostureMonitor() {
 
       <section className="rounded-2xl border border-border bg-gradient-to-br from-card via-background to-background overflow-hidden fold:col-start-1">
         {!running ? (
-          <div className="flex justify-center bg-[#04070d]">
+          <div ref={startFit.wrapRef} className="flex justify-center bg-[#04070d]">
           <div
             className="relative aspect-[9/16] max-w-full flex flex-col items-center justify-center gap-3 px-4 text-center bg-gradient-to-b from-card via-background to-background"
-            style={{ width: "min(100%, calc(max(320px, min(100dvh - 250px, 680px)) * 9 / 16))" }}
+            style={startFit.box ? { width: startFit.box.w, height: startFit.box.h } : { width: "min(100%, calc(max(320px, 100dvh - 250px) * 9 / 16))" }}
           >
             <button
               onClick={() => setShowCameraSetting(true)}
