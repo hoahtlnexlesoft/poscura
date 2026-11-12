@@ -101,17 +101,26 @@ function PlanCard({ plan, cycle }: { plan: Plan; cycle: BillingCycle }) {
   );
 }
 
-/** Monthly/annual toggle + plan cards. Cards sit side by side when there is room. */
-export function PlanPicker({ className }: { className?: string }) {
-  const [cycle, setCycle] = useState<BillingCycle>("monthly");
+/** Plan cards only; side by side when there is room. */
+export function PlanCards({ cycle, className }: { cycle: BillingCycle; className?: string }) {
   return (
-    <div className={cn("@container space-y-5", className)}>
-      <BillingToggle cycle={cycle} onChange={setCycle} />
+    <div className={cn("@container", className)}>
       <div className="grid gap-3 @[620px]:grid-cols-3 @[620px]:items-stretch @[620px]:gap-4 @[620px]:pt-[26px]">
         {PLANS.map((p) => (
           <PlanCard key={p.id} plan={p} cycle={cycle} />
         ))}
       </div>
+    </div>
+  );
+}
+
+/** Monthly/annual toggle + plan cards. */
+export function PlanPicker({ className }: { className?: string }) {
+  const [cycle, setCycle] = useState<BillingCycle>("monthly");
+  return (
+    <div className={cn("space-y-5", className)}>
+      <BillingToggle cycle={cycle} onChange={setCycle} />
+      <PlanCards cycle={cycle} />
     </div>
   );
 }
