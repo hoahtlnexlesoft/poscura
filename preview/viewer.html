@@ -127,10 +127,7 @@
     { n:"10", label:"My Account", path:"/account" },
     { n:"11", label:"Checkout — upgrade", path:"/checkout" },
     { n:"12", label:"Settings", path:"/settings" },
-    { n:"13", label:"Support", path:"/support" },
-    { n:"14", label:"Report an Issue", path:"/support/report" },
-    { n:"15", label:"My Tickets", path:"/support/tickets" },
-    { n:"15b", label:"Ticket detail", path:"/support/tickets/TKT-1045" }
+    { n:"13", label:"Support", path:"/support" }
   ];
   var DEVICES = [
     { id:"ip16pm", name:"iPhone 16 Pro Max", w:440, h:956, kind:"island", unit:"pt", color:"#8d8577" },
@@ -153,7 +150,7 @@
   function view() {
     var d = dev();
     if (!d.rotate) return d;
-    return Object.assign({}, d, { w:d.h, h:d.w, crease:"h", land:true });
+    return Object.assign({}, d, { w:d.h, h:d.w, crease:"v", land:true });
   }
   function dev() { return DEVICES.filter(function (d) { return d.id === state.dev; })[0]; }
 
@@ -208,10 +205,10 @@
         extra = '<span class="sidebtn" style="background:'+c4+';right:-3px;top:120px;height:60px"></span><span class="sidebtn" style="background:'+c4+';top:-3px;left:80px;width:70px;height:4px"></span><div class="shell"></div>' +
           '<span style="position:absolute;left:50%;top:-3px;bottom:-3px;width:6px;transform:translateX(-50%);background:linear-gradient(90deg,#1c1d20,' + (d.android ? '#565b63' : '#6a6357') + ',#1c1d20);border-radius:3px"></span>';
       } else {
-        // turned 90° clockwise: camera on the right edge, hinge runs left-right
-        cut = '<div class="cut" style="right:13px;top:25%;transform:translateY(-50%);width:16px;height:16px;border-radius:50%"></div>';
-        extra = '<span class="sidebtn" style="background:'+c4+';top:-3px;right:120px;width:60px;height:4px"></span><span class="sidebtn" style="background:'+c4+';right:-3px;bottom:80px;height:70px"></span><div class="shell"></div>' +
-          '<span style="position:absolute;top:50%;left:-3px;right:-3px;height:6px;transform:translateY(-50%);background:linear-gradient(180deg,#1c1d20,' + (d.android ? '#565b63' : '#6a6357') + ',#1c1d20);border-radius:3px"></span>';
+        // landscape book fold: hinge stays vertical in the middle, camera top of the right panel
+        cut = '<div class="cut" style="left:75%;top:13px;transform:translateX(-50%);width:16px;height:16px;border-radius:50%"></div>';
+        extra = '<span class="sidebtn" style="background:'+c4+';right:-3px;top:110px;height:60px"></span><span class="sidebtn" style="background:'+c4+';top:-3px;right:120px;width:70px;height:4px"></span><div class="shell"></div>' +
+          '<span style="position:absolute;left:50%;top:-3px;bottom:-3px;width:6px;transform:translateX(-50%);background:linear-gradient(90deg,#1c1d20,' + (d.android ? '#565b63' : '#6a6357') + ',#1c1d20);border-radius:3px"></span>';
       }
     } else {
       ow = d.w + 28; oh = d.h + 30; sl = 14; st = 15; radius = 52; scr = 40; top = 40; bot = 24;

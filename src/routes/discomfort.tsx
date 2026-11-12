@@ -46,7 +46,7 @@ function DiscomfortPage() {
         <p className="text-xs text-muted-foreground mt-0.5">Tap areas where you feel pain. Multiple allowed.</p>
       </div>
 
-      <div className="glass-card p-4 flex flex-col items-center fold:col-start-1 fold:row-start-3 fold:row-span-2 fold:sticky fold:top-[72px]">
+      <div className="glass-card p-4 flex flex-col items-center fold:col-start-1 fold:row-start-3 fold:sticky fold:top-[72px]">
         <div className="relative w-full max-w-[280px] fold:max-w-[230px] land:max-w-[190px]">
           <img src={bodyImg} alt="Body" className="w-full h-auto pointer-events-none select-none" draggable={false} />
           {([
@@ -78,7 +78,8 @@ function DiscomfortPage() {
         )}
       </div>
 
-      <div className="glass-card p-4 space-y-4 fold:col-start-2 fold:row-start-3">
+      <div className="space-y-4 fold:col-start-2 fold:row-start-3">
+      <div className="glass-card p-4 space-y-4">
         <div>
           <label className="text-xs text-muted-foreground flex items-center gap-1.5">
             <Clock className="h-3.5 w-3.5" /> Hours seated today: <span className="text-foreground font-medium">{hours}</span>
@@ -108,13 +109,14 @@ function DiscomfortPage() {
         )}
       </div>
 
-      <div className="flex gap-2 fold:col-start-2 fold:row-start-4">
+      <div className="flex gap-3">
         <button onClick={() => navigate({ to: "/" })} className="flex-1 py-2.5 rounded-lg border border-primary/40 text-primary text-sm font-medium">
           Skip
         </button>
         <button onClick={() => navigate({ to: "/" })} className="flex-1 py-2.5 rounded-lg bg-gradient-to-r from-primary to-secondary text-primary-foreground text-sm font-medium shadow-lg">
           Submit
         </button>
+      </div>
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import logo from "@/assets/poscura-logo.png";
 import { signIn } from "@/lib/auth-store";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/login")({ component: LoginPage });
 
@@ -66,6 +67,18 @@ function LoginPage() {
               {showPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
+
+          {mode === "signin" && (
+            <div className="flex justify-end -mt-1">
+              <button
+                type="button"
+                onClick={() => (email ? toast.success(`Reset link sent to ${email}`) : toast("Enter your email above, then tap Forgot password"))}
+                className="text-xs font-medium text-primary hover:underline"
+              >
+                Forgot password?
+              </button>
+            </div>
+          )}
 
           {mode === "signup" && (
             <>

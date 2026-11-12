@@ -125,7 +125,7 @@ function CommunityPage() {
   if (sortBy === "popular") filtered = [...filtered].sort((a, b) => b.likes - a.likes);
 
   return (
-    <div className="space-y-3 pb-20">
+    <div className="space-y-3 pb-20 fold:max-w-[680px] fold:mx-auto">
       <div className="sticky top-14 -mx-4 px-4 py-2 z-20 bg-background/80 backdrop-blur-xl border-b border-border/50 space-y-2">
         <div className="flex items-center gap-2">
           <h1 className="text-xl font-bold flex-1">Community</h1>
@@ -187,30 +187,25 @@ function CommunityPage() {
         )}
       </div>
 
-      {/* Inline composer */}
-      <div className="glass-card p-3">
-        <div className="flex gap-3 items-start">
-          <Avatar name="You" />
-          <textarea
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            placeholder="What's inspiring your progress today, share it…"
-            className="flex-1 bg-transparent outline-none resize-none text-sm min-h-[44px]"
-          />
-        </div>
-        <div className="flex items-center justify-between mt-2 pt-2 border-t border-border/40">
-          <div className="flex items-center gap-3 text-muted-foreground">
-            <button aria-label="Add image"><ImageIcon className="h-4 w-4" /></button>
-            <button aria-label="Emoji"><Smile className="h-4 w-4" /></button>
-          </div>
-          <button
-            onClick={submitPost}
-            disabled={!draft.trim()}
-            className="px-4 py-1.5 rounded-full bg-gradient-to-r from-primary to-secondary text-white text-sm font-semibold disabled:opacity-40"
-          >
-            Post
-          </button>
-        </div>
+      {/* Inline composer — one row */}
+      <div className="glass-card flex items-center gap-2.5 py-2 pl-2.5 pr-2">
+        <Avatar name="You" size={32} />
+        <input
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter" && draft.trim()) submitPost(); }}
+          placeholder="Share your progress today…"
+          className="flex-1 min-w-0 bg-transparent outline-none text-sm placeholder:text-muted-foreground"
+        />
+        <button aria-label="Add image" className="h-8 w-8 shrink-0 rounded-full flex items-center justify-center text-muted-foreground hover:bg-muted/60"><ImageIcon className="h-4 w-4" /></button>
+        <button aria-label="Emoji" className="h-8 w-8 shrink-0 rounded-full hidden min-[380px]:flex items-center justify-center text-muted-foreground hover:bg-muted/60"><Smile className="h-4 w-4" /></button>
+        <button
+          onClick={submitPost}
+          disabled={!draft.trim()}
+          className="h-8 px-4 shrink-0 rounded-full bg-gradient-to-r from-primary to-secondary text-white text-sm font-semibold disabled:opacity-40"
+        >
+          Post
+        </button>
       </div>
 
       {filtered.length === 0 && (
@@ -218,9 +213,9 @@ function CommunityPage() {
           No posts match your filters.
         </div>
       )}
-      <div className="space-y-3 fold:space-y-0 fold:columns-2 fold:gap-3">
+      <div className="space-y-3">
       {filtered.map((p) => (
-        <article key={p.id} className={`glass-card overflow-hidden fold:break-inside-avoid fold:mb-3 ${p.pinned ? "border-primary/40 bg-gradient-to-br from-primary/10 to-secondary/5" : ""}`}>
+        <article key={p.id} className={`glass-card overflow-hidden ${p.pinned ? "border-primary/40 bg-gradient-to-br from-primary/10 to-secondary/5" : ""}`}>
           <header className="flex items-center gap-3 p-3">
             <Avatar name={p.user} />
             <div className="flex-1 min-w-0">

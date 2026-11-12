@@ -1,6 +1,6 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
-import { Bell, Mic, Clock, Languages, ArrowLeft } from "lucide-react";
+import { Bell, Mic, Clock, Languages, ArrowLeft, ShieldAlert, ChevronRight } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -22,9 +22,11 @@ function SettingsPage() {
   const router = useRouter();
   const [language, setLanguage] = useState("en");
   
-  const [voice, setVoice] = useState(true);
-  const [postureAlerts, setPostureAlerts] = useState(true);
-  const [workoutReminders, setWorkoutReminders] = useState(true);
+  const [voice, setVoice] = useState(false);
+  const [allowNotifications, setAllowNotifications] = useState(true);
+  const [postureAlerts, setPostureAlerts] = useState(false);
+  const [workoutReminders, setWorkoutReminders] = useState(false);
+  const [communityNotifications, setCommunityNotifications] = useState(true);
 
   return (
     <div className="-mx-4 -mt-4">
@@ -67,13 +69,22 @@ function SettingsPage() {
       </Section>
 
       <Section icon={Mic} title="Voice">
-        <Row label="Wake word"><span className="text-sm">Hey Poscura</span></Row>
-        <Row label="Voice activation"><Switch checked={voice} onCheckedChange={setVoice} /></Row>
+        <Row label="Wake word"><span className="text-[15px] text-muted-foreground">Motion Future</span></Row>
+        <Row label="Voice activation" hint="Always listen for wake word">
+          <Switch checked={voice} onCheckedChange={setVoice} />
+        </Row>
       </Section>
 
       <Section icon={Bell} title="Notifications">
-        <Row label="Posture alerts"><Switch checked={postureAlerts} onCheckedChange={setPostureAlerts} /></Row>
-        <Row label="Workout reminders"><Switch checked={workoutReminders} onCheckedChange={setWorkoutReminders} /></Row>
+        <Row label="Allow notifications"><Switch checked={allowNotifications} onCheckedChange={setAllowNotifications} /></Row>
+        <Row label="Posture alerts"><Switch checked={postureAlerts} onCheckedChange={setPostureAlerts} disabled={!allowNotifications} /></Row>
+        <Row label="Workout reminders"><Switch checked={workoutReminders} onCheckedChange={setWorkoutReminders} disabled={!allowNotifications} /></Row>
+        <Row label="Community notifications"><Switch checked={communityNotifications} onCheckedChange={setCommunityNotifications} disabled={!allowNotifications} /></Row>
+      </Section>
+
+      <Section icon={ShieldAlert} title="Legal Information">
+        <LinkRow label="Terms Of Service" />
+        <LinkRow label="Privacy Policy" />
       </Section>
       </div>
     </div>
@@ -84,23 +95,35 @@ function Section(props: SectionProps) {
   const { icon: Icon, title, children } = props;
 
   return (
-    <section className="glass-card p-4">
-      <div className="flex items-center gap-2 mb-2">
-        <Icon className="h-4 w-4 text-primary" />
-        <h2 className="text-sm font-semibold">{title}</h2>
+    <section className="glass-card px-4 pt-4 pb-1">
+      <div className="flex items-center gap-2 mb-1">
+        <Icon className="h-[18px] w-[18px] text-primary" />
+        <h2 className="text-[15px] font-semibold">{title}</h2>
       </div>
       <div className="divide-y divide-border">{children}</div>
     </section>
   );
 }
 
-function Row(props: RowProps) {
-  const { label, children } = props;
+function Row(props: RowProps & { hint?: string }) {
+  const { label, children, hint } = props;
 
   return (
-    <div className="flex items-center justify-between py-2.5">
-      <span className="text-sm text-muted-foreground">{label}</span>
-      {children}
+    <div className="py-3">
+      <div className="flex items-center justify-between gap-3 min-h-[28px]">
+        <span className="text-[15px] text-foreground">{label}</span>
+        {children}
+      </div>
+      {hint && <p className="mt-1.5 text-xs text-muted-foreground">{hint}</p>}
     </div>
+  );
+}
+
+function LinkRow({ label }: { label: string }) {
+  return (
+    <button type="button" className="flex w-full items-center justify-between py-3.5 text-left text-[15px] hover:text-primary transition-colors">
+      {label}
+      <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
+    </button>
   );
 }

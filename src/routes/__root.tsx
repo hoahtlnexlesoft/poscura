@@ -116,15 +116,16 @@ function AuthGate() {
   }
 
   const hideTopBar = location.pathname === "/account" || location.pathname === "/settings" || location.pathname === "/support";
+  const isOnboarding = location.pathname === "/onboarding";
   return (
-    <div className="flex flex-col min-h-screen w-full bg-background text-foreground rail:pr-[92px]">
+    <div className={`flex flex-col min-h-screen w-full bg-background text-foreground ${isOnboarding ? "" : "rail:pr-[92px]"}`}>
       {!hideTopBar && <MobileTopBar />}
-      <main className="flex-1 p-4 pb-24 rail:pb-6">
+      <main className={`flex-1 p-4 ${isOnboarding ? "pb-6" : "pb-24 rail:pb-6"}`}>
         <div className="fold:max-w-[1040px] fold:mx-auto">
           <Outlet />
         </div>
       </main>
-      <BottomNav />
+      {!isOnboarding && <BottomNav />}
       <Toaster position="top-center" />
     </div>
   );

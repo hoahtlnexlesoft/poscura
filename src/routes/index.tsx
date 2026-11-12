@@ -20,8 +20,9 @@ const progress = [
 function Dashboard() {
   const navigate = useNavigate();
   return (
-    <div className="space-y-4 fold:grid fold:grid-cols-2 land:grid-cols-[1.1fr_1fr] fold:gap-4 fold:space-y-0 fold:items-start">
-      <section className="glass-card p-4 fold:col-start-2">
+    <div className="space-y-4 fold:grid fold:grid-cols-[1.25fr_1fr] fold:gap-4 fold:space-y-0 fold:items-start">
+      <div className="space-y-4">
+      <section className="glass-card p-4">
         <h2 className="text-base font-semibold mb-3">Posture Insights</h2>
         <div className="rounded-xl bg-primary/5 border border-primary/20 p-3 text-xs leading-relaxed">
           Excellent work! Your latest scan shows perfect alignment. No slouching, pelvic tilt, or forward head posture detected.
@@ -31,7 +32,7 @@ function Dashboard() {
         </Link>
       </section>
 
-      <section className="glass-card p-4 fold:col-start-1 fold:row-start-1 fold:row-span-3 fold:sticky fold:top-[72px]">
+      <section className="glass-card p-4">
         <h2 className="text-base font-semibold mb-3">Posture Summary</h2>
         <div className="space-y-4">
           <div className="flex items-end justify-between gap-4">
@@ -74,7 +75,10 @@ function Dashboard() {
         </div>
       </section>
 
-      <section className="glass-card p-4 fold:col-start-2">
+      </div>
+
+      <div className="space-y-4">
+      <section className="glass-card p-4">
         <h2 className="text-base font-semibold mb-3">Today's Sessions</h2>
         <div className="rounded-xl bg-primary/10 border border-primary/30 p-3 mb-3">
           <div className="flex items-center gap-2 text-primary text-xs font-medium">
@@ -97,7 +101,7 @@ function Dashboard() {
         </div>
       </section>
 
-      <section className="glass-card p-4 fold:col-start-2">
+      <section className="glass-card p-4">
         <h2 className="text-base font-semibold mb-3">Workout Progress</h2>
         <div className="flex items-baseline gap-2 mb-1">
           <span className="text-2xl font-bold">8</span>
@@ -120,6 +124,7 @@ function Dashboard() {
           View workout plan <ChevronRight className="h-3.5 w-3.5" />
         </Link>
       </section>
+      </div>
     </div>
   );
 }

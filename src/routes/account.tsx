@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { PLANS } from "@/lib/plans";
+import { PlanPicker } from "@/components/PlanPicker";
 import { cn } from "@/lib/utils";
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
@@ -250,18 +250,26 @@ function AccountPage() {
       </header>
       <div className="p-4 space-y-4">
         <Tabs defaultValue="info">
-          <div className="-mx-4 overflow-x-auto [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
-            <TabsList className="inline-flex w-max min-w-full bg-muted/50 mx-4 gap-1">
-              <TabsTrigger value="info" className="text-sm px-4 py-2">Information</TabsTrigger>
-              <TabsTrigger value="subscription" className="text-sm px-4 py-2">Plan</TabsTrigger>
-              <TabsTrigger value="payment" className="text-sm px-4 py-2">Payment</TabsTrigger>
-              <TabsTrigger value="invite" className="text-sm px-4 py-2">Invite</TabsTrigger>
+          <div className="-mx-4 border-b border-border px-2">
+            <TabsList className="h-auto w-full justify-center gap-1 rounded-none bg-transparent p-0">
+              {[
+                { v: "info", l: "Information" },
+                { v: "subscription", l: "Plan" },
+                { v: "invite", l: "Invite & Rewards" },
+              ].map((t) => (
+                <TabsTrigger
+                  key={t.v}
+                  value={t.v}
+                  className="relative flex-1 max-w-[180px] rounded-none bg-transparent px-2 pb-3 pt-2 text-[15px] font-medium text-muted-foreground shadow-none transition-colors hover:text-foreground data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none after:absolute after:inset-x-3 after:-bottom-px after:h-[3px] after:rounded-full after:bg-primary after:opacity-0 after:transition-opacity data-[state=active]:after:opacity-100"
+                >
+                  {t.l}
+                </TabsTrigger>
+              ))}
             </TabsList>
           </div>
-          <TabsContent value="info" className="space-y-4 mt-3 fold:space-y-0 fold:columns-2 fold:gap-4 fold:[&>*]:break-inside-avoid fold:[&>*]:mb-4"><AccountInfo /></TabsContent>
-          <TabsContent value="subscription" className="space-y-4 mt-3 fold:space-y-0 fold:columns-2 fold:gap-4 fold:[&>*]:break-inside-avoid fold:[&>*]:mb-4"><SubscriptionTab /></TabsContent>
-          <TabsContent value="payment" className="space-y-4 mt-3 fold:space-y-0 fold:columns-2 fold:gap-4 fold:[&>*]:break-inside-avoid fold:[&>*]:mb-4"><PaymentTab /></TabsContent>
-          <TabsContent value="invite" className="space-y-4 mt-3 fold:space-y-0 fold:columns-2 fold:gap-4 fold:[&>*]:break-inside-avoid fold:[&>*]:mb-4"><InviteTab /></TabsContent>
+          <TabsContent value="info" className="space-y-4 mt-4 fold:space-y-0 fold:columns-2 fold:gap-4 fold:[&>*]:break-inside-avoid fold:[&>*]:mb-4"><AccountInfo /></TabsContent>
+          <TabsContent value="subscription" className="space-y-4 mt-4 fold:space-y-0 fold:columns-2 fold:gap-4 fold:[&>*]:break-inside-avoid fold:[&>*]:mb-4"><SubscriptionTab /></TabsContent>
+          <TabsContent value="invite" className="space-y-4 mt-4 fold:space-y-0 fold:columns-2 fold:gap-4 fold:[&>*]:break-inside-avoid fold:[&>*]:mb-4"><InviteTab /></TabsContent>
         </Tabs>
       </div>
     </div>
@@ -442,10 +450,6 @@ function SubscriptionTab() {
     setRedeemOpen(false);
   }
 
-  function scrollToPlans() {
-    document.getElementById("upgrade-your-plan")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
   return (
     <>
       <Section title="Current Plan">
@@ -454,7 +458,7 @@ function SubscriptionTab() {
             <div className="text-base font-bold">Freemium</div>
             <div className="text-xs text-muted-foreground">Free forever — limited features</div>
           </div>
-          <Button size="sm" onClick={scrollToPlans}>Upgrade</Button>
+          <Button size="sm" asChild><Link to="/checkout">Upgrade</Link></Button>
         </div>
       </Section>
 
@@ -493,14 +497,7 @@ function SubscriptionTab() {
         )}
       </Section>
 
-      <Section
-        title="Voucher History"
-        action={
-          <Button variant="outline" size="sm" onClick={() => setRedeemOpen(true)}>
-            <Ticket className="h-3.5 w-3.5" /> Redeem
-          </Button>
-        }
-      >
+      <Section title="Voucher History">
         <ul className="text-xs divide-y divide-border">
           {vouchers.map((v) => (
             <li key={v.code} className="py-2 flex items-center justify-between gap-2">
@@ -514,43 +511,10 @@ function SubscriptionTab() {
         </ul>
       </Section>
 
-      <Section title="Upgrade Your Plan" id="upgrade-your-plan">
-        <div className="space-y-3">
-          {PLANS.map((p) => (
-            <div key={p.id} className={cn("relative rounded-2xl border p-4 flex flex-col",
-              p.highlighted ? "border-primary/60 bg-gradient-to-br from-primary/10 to-secondary/5 shadow-lg" : "border-border bg-card")}>
-              {p.badge && (
-                <span className="absolute -top-2.5 left-4 text-[10px] font-semibold uppercase tracking-wider bg-gradient-to-r from-primary to-secondary text-primary-foreground px-2 py-0.5 rounded-full">
-                  {p.badge}
-                </span>
-              )}
-              <div className="text-xs font-medium text-muted-foreground">{p.name}</div>
-              <div className="mt-1 flex items-baseline gap-1">
-                <span className="text-2xl font-bold">{p.price}</span>
-                <span className="text-[10px] text-muted-foreground">{p.cadence}</span>
-              </div>
-              <p className="text-[11px] text-muted-foreground mt-1">{p.tagline}</p>
-              <ul className="mt-3 space-y-1.5 text-xs flex-1">
-                {p.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2">
-                    <Check className="h-3.5 w-3.5 text-secondary shrink-0 mt-0.5" />
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
-              <Button
-                asChild={!p.current}
-                size="sm"
-                disabled={p.current}
-                variant={p.highlighted ? "default" : "outline"}
-                className={cn("mt-4 w-full", p.highlighted && "bg-gradient-to-r from-primary to-secondary text-primary-foreground hover:opacity-90")}
-              >
-                {p.current ? <span>Current plan</span> : <Link to="/checkout" search={{ plan: p.id }}>Choose Plan</Link>}
-              </Button>
-            </div>
-          ))}
-        </div>
-      </Section>
+      <section id="upgrade-your-plan" className="glass-card p-4 fold:[column-span:all]">
+        <h2 className="mb-4 text-sm font-semibold">Upgrade Your Plan</h2>
+        <PlanPicker />
+      </section>
 
       <BrowseAddOnsDialog open={browseOpen} onOpenChange={setBrowseOpen} onConfirm={addPurchase} />
       <RedeemVoucherDialog
@@ -691,32 +655,6 @@ function RedeemVoucherDialog({
         </div>
       </DialogContent>
     </Dialog>
-  );
-}
-
-function PaymentTab() {
-  return (
-    <>
-      <Section title="Payment Methods">
-        <div className="rounded-lg border border-border p-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CreditCard className="h-4 w-4 text-primary" />
-            <div>
-              <div className="text-sm font-medium">Visa •••• 4242</div>
-              <div className="text-[10px] text-muted-foreground">Expires 08/27</div>
-            </div>
-          </div>
-          <Button variant="ghost" size="sm"><Trash2 className="h-3.5 w-3.5" /></Button>
-        </div>
-        <Button variant="outline" size="sm" className="mt-3 w-full"><Plus className="h-3.5 w-3.5" /> Add card</Button>
-      </Section>
-      <Section title="History">
-        <ul className="divide-y divide-border text-xs">
-          <li className="py-2 flex justify-between"><span>Premium Monthly</span><span className="text-muted-foreground">Apr 01 · $9.99</span></li>
-          <li className="py-2 flex justify-between"><span>10hr Add-on</span><span className="text-muted-foreground">Mar 14 · $5.00</span></li>
-        </ul>
-      </Section>
-    </>
   );
 }
 

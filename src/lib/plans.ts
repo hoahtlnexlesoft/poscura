@@ -1,69 +1,67 @@
+export type BillingCycle = "monthly" | "annual";
+
 export type Plan = {
-  id: string;
+  id: "freemium" | "individual" | "family";
   name: string;
-  price: string;
-  priceNumeric: number;
-  cadence: string;
-  tagline: string;
+  note?: string;
+  /** monthly price in VND; 0 = free */
+  monthly: number;
   features: string[];
-  cta: string;
   highlighted?: boolean;
   badge?: string;
   current?: boolean;
 };
 
+/** Annual billing saves 25% versus paying monthly. */
+export const ANNUAL_DISCOUNT = 0.25;
+
 export const PLANS: Plan[] = [
   {
     id: "freemium",
     name: "Freemium",
-    price: "$0",
-    priceNumeric: 0,
-    cadence: "forever",
-    tagline: "Start your posture journey, free.",
+    monthly: 0,
     features: [
-      "20 monitoring hours / month",
-      "Basic posture insights",
-      "5 AI session reports / month",
-      "Community access",
+      "Limited monitoring time per month",
+      "Personalized workout plans",
+      "Basic progress tracking and reporting",
     ],
-    cta: "Current plan",
     current: true,
   },
   {
-    id: "premium-monthly",
-    name: "Premium",
-    price: "$9.99",
-    priceNumeric: 9.99,
-    cadence: "/ month",
-    tagline: "Unlimited insight, every moment.",
+    id: "individual",
+    name: "Individual",
+    monthly: 299000,
     features: [
-      "Unlimited monitoring hours",
-      "Advanced posture analytics",
-      "Unlimited AI reports",
-      "Personalized workout programs",
-      "Discomfort tracking & trends",
-      "Priority support",
+      "Unlimited monitoring time",
+      "Personalized workout plans",
+      "Progress tracking and reporting",
+      "AI chatbot support",
     ],
-    cta: "Upgrade to Premium",
     highlighted: true,
     badge: "Most popular",
   },
   {
-    id: "premium-annual",
-    name: "Premium Annual",
-    price: "$89.99",
-    priceNumeric: 89.99,
-    cadence: "/ year",
-    tagline: "Save 25% with yearly billing.",
+    id: "family",
+    name: "Family",
+    note: "Sharing up to 5 users",
+    monthly: 999000,
     features: [
-      "Everything in Premium",
-      "2 months free",
-      "Early access to new features",
-      "Annual posture health report",
+      "Everything in Individual",
+      "5 separate user profiles",
+      "Family progress dashboard",
+      "Priority support",
     ],
-    cta: "Go Annual",
   },
 ];
+
+export function priceFor(plan: Plan, cycle: BillingCycle): number {
+  if (cycle === "monthly") return plan.monthly;
+  return Math.round((plan.monthly * 12 * (1 - ANNUAL_DISCOUNT)) / 1000) * 1000;
+}
+
+export function formatVND(n: number): string {
+  return "đ" + n.toLocaleString("vi-VN");
+}
 
 export function getPlan(id: string): Plan | undefined {
   return PLANS.find((p) => p.id === id);

@@ -48,7 +48,7 @@ export function MonitoringTimeLeft({
         </div>
       </div>
       <Link
-        to="/account"
+        to="/checkout"
         className="shrink-0 inline-flex items-center gap-1 text-[10px] font-medium px-2.5 py-1 rounded-full bg-gradient-to-r from-primary to-secondary text-primary-foreground hover:opacity-90 transition"
       >
         <Crown className="h-2.5 w-2.5" />
