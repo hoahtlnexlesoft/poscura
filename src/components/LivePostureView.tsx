@@ -129,7 +129,11 @@ function body(p: Pose) {
   // tragus: the ear point drawn in the head's own (rotated) frame
   const th = rad(-p.neck * 0.6);
   const ear = add(head, { x: 7 * Math.cos(th) - 1 * Math.sin(th), y: 7 * Math.sin(th) + 1 * Math.cos(th) });
-  const wrist = add(WRIST, { x: -p.lean * 0.6, y: p.lean * 0.1 }); // leaning forward slides the hand toward the knee
+  // leaning forward rolls the knees forward and slightly up, and the feet slide out a little
+  const knee = add(KNEE, { x: -p.lean * 0.28, y: -p.lean * 0.12 });
+  const ankle = add(ANKLE, { x: -p.lean * 0.4, y: 0 });
+  const toe = add(TOE, { x: -p.lean * 0.4, y: 0 });
+  const wrist = add(add(WRIST, { x: -p.lean * 0.6, y: p.lean * 0.1 }), { x: knee.x - KNEE.x, y: knee.y - KNEE.y }); // the hand stays on the knee as it moves
   const elb = elbow(shoulder, wrist, 74, 72);
 
   const hunch = p.lean * 0.3;
@@ -148,7 +152,7 @@ function body(p: Pose) {
   ]);
   const rs = add(shoulder, add(mul(up(a2), 13), mul(fwd(a2), -2)));
   const ls = add(shoulder, add(mul(up(a2), -15), mul(fwd(a2), 4)));
-  return { mid, c7, shoulder, rs, ls, neckTop, head, ear, elb, wrist, torso, a2 };
+  return { mid, c7, shoulder, rs, ls, neckTop, head, ear, elb, wrist, knee, ankle, toe, torso, a2 };
 }
 
 /* ---------------- component ---------------- */
@@ -319,20 +323,20 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
 
           {/* far leg: a step behind and in shadow, so both legs read */}
           <g transform="translate(-9 -7)" opacity="0.92">
-            <path d={`M ${KNEE.x - 8} ${KNEE.y - 6} C ${KNEE.x - 16} ${KNEE.y + 40}, ${ANKLE.x - 12} ${ANKLE.y - 50}, ${ANKLE.x - 7} ${ANKLE.y - 4} L ${ANKLE.x + 9} ${ANKLE.y - 4} C ${ANKLE.x + 14} ${ANKLE.y - 60}, ${KNEE.x + 26} ${KNEE.y + 30}, ${KNEE.x + 16} ${KNEE.y - 8} Z`} fill="#b07a5c" />
-            <path d={`M ${HIP.x - 10} ${HIP.y} L ${KNEE.x} ${KNEE.y}`} stroke="#b07a5c" strokeWidth="36" strokeLinecap="round" />
-            <path d={`M ${HIP.x - 10} ${HIP.y - 2} L ${HIP.x + (KNEE.x - HIP.x) * 0.8} ${HIP.y + (KNEE.y - HIP.y) * 0.8}`} stroke="#0f1114" strokeWidth="44" strokeLinecap="round" />
+            <path d={`M ${b.knee.x - 8} ${b.knee.y - 6} C ${b.knee.x - 16} ${b.knee.y + 40}, ${b.ankle.x - 12} ${b.ankle.y - 50}, ${b.ankle.x - 7} ${b.ankle.y - 4} L ${b.ankle.x + 9} ${b.ankle.y - 4} C ${b.ankle.x + 14} ${b.ankle.y - 60}, ${b.knee.x + 26} ${b.knee.y + 30}, ${b.knee.x + 16} ${b.knee.y - 8} Z`} fill="#b07a5c" />
+            <path d={`M ${HIP.x - 10} ${HIP.y} L ${b.knee.x} ${b.knee.y}`} stroke="#b07a5c" strokeWidth="36" strokeLinecap="round" />
+            <path d={`M ${HIP.x - 10} ${HIP.y - 2} L ${HIP.x + (b.knee.x - HIP.x) * 0.8} ${HIP.y + (b.knee.y - HIP.y) * 0.8}`} stroke="#0f1114" strokeWidth="44" strokeLinecap="round" />
           </g>
           {/* legs: loose shorts to just above the knee, calves, socks and sneakers */}
-          <path d={`M ${KNEE.x - 8} ${KNEE.y - 6} C ${KNEE.x - 16} ${KNEE.y + 40}, ${ANKLE.x - 12} ${ANKLE.y - 50}, ${ANKLE.x - 7} ${ANKLE.y - 4} L ${ANKLE.x + 9} ${ANKLE.y - 4} C ${ANKLE.x + 14} ${ANKLE.y - 60}, ${KNEE.x + 26} ${KNEE.y + 30}, ${KNEE.x + 16} ${KNEE.y - 8} Z`} fill="url(#lp-skin)" />
-          <path d={`M ${HIP.x + 4} ${HIP.y + 4} L ${KNEE.x} ${KNEE.y}`} stroke="url(#lp-skin)" strokeWidth="38" strokeLinecap="round" />
-          <path d={`M ${HIP.x + 6} ${HIP.y + 2} L ${HIP.x + (KNEE.x - HIP.x) * 0.8} ${HIP.y + (KNEE.y - HIP.y) * 0.8}`} stroke="url(#lp-pants)" strokeWidth="46" strokeLinecap="round" />
-          <path d={`M ${HIP.x + (KNEE.x - HIP.x) * 0.8 - 2} ${HIP.y + (KNEE.y - HIP.y) * 0.8 - 22} L ${HIP.x + (KNEE.x - HIP.x) * 0.8 + 3} ${HIP.y + (KNEE.y - HIP.y) * 0.8 + 22}`} stroke="#2e1515" strokeOpacity="0.5" strokeWidth="2" />
+          <path d={`M ${b.knee.x - 8} ${b.knee.y - 6} C ${b.knee.x - 16} ${b.knee.y + 40}, ${b.ankle.x - 12} ${b.ankle.y - 50}, ${b.ankle.x - 7} ${b.ankle.y - 4} L ${b.ankle.x + 9} ${b.ankle.y - 4} C ${b.ankle.x + 14} ${b.ankle.y - 60}, ${b.knee.x + 26} ${b.knee.y + 30}, ${b.knee.x + 16} ${b.knee.y - 8} Z`} fill="url(#lp-skin)" />
+          <path d={`M ${HIP.x + 4} ${HIP.y + 4} L ${b.knee.x} ${b.knee.y}`} stroke="url(#lp-skin)" strokeWidth="38" strokeLinecap="round" />
+          <path d={`M ${HIP.x + 6} ${HIP.y + 2} L ${HIP.x + (b.knee.x - HIP.x) * 0.8} ${HIP.y + (b.knee.y - HIP.y) * 0.8}`} stroke="url(#lp-pants)" strokeWidth="46" strokeLinecap="round" />
+          <path d={`M ${HIP.x + (b.knee.x - HIP.x) * 0.8 - 2} ${HIP.y + (b.knee.y - HIP.y) * 0.8 - 22} L ${HIP.x + (b.knee.x - HIP.x) * 0.8 + 3} ${HIP.y + (b.knee.y - HIP.y) * 0.8 + 22}`} stroke="#2e1515" strokeOpacity="0.5" strokeWidth="2" />
           <path d={`M ${HIP.x - 20} ${HIP.y - 4} Q ${HIP.x - 50} ${HIP.y + 6} ${HIP.x - 66} ${HIP.y + 2}`} stroke="#2e1515" strokeOpacity="0.35" strokeWidth="2" fill="none" />
           <path d={`M ${HIP.x + 18} ${HIP.y - 12} Q ${HIP.x - 10} ${HIP.y - 18} ${HIP.x - 38} ${HIP.y - 8}`} stroke="#2e1515" strokeOpacity="0.55" strokeWidth="3" fill="none" strokeLinecap="round" />
-          <rect x={ANKLE.x - 8} y={ANKLE.y - 10} width="18" height="12" rx="3" fill="#e9ebef" />
-          <path d={`M ${ANKLE.x + 12} ${ANKLE.y - 2} C ${ANKLE.x - 2} ${ANKLE.y - 6}, ${TOE.x - 8} ${TOE.y - 8}, ${TOE.x - 10} ${TOE.y + 1} L ${ANKLE.x + 13} ${ANKLE.y + 13} Z`} fill="#c9ccd3" />
-          <path d={`M ${TOE.x - 10} ${TOE.y + 1} L ${ANKLE.x + 13} ${ANKLE.y + 13}`} stroke="#8a8f99" strokeWidth="3" />
+          <rect x={b.ankle.x - 8} y={b.ankle.y - 10} width="18" height="12" rx="3" fill="#e9ebef" />
+          <path d={`M ${b.ankle.x + 12} ${b.ankle.y - 2} C ${b.ankle.x - 2} ${b.ankle.y - 6}, ${b.toe.x - 8} ${b.toe.y - 8}, ${b.toe.x - 10} ${b.toe.y + 1} L ${b.ankle.x + 13} ${b.ankle.y + 13} Z`} fill="#c9ccd3" />
+          <path d={`M ${b.toe.x - 10} ${b.toe.y + 1} L ${b.ankle.x + 13} ${b.ankle.y + 13}`} stroke="#8a8f99" strokeWidth="3" />
 
           {/* neck */}
           <path d={`M ${b.c7.x - 3} ${b.c7.y + 6} L ${b.neckTop.x} ${b.neckTop.y}`} stroke="url(#lp-skin)" strokeWidth="23" strokeLinecap="round" />
