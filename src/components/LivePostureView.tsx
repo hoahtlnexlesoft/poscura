@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AlertTriangle, CheckCircle2, Clock, Eye, Square } from "lucide-react";
+import { AlertTriangle, Check, CheckCircle2, Clock, Eye, Square } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------------
@@ -465,6 +465,20 @@ function CoachBanner({ tone, kicker, title, note, more, fixed }: NonNullable<Pha
     ok: { color: "var(--color-success)", icon: CheckCircle2 },
   }[tone];
   const Icon = t.icon;
+  if (tone === "ok") {
+    // positive feedback: a light, compact pill instead of a full card
+    return (
+      <div className="flex justify-center">
+        <div className="inline-flex max-w-full items-center gap-2.5 rounded-full border border-success/30 bg-[color-mix(in_oklab,var(--color-success)_16%,#06120e)]/85 py-1.5 pl-1.5 pr-4 shadow-[0_10px_28px_-14px_var(--color-success)] backdrop-blur-md animate-in fade-in zoom-in-95 duration-300">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-success text-success-foreground">
+            <Check className="h-4 w-4" strokeWidth={3} />
+          </span>
+          <span className="truncate text-[14px] font-medium text-white">{title}</span>
+          {note && <span className="hidden shrink-0 text-[11.5px] text-white/55 min-[360px]:inline">{note}</span>}
+        </div>
+      </div>
+    );
+  }
   return (
     <div
       className="flex items-start gap-2.5 rounded-2xl border-[1.5px] bg-black/75 px-3.5 py-3 backdrop-blur-md animate-in fade-in slide-in-from-bottom-2 duration-300"
