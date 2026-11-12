@@ -62,11 +62,11 @@ function PostureMonitor() {
   ];
 
   return (
-    <div className="space-y-4 fold:grid fold:grid-cols-[1.25fr_1fr] fold:gap-4 fold:space-y-0 fold:items-start">
-      {!running && <MonitoringTimeLeft />}
+    <div data-fit-bound className="space-y-4 fold:grid fold:grid-cols-[auto_minmax(0,1fr)] fold:gap-4 fold:space-y-0 fold:items-start">
+      {!running && <div className="fold:col-start-2 fold:row-start-1"><MonitoringTimeLeft /></div>}
 
 
-      <section className="rounded-2xl border border-border bg-gradient-to-br from-card via-background to-background overflow-hidden fold:col-start-1">
+      <section className="rounded-2xl border border-border bg-gradient-to-br from-card via-background to-background overflow-hidden fold:col-start-1 fold:row-start-1 fold:row-span-3 fold:w-fit">
         {!running ? (
           <div ref={startFit.wrapRef} className="flex justify-center bg-[radial-gradient(120%_70%_at_50%_45%,color-mix(in_oklab,var(--color-primary)_7%,transparent),transparent_70%)]">
           <div
@@ -98,7 +98,7 @@ function PostureMonitor() {
         )}
       </section>
 
-      <section className="glass-card p-4 fold:col-start-2 fold:row-start-1 fold:row-span-2">
+      <section className={`glass-card p-4 fold:col-start-2 ${running ? "fold:row-start-1" : "fold:row-start-2"}`}>
         <div className="flex items-center gap-2 mb-3">
           <Activity className="h-4 w-4 text-primary" />
           <h2 className="text-sm font-semibold">History</h2>
