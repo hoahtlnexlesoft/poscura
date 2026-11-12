@@ -395,61 +395,33 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
 
       {/* ---------- status bar ---------- */}
       <div ref={statusRef} className="@container border-t border-white/[0.06]">
-      <div className="flex items-center gap-3 px-4 py-3 @max-[360px]:gap-2.5 @max-[360px]:px-3">
-        <SegmentGauge value={score} level={phase.level} />
-        <div className="min-w-0 flex-1">
-          <div className="flex items-baseline gap-2">
-            <span className={cn("text-[22px] font-semibold leading-none tracking-tight transition-colors", LEVEL_TEXT[phase.level])}>{phase.status.word}</span>
-            <span className="text-[11px] text-muted-foreground @max-[360px]:hidden!">Avg <b className="font-semibold text-foreground tabular-nums">{avg}</b></span>
-          </div>
-          <div className="mt-1 line-clamp-2 text-[11px] leading-snug text-muted-foreground @max-[360px]:hidden!">{phase.status.note}</div>
-          <div className="mt-1.5 hidden whitespace-nowrap text-[11px] text-muted-foreground @max-[360px]:block!">
-            Avg <b className="font-semibold text-foreground tabular-nums">{avg}</b> · <b className="font-semibold text-foreground tabular-nums">{timeLeft}</b> left
-          </div>
-        </div>
-        <div className="flex shrink-0 items-center gap-3">
-          <div className="border-l border-white/[0.08] pl-3 text-right leading-none @max-[360px]:hidden!">
-            <div className="text-[9px] font-medium uppercase tracking-[0.1em] text-muted-foreground">Time left</div>
-            <div className="mt-1.5 text-[20px] font-semibold tabular-nums">{timeLeft}</div>
+        <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 px-4 py-3 @max-[360px]:px-3">
+          <div className="min-w-0">
+            <div className="text-[9px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
+              Avg score <b className="font-semibold text-foreground tabular-nums">{avg}</b>
+            </div>
+            <div className={cn("mt-1.5 text-[20px] font-semibold leading-none tracking-tight transition-colors", LEVEL_TEXT[phase.level])}>{phase.status.word}</div>
+            <div className="mt-1 truncate text-[11px] text-muted-foreground @max-[400px]:hidden!">{phase.status.note}</div>
           </div>
           <button
             type="button"
             onClick={onEnd}
             aria-label="Stop monitoring"
             title="Stop monitoring"
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-destructive/50 bg-destructive/15 text-destructive transition hover:bg-destructive/25 active:scale-95"
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-destructive/50 bg-destructive/15 text-destructive shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-destructive)_8%,transparent)] transition hover:bg-destructive/25 active:scale-95"
           >
-            <Square className="h-3.5 w-3.5 fill-current" />
+            <Square className="h-4 w-4 fill-current" />
           </button>
+          <div className="text-right leading-none">
+            <div className="text-[9px] font-medium uppercase tracking-[0.1em] text-muted-foreground">Time left</div>
+            <div className="mt-1.5 text-[20px] font-semibold tabular-nums">{timeLeft}</div>
+          </div>
         </div>
-      </div>
       </div>
     </div>
   );
 }
 
-/** half-ring of segments; filled up to the score, tinted by posture level */
-function SegmentGauge({ value, level }: { value: number; level: Level }) {
-  const n = 10, filled = Math.round((Math.max(0, Math.min(100, value)) / 100) * n);
-  const color = level === "good" ? "var(--color-success)" : level === "adjust" ? "var(--color-warning)" : "var(--color-destructive)";
-  const cx = 34, cy = 34, r = 29, gap = 4;
-  const seg = (k: number) => {
-    const a0 = 180 + (k * 180) / n + gap / 2, a1 = 180 + ((k + 1) * 180) / n - gap / 2;
-    const p = (a: number) => [cx + r * Math.cos(rad(a)), cy + r * Math.sin(rad(a))];
-    const [x0, y0] = p(a0), [x1, y1] = p(a1);
-    return `M ${x0.toFixed(2)} ${y0.toFixed(2)} A ${r} ${r} 0 0 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
-  };
-  return (
-    <div className="relative h-[40px] w-[68px] shrink-0" aria-label={`Score ${value} of 100`}>
-      <svg viewBox="0 0 68 38" className="h-[38px] w-[68px]" aria-hidden>
-        {Array.from({ length: n }, (_, k) => (
-          <path key={k} d={seg(k)} fill="none" strokeWidth="6" stroke={k < filled ? color : "var(--color-muted)"} style={{ transition: "stroke 400ms ease" }} />
-        ))}
-      </svg>
-      <div className="absolute inset-x-0 bottom-0 text-center text-[17px] font-bold leading-none tabular-nums">{value}</div>
-    </div>
-  );
-}
 
 /** filled sector between the vertical (up) and the direction from `at` to `to` */
 function Wedge({ at, to, r, color }: { at: V; to: V; r: number; color: string }) {
