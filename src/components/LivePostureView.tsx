@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AlertTriangle, CheckCircle2, Clock, Eye, Square } from "lucide-react";
-import { ScoreGauge } from "@/components/ScoreGauge";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------------
@@ -348,12 +347,15 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
         </svg>
 
         {/* top: live pill + coaching banner */}
-        <div className="absolute inset-x-3 top-3 space-y-2">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-destructive/40 bg-destructive/20 px-2.5 py-1 text-[11px] font-medium text-destructive backdrop-blur-sm">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-destructive" /> Live monitoring
+        <div className="absolute inset-x-3.5 top-3.5 space-y-3">
+          <div className="flex items-center gap-2 text-[11px] font-medium text-white/70">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-60" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-destructive" />
             </span>
-            <span className="text-[11px] text-muted-foreground">Tilt 10°</span>
+            Live monitoring
+            <span className="text-white/30">·</span>
+            <span className="text-white/50">Tilt 10°</span>
           </div>
           {phase.banner && <CoachBanner key={phase.key} {...phase.banner} />}
         </div>
@@ -369,30 +371,60 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
       </div>
 
       {/* ---------- status bar ---------- */}
-      <div className="space-y-3 border-t border-border p-4">
-        <div className="flex items-center gap-3">
-          <ScoreGauge value={score} size={70} />
+      <div className="space-y-3.5 border-t border-border bg-gradient-to-b from-card/60 to-transparent px-4 pb-4 pt-3.5">
+        <div className="flex items-center gap-3.5">
+          <SegmentGauge value={score} level={phase.level} />
           <div className="min-w-0 flex-1">
-            <div className={cn("text-2xl font-semibold leading-none transition-colors", LEVEL_TEXT[phase.level])}>{phase.status.word}</div>
-            <div className="mt-1 truncate text-[11px] text-muted-foreground">{phase.status.note}</div>
+            <div className={cn("text-[26px] font-semibold leading-none tracking-tight transition-colors", LEVEL_TEXT[phase.level])}>{phase.status.word}</div>
+            <div className="mt-1.5 truncate text-[11.5px] text-muted-foreground">{phase.status.note}</div>
           </div>
-          <div className="flex flex-col items-end gap-1.5">
-            <span className="inline-flex items-center gap-1 rounded-full bg-muted/60 px-2.5 py-1 text-[11px] tabular-nums">
-              <Clock className="h-3 w-3 text-muted-foreground" /> {timeLeft}
-              <span className="text-muted-foreground">left</span>
-            </span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-muted/60 px-2.5 py-1 text-[11px]">
-              <span className="text-muted-foreground">Avg</span> <b className="tabular-nums">{avg}</b>
-            </span>
+          <span className="inline-flex shrink-0 items-center gap-1 self-start rounded-full bg-muted/60 px-2.5 py-1.5 text-[11.5px]">
+            <span className="text-muted-foreground">Avg</span> <b className="tabular-nums">{avg}</b>
+          </span>
+        </div>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onEnd}
+            className="flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-b from-[#ff5a5f] to-[#e0313a] text-[15px] font-semibold text-white shadow-[0_10px_24px_-10px_rgba(240,60,70,.8)] transition active:scale-[.98]"
+          >
+            <Square className="h-3.5 w-3.5 fill-current" /> Stop
+          </button>
+          <div className="shrink-0 text-right leading-none">
+            <div className="text-[9.5px] font-medium uppercase tracking-[0.08em] text-muted-foreground">Time left</div>
+            <div className="mt-1 flex items-center justify-end gap-1 text-[22px] font-semibold tabular-nums">
+              <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+              {timeLeft}
+            </div>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={onEnd}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-secondary py-3 text-sm font-semibold text-primary-foreground shadow-lg glow-primary"
-        >
-          <Square className="h-3.5 w-3.5 fill-current" /> End session
-        </button>
+      </div>
+    </div>
+  );
+}
+
+/** half-ring of segments; filled up to the score, tinted by posture level */
+function SegmentGauge({ value, level }: { value: number; level: Level }) {
+  const n = 10, filled = Math.round((Math.max(0, Math.min(100, value)) / 100) * n);
+  const color = level === "good" ? "var(--color-success)" : level === "adjust" ? "var(--color-warning)" : "var(--color-destructive)";
+  const cx = 44, cy = 42, r = 34, gap = 3.2; // degrees between segments
+  const seg = (i: number) => {
+    const a0 = 180 + (i * 180) / n + gap / 2, a1 = 180 + ((i + 1) * 180) / n - gap / 2;
+    const p = (a: number) => [cx + r * Math.cos(rad(a)), cy + r * Math.sin(rad(a))];
+    const [x0, y0] = p(a0), [x1, y1] = p(a1);
+    return `M ${x0.toFixed(2)} ${y0.toFixed(2)} A ${r} ${r} 0 0 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
+  };
+  return (
+    <div className="relative h-[54px] w-[88px] shrink-0">
+      <svg viewBox="0 0 88 50" className="h-[50px] w-[88px]" aria-hidden>
+        {Array.from({ length: n }, (_, i) => (
+          <path key={i} d={seg(i)} fill="none" strokeWidth="9" strokeLinecap="butt"
+            stroke={i < filled ? color : "var(--color-muted)"} style={{ transition: "stroke 400ms ease" }} />
+        ))}
+      </svg>
+      <div className="absolute inset-x-0 bottom-0 text-center leading-none">
+        <span className="text-[22px] font-bold tabular-nums">{value}</span>
+        <span className="text-[11px] text-muted-foreground">/100</span>
       </div>
     </div>
   );
@@ -417,22 +449,33 @@ function AngleBadge({ x, y, value, color, big }: { x: number; y: number; value: 
 }
 
 function CoachBanner({ tone, kicker, title, note, more, fixed }: NonNullable<Phase["banner"]>) {
-  const styles = {
-    warn: { box: "border-warning/80 bg-black/70", icon: <Eye className="h-5 w-5 text-warning" />, kicker: "text-warning" },
-    bad: { box: "border-destructive/80 bg-black/70", icon: <AlertTriangle className="h-5 w-5 text-destructive" />, kicker: "text-destructive" },
-    ok: { box: "border-success/80 bg-black/70", icon: <CheckCircle2 className="h-5 w-5 text-success" />, kicker: "text-success" },
+  const t = {
+    warn: { color: "var(--color-warning)", icon: Eye },
+    bad: { color: "var(--color-destructive)", icon: AlertTriangle },
+    ok: { color: "var(--color-success)", icon: CheckCircle2 },
   }[tone];
+  const Icon = t.icon;
   return (
-    <div className={cn("flex items-start gap-3 rounded-2xl border-2 px-3.5 py-3 backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-300", styles.box)}>
-      <div className="mt-0.5 shrink-0">{styles.icon}</div>
+    <div
+      className="flex items-start gap-3 rounded-[18px] border-[1.5px] bg-black/75 px-4 py-3.5 backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-300"
+      style={{
+        borderColor: `color-mix(in oklab, ${t.color} 85%, transparent)`,
+        boxShadow: `0 12px 32px -14px color-mix(in oklab, ${t.color} 55%, transparent)`,
+      }}
+    >
+      <Icon className="mt-[3px] h-[22px] w-[22px] shrink-0" style={{ color: t.color }} strokeWidth={1.9} />
       <div className="min-w-0">
-        {kicker && <div className={cn("text-[9.5px] font-semibold uppercase tracking-wide", styles.kicker)}>{kicker}</div>}
-        <div className="text-[15px] font-semibold leading-snug text-white">{title}</div>
-        {note && <div className="mt-0.5 text-[11px] text-white/60">{note}</div>}
-        {more && <div className="mt-1 text-[11px] font-medium text-white/85">{more}</div>}
+        {kicker && (
+          <div className="text-[9.5px] font-medium uppercase leading-tight tracking-[0.04em]" style={{ color: t.color }}>
+            {kicker}
+          </div>
+        )}
+        <div className={cn("text-[19px] font-normal leading-[1.25] tracking-[-0.005em] text-white", kicker && "mt-1")}>{title}</div>
+        {note && <div className="mt-1 text-[11.5px] text-white/55">{note}</div>}
+        {more && <div className="mt-1.5 text-[11.5px] text-white/80">{more}</div>}
         {fixed && (
-          <div className="mt-1 flex items-center gap-1 text-[11px] font-medium text-success">
-            <CheckCircle2 className="h-3 w-3" /> {fixed}
+          <div className="mt-1.5 flex items-center gap-1 text-[11.5px] text-success">
+            <CheckCircle2 className="h-3.5 w-3.5" /> {fixed}
           </div>
         )}
       </div>
