@@ -62,7 +62,7 @@ function PostureMonitor() {
   ];
 
   return (
-    <div data-fit-bound className="space-y-4 fold:grid fold:grid-cols-[auto_minmax(0,1fr)] fold:gap-4 fold:space-y-0 fold:items-start">
+    <div data-fit-bound className="space-y-4 fold:grid fold:grid-cols-[auto_minmax(0,340px)] fold:justify-center fold:gap-5 fold:space-y-0 fold:items-start">
       {!running && <div className="fold:col-start-2 fold:row-start-1"><MonitoringTimeLeft /></div>}
 
 
@@ -106,14 +106,14 @@ function PostureMonitor() {
         <div className="space-y-2">
           {history.map((m) => (
             <button key={m.date} onClick={() => setShowReport(true)}
-              className="w-full text-left p-3 rounded-xl bg-card border border-border flex items-center gap-3">
-              <ScoreGauge value={m.score} size={80} />
+              className="w-full text-left p-2.5 rounded-xl bg-card border border-border flex items-center gap-3 transition hover:border-primary/40">
+              <ScoreGauge value={m.score} size={60} />
               <div className="flex-1">
                 <div className="font-semibold text-sm">{m.date}</div>
                 <div className="text-[11px] text-primary mt-0.5">View detail ›</div>
               </div>
               <div className="text-right">
-                <div className="text-lg font-bold">{m.duration}</div>
+                <div className="text-base font-bold">{m.duration}</div>
                 <div className="text-[10px] text-muted-foreground">min</div>
               </div>
             </button>
