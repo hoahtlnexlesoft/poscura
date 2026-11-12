@@ -202,7 +202,7 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
   return (
     <div>
       {/* ---------- live view ---------- */}
-      <div className="relative h-[clamp(300px,calc(100dvh-330px),620px)] overflow-hidden bg-[#070b14]">
+      <div className="relative h-[clamp(320px,calc(100dvh-290px),660px)] overflow-hidden bg-[#070b14]">
         {/* state tint */}
         <div
           className="absolute inset-0 transition-opacity duration-700"

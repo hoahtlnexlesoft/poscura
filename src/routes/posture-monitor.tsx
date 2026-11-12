@@ -66,7 +66,7 @@ function PostureMonitor() {
 
       <section className="rounded-2xl border border-border bg-gradient-to-br from-card via-background to-background overflow-hidden fold:col-start-1">
         {!running ? (
-          <div className="h-[clamp(300px,calc(100dvh-290px),640px)] relative flex flex-col items-center justify-center gap-3 px-4 text-center">
+          <div className="h-[clamp(320px,calc(100dvh-250px),680px)] relative flex flex-col items-center justify-center gap-3 px-4 text-center">
             <button
               onClick={() => setShowCameraSetting(true)}
               className="absolute top-3 left-3 inline-flex items-center gap-1 px-2 py-1 rounded-md bg-background/80 backdrop-blur-sm border border-border text-[10px] text-muted-foreground"
