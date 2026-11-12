@@ -62,11 +62,11 @@ function PostureMonitor() {
   ];
 
   return (
-    <div data-fit-bound className="space-y-4 fold:grid fold:grid-cols-[auto_minmax(0,340px)] fold:justify-center fold:gap-5 fold:space-y-0 fold:items-start">
-      {!running && <div className="fold:col-start-2 fold:row-start-1"><MonitoringTimeLeft /></div>}
+    <div data-fit-bound className="space-y-4 fold:grid fold:grid-cols-[auto_minmax(0,340px)] fold:grid-rows-[auto_1fr] fold:justify-center fold:gap-5 fold:space-y-0 fold:items-stretch">
+      {!running && <div className="fold:col-start-2 fold:row-start-1 fold:self-start"><MonitoringTimeLeft /></div>}
 
 
-      <section className="rounded-2xl border border-border bg-gradient-to-br from-card via-background to-background overflow-hidden fold:col-start-1 fold:row-start-1 fold:row-span-3 fold:w-fit">
+      <section className="rounded-2xl border border-border bg-gradient-to-br from-card via-background to-background overflow-hidden fold:col-start-1 fold:row-start-1 fold:row-span-2 fold:w-fit fold:self-start">
         {!running ? (
           <div ref={startFit.wrapRef} className="flex justify-center bg-[radial-gradient(120%_70%_at_50%_45%,color-mix(in_oklab,var(--color-primary)_7%,transparent),transparent_70%)]">
           <div
@@ -98,12 +98,28 @@ function PostureMonitor() {
         )}
       </section>
 
-      <section className={`glass-card p-4 fold:col-start-2 ${running ? "fold:row-start-1" : "fold:row-start-2"}`}>
+      <section className={`glass-card p-4 fold:col-start-2 fold:flex fold:flex-col ${running ? "fold:row-start-1 fold:row-span-2" : "fold:row-start-2"}`}>
         <div className="flex items-center gap-2 mb-3">
           <Activity className="h-4 w-4 text-primary" />
           <h2 className="text-sm font-semibold">History</h2>
         </div>
-        <div className="space-y-2">
+        {/* summary of the sessions listed below */}
+        <div className="mb-3 grid grid-cols-3 gap-2">
+          {[
+            { label: "Sessions", value: String(history.length), unit: "" },
+            { label: "Avg score", value: String(Math.round(history.reduce((a, m) => a + m.score, 0) / history.length)), unit: "/100" },
+            { label: "Total", value: String(history.reduce((a, m) => a + m.duration, 0)), unit: "min" },
+          ].map((t) => (
+            <div key={t.label} className="rounded-xl border border-border bg-card/60 px-3 py-2.5">
+              <div className="text-[9.5px] font-medium uppercase tracking-[0.08em] text-muted-foreground">{t.label}</div>
+              <div className="mt-1 flex items-baseline gap-0.5">
+                <span className="text-lg font-bold leading-none tabular-nums">{t.value}</span>
+                {t.unit && <span className="text-[10px] text-muted-foreground">{t.unit}</span>}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="space-y-2 fold:grid fold:flex-1 fold:auto-rows-fr fold:gap-2 fold:space-y-0">
           {history.map((m) => (
             <button key={m.date} onClick={() => setShowReport(true)}
               className="w-full text-left p-2.5 rounded-xl bg-card border border-border flex items-center gap-3 transition hover:border-primary/40">
