@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ChevronRight, Play, Clock } from "lucide-react";
 import { ScoreGauge } from "@/components/ScoreGauge";
 import bodyTorso from "@/assets/body-torso.png";
-import { NEXT_WORKOUT, TODAYS_WORKOUTS, TODAY_TIME } from "@/lib/todays-workouts";
+import { NEXT_WORKOUT, PROGRESS_ORDER, TODAYS_WORKOUTS, TODAY_TIME } from "@/lib/todays-workouts";
 
 export const Route = createFileRoute("/")({ component: Dashboard });
 
@@ -100,7 +100,7 @@ function Dashboard() {
           <span className="text-xs text-muted-foreground">/{progressTotal} sessions · {Math.round((progressDone / progressTotal) * 100)}%</span>
         </div>
         <div className="space-y-2 mt-3">
-          {TODAYS_WORKOUTS.map((p) => (
+          {PROGRESS_ORDER.map((p) => (
             <div key={p.name}>
               <div className="flex justify-between gap-2 text-[11px] mb-1">
                 <span className="truncate">{p.name}</span>
@@ -113,7 +113,7 @@ function Dashboard() {
           ))}
         </div>
         <Link to="/workout" className="mt-3 flex items-center justify-center gap-1 text-primary text-xs font-medium">
-          View workout plan <ChevronRight className="h-3.5 w-3.5" />
+          Tap to view workout plan <ChevronRight className="h-3.5 w-3.5" />
         </Link>
       </section>
       </div>
