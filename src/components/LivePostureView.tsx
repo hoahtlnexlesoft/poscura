@@ -135,7 +135,9 @@ function body(p: Pose) {
     add(HIP, add(mul(fwd(a1), 31), mul(up(a1), 10))), // belly
     add(HIP, { x: -26, y: 16 }), // lap
   ]);
-  return { mid, c7, shoulder, neckTop, head, ear, elb, torso, a2 };
+  const rs = add(shoulder, add(mul(up(a2), 13), mul(fwd(a2), -2)));
+  const ls = add(shoulder, add(mul(up(a2), -15), mul(fwd(a2), 4)));
+  return { mid, c7, shoulder, rs, ls, neckTop, head, ear, elb, torso, a2 };
 }
 
 /* ---------------- component ---------------- */
@@ -305,43 +307,41 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
           <path d={`M ${b.elb.x} ${b.elb.y} L ${WRIST.x} ${WRIST.y}`} stroke="url(#lp-skin)" strokeWidth="13" strokeLinecap="round" />
           <ellipse cx={WRIST.x - 9} cy={WRIST.y + 2} rx="11" ry="6" fill="url(#lp-skin)" />
 
-          {/* ---------- angle lines ---------- */}
+          {/* ---------- angle lines (same marks as the running app) ---------- */}
           <g className="transition-opacity duration-300" opacity={showLines ? 1 : 0}>
             {/* vertical references */}
-            <line x1={HIP.x} y1={HIP.y} x2={HIP.x} y2={HIP.y - 170} stroke="#fff" strokeOpacity="0.28" strokeDasharray="4 5" />
-            <line x1={b.c7.x} y1={b.c7.y} x2={b.c7.x} y2={b.c7.y - 70} stroke="#fff" strokeOpacity="0.28" strokeDasharray="4 5" />
+            <line x1={HIP.x} y1={HIP.y} x2={HIP.x} y2={HIP.y - 150} stroke="#fff" strokeOpacity="0.45" strokeDasharray="4 5" />
+            <line x1={b.c7.x} y1={b.c7.y} x2={b.c7.x} y2={b.c7.y - 70} stroke="#fff" strokeOpacity="0.45" strokeDasharray="4 5" />
 
-            {/* torso + neck + thigh */}
-            <line x1={HIP.x} y1={HIP.y} x2={b.c7.x} y2={b.c7.y} stroke={lineColor("torso")} strokeWidth="3.5" strokeLinecap="round" filter="url(#lp-glow)" />
-            <line x1={b.c7.x} y1={b.c7.y} x2={b.ear.x} y2={b.ear.y} stroke={lineColor("neck")} strokeWidth="3.5" strokeLinecap="round" filter="url(#lp-glow)" />
-            <line x1={b.c7.x} y1={b.c7.y} x2={b.shoulder.x} y2={b.shoulder.y} stroke={lineColor("shoulders")} strokeWidth="3.5" strokeLinecap="round" filter="url(#lp-glow)" />
-            <line x1={HIP.x} y1={HIP.y} x2={KNEE.x} y2={KNEE.y} stroke="var(--color-primary)" strokeOpacity="0.7" strokeWidth="3" strokeLinecap="round" />
+            {/* angle wedges between the vertical and each segment */}
+            <Wedge at={HIP} to={b.c7} r={54} color={lineColor("torso")} />
+            <Wedge at={b.c7} to={b.ear} r={30} color={lineColor("neck")} />
 
-            {/* joints */}
+            {/* segments: Mid hip → C7 → Tragus, and the shoulder line RS – LS */}
+            <line x1={HIP.x} y1={HIP.y} x2={b.c7.x} y2={b.c7.y} stroke={lineColor("torso")} strokeWidth="3" strokeLinecap="round" filter="url(#lp-glow)" />
+            <line x1={b.c7.x} y1={b.c7.y} x2={b.ear.x} y2={b.ear.y} stroke={lineColor("neck")} strokeWidth="3" strokeLinecap="round" filter="url(#lp-glow)" />
+            <line x1={b.rs.x} y1={b.rs.y} x2={b.ls.x} y2={b.ls.y} stroke={flagged("shoulders") ? lineColor("shoulders") : "#ffffff"} strokeOpacity={flagged("shoulders") ? 1 : 0.85} strokeWidth="2.5" strokeLinecap="round" />
+
+            {/* joints: small solid dots */}
             {[
-              { p: b.ear, c: lineColor("neck"), hot: flagged("neck") },
-              { p: b.c7, c: flagged("neck") ? lineColor("neck") : "var(--color-primary)", hot: flagged("neck") },
-              { p: b.shoulder, c: lineColor("shoulders"), hot: flagged("shoulders") },
-              { p: HIP, c: lineColor("torso"), hot: flagged("torso") },
-              { p: KNEE, c: "var(--color-primary)", hot: false },
-            ].map((j, i) => (
-              <g key={i}>
-                {j.hot && <circle cx={j.p.x} cy={j.p.y} r="15" fill={j.c} opacity="0.22" />}
-                <circle cx={j.p.x} cy={j.p.y} r="6.5" fill="#0b1220" stroke={j.c} strokeWidth="3" />
+              { p: b.ear, hot: flagged("neck"), c: lineColor("neck"), label: "Tragus", dx: 9, dy: -6 },
+              { p: b.c7, hot: flagged("neck") || flagged("torso"), c: flagged("neck") ? lineColor("neck") : lineColor("torso"), label: "C7", dx: 9, dy: 4 },
+              { p: b.rs, hot: flagged("shoulders"), c: lineColor("shoulders"), label: "RS", dx: -19, dy: 2 },
+              { p: b.ls, hot: flagged("shoulders"), c: lineColor("shoulders"), label: "LS", dx: -17, dy: 6 },
+              { p: HIP, hot: flagged("torso"), c: lineColor("torso"), label: "Mid hip", dx: 9, dy: 14 },
+            ].map((j) => (
+              <g key={j.label}>
+                {j.hot && <circle cx={j.p.x} cy={j.p.y} r="11" fill={j.c} opacity="0.25" />}
+                <circle cx={j.p.x} cy={j.p.y} r="4.5" fill={j.hot ? j.c : "#ffffff"} stroke="#0b1220" strokeWidth="1.5" />
+                <text x={j.p.x + j.dx} y={j.p.y + j.dy} fontSize="10" fontWeight="600" fontFamily="Quicksand, sans-serif" fill="#fff" stroke="#070b14" strokeWidth="3" paintOrder="stroke">{j.label}</text>
               </g>
             ))}
 
-            {/* labels */}
-            <g fontSize="10" fontFamily="Quicksand, sans-serif" fill="#cfd8ea" opacity="0.75">
-              <text x={b.c7.x + 10} y={b.c7.y + 4}>C7</text>
-              <text x={HIP.x + 12} y={HIP.y + 4}>Mid hip</text>
-            </g>
-
-            {/* angle values */}
-            <AngleBadge x={(HIP.x + b.c7.x) / 2 + 16} y={(HIP.y + b.c7.y) / 2} value={torsoDeg} color={lineColor("torso")} big={flagged("torso")} />
-            <AngleBadge x={Math.max(b.ear.x, b.c7.x) + 14} y={(b.ear.y + b.c7.y) / 2} value={neckDeg} color={lineColor("neck")} big={flagged("neck")} />
+            {/* angle values beside their wedges */}
+            <AngleBadge x={HIP.x - 34} y={HIP.y - 22} value={torsoDeg} color={flagged("torso") ? lineColor("torso") : "#fff"} big={flagged("torso")} />
+            <AngleBadge x={b.c7.x + 10} y={b.c7.y - 38} value={neckDeg} color={flagged("neck") ? lineColor("neck") : "#fff"} big={flagged("neck")} />
             {flagged("shoulders") && (
-              <AngleBadge x={b.shoulder.x - 50} y={b.shoulder.y + 8} value={14} color={lineColor("shoulders")} big />
+              <AngleBadge x={b.ls.x - 46} y={b.ls.y + 14} value={14} color={lineColor("shoulders")} big />
             )}
           </g>
         </svg>
@@ -428,6 +428,18 @@ function SegmentGauge({ value, level }: { value: number; level: Level }) {
   );
 }
 
+/** filled sector between the vertical (up) and the direction from `at` to `to` */
+function Wedge({ at, to, r, color }: { at: V; to: V; r: number; color: string }) {
+  const ang = Math.atan2(to.x - at.x, -(to.y - at.y)); // 0 = straight up, negative = leaning left
+  if (Math.abs(ang) < 0.02) return null;
+  const end = { x: at.x + r * Math.sin(ang), y: at.y - r * Math.cos(ang) };
+  const sweep = ang < 0 ? 0 : 1;
+  return (
+    <path d={`M ${at.x} ${at.y} L ${at.x} ${at.y - r} A ${r} ${r} 0 0 ${sweep} ${end.x.toFixed(1)} ${end.y.toFixed(1)} Z`}
+      fill={color} fillOpacity="0.34" stroke={color} strokeOpacity="0.6" strokeWidth="1" />
+  );
+}
+
 function AngleBadge({ x, y, value, color, big }: { x: number; y: number; value: number; color: string; big?: boolean }) {
   return (
     <text
@@ -435,7 +447,7 @@ function AngleBadge({ x, y, value, color, big }: { x: number; y: number; value: 
       y={y}
       fontFamily="Quicksand, sans-serif"
       fontWeight="700"
-      fontSize={big ? 22 : 14}
+      fontSize={big ? 18 : 12.5}
       fill={color}
       stroke="#070b14"
       strokeWidth="3"
