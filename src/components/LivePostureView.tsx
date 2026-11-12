@@ -502,30 +502,45 @@ function CoachBanner({ tone, kicker, title, note, more, fixed }: NonNullable<Pha
       </div>
     );
   }
+  // "Area · Issue 14°" → area, issue, degrees
+  const [area, issueRaw] = (kicker ?? "").split(" · ");
+  const deg = issueRaw?.match(/(\d+)°/)?.[1];
+  const issue = issueRaw?.replace(/\s*\d+°/, "");
   return (
     <div
-      className="relative flex items-start gap-2.5 rounded-2xl bg-black/75 px-3.5 py-3 backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-300"
+      className="relative overflow-hidden rounded-[18px] backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-300"
       style={{
-        boxShadow: `0 12px 32px -14px color-mix(in oklab, ${t.color} 55%, transparent)`,
+        background: `linear-gradient(100deg, color-mix(in oklab, ${t.color} 20%, #0a0f19) 0%, rgba(10,15,25,.86) 55%)`,
+        boxShadow: `inset 0 0 0 1px color-mix(in oklab, ${t.color} 30%, rgba(255,255,255,.06)), 0 16px 36px -18px color-mix(in oklab, ${t.color} 60%, transparent)`,
       }}
     >
-      <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden>
-        <rect x="0.5" y="0.5" rx="15.5" fill="none" stroke={t.color} strokeOpacity="0.9" strokeWidth="1"
-          strokeDasharray="2 6" strokeLinecap="round" style={{ width: "calc(100% - 1px)", height: "calc(100% - 1px)" }} />
-      </svg>
-      <Icon className="mt-[2px] h-5 w-5 shrink-0 @max-[300px]:hidden!" style={{ color: t.color }} strokeWidth={1.9} />
-      <div className="min-w-0">
-        {kicker && (
-          <div className="text-[9.5px] font-medium uppercase leading-tight tracking-[0.04em] @max-[300px]:hidden!" style={{ color: t.color }}>
-            {kicker}
+      <span aria-hidden className="absolute inset-y-3 left-0 w-[3px] rounded-r-full" style={{ background: t.color }} />
+      <div className="py-3 pl-4 pr-3.5 @max-[300px]:py-2.5 @max-[300px]:pl-3.5">
+        {issue && (
+          <div className="flex items-center gap-2">
+            <span
+              className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full @max-[300px]:hidden!"
+              style={{ background: `color-mix(in oklab, ${t.color} 22%, transparent)`, color: t.color }}
+            >
+              <Icon className="h-3.5 w-3.5" strokeWidth={2.2} />
+            </span>
+            <span className="shrink-0 whitespace-nowrap text-[12.5px] font-semibold" style={{ color: t.color }}>{issue}</span>
+            {area && <span className="min-w-0 truncate text-[11px] text-white/40 @max-[340px]:hidden!">{area}</span>}
+            {deg && (
+              <span className="ml-auto shrink-0 text-[17px] font-bold leading-none tabular-nums" style={{ color: t.color }}>
+                {deg}°
+              </span>
+            )}
           </div>
         )}
-        <div className={cn("text-[clamp(15px,2.1dvh,18px)] @max-[300px]:text-[13.5px]! @max-[300px]:leading-snug! font-normal leading-[1.25] tracking-[-0.005em] text-white", kicker && "mt-1 @max-[300px]:mt-0!")}>{title}</div>
-        {note && <div className="mt-1 text-[11.5px] text-white/55">{note}</div>}
-        {more && <div className="mt-1.5 text-[11.5px] text-white/80">{more}</div>}
-        {fixed && (
-          <div className="mt-1.5 flex items-center gap-1 text-[11.5px] text-success">
-            <CheckCircle2 className="h-3.5 w-3.5" /> {fixed}
+        <p className="mt-2 text-[clamp(15px,2dvh,17px)] font-medium leading-snug tracking-[-0.01em] text-white @max-[300px]:mt-1.5 @max-[300px]:text-[13.5px]!">{title}</p>
+        {note && <p className="mt-1 text-[11.5px] text-white/55">{note}</p>}
+        {(more || fixed) && (
+          <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-white/[0.07] pt-2 text-[11.5px]">
+            {fixed && (
+              <span className="inline-flex items-center gap-1 text-success"><CheckCircle2 className="h-3.5 w-3.5" /> {fixed}</span>
+            )}
+            {more && <span className="text-white/60">{more}</span>}
           </div>
         )}
       </div>
