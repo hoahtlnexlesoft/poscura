@@ -394,28 +394,35 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
       </div>
 
       {/* ---------- status bar ---------- */}
-      <div ref={statusRef} className="space-y-3 border-t border-white/[0.06] px-4 pb-4 pt-3">
-        <div className="flex items-center gap-3">
-          <SegmentGauge value={score} level={phase.level} />
-          <div className="min-w-0 flex-1">
-            <div className="flex items-baseline gap-2">
-              <span className={cn("text-[22px] font-semibold leading-none tracking-tight transition-colors", LEVEL_TEXT[phase.level])}>{phase.status.word}</span>
-              <span className="text-[11px] text-muted-foreground">Avg <b className="font-semibold text-foreground tabular-nums">{avg}</b></span>
-            </div>
-            <div className="mt-1 line-clamp-2 text-[11px] leading-snug text-muted-foreground">{phase.status.note}</div>
+      <div ref={statusRef} className="@container border-t border-white/[0.06]">
+      <div className="flex items-center gap-3 px-4 py-3 @max-[360px]:gap-2.5 @max-[360px]:px-3">
+        <SegmentGauge value={score} level={phase.level} />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-baseline gap-2">
+            <span className={cn("text-[22px] font-semibold leading-none tracking-tight transition-colors", LEVEL_TEXT[phase.level])}>{phase.status.word}</span>
+            <span className="text-[11px] text-muted-foreground @max-[360px]:hidden!">Avg <b className="font-semibold text-foreground tabular-nums">{avg}</b></span>
           </div>
-          <div className="shrink-0 border-l border-white/[0.08] pl-3 text-right leading-none">
+          <div className="mt-1 line-clamp-2 text-[11px] leading-snug text-muted-foreground @max-[360px]:hidden!">{phase.status.note}</div>
+          <div className="mt-1.5 hidden whitespace-nowrap text-[11px] text-muted-foreground @max-[360px]:block!">
+            Avg <b className="font-semibold text-foreground tabular-nums">{avg}</b> · <b className="font-semibold text-foreground tabular-nums">{timeLeft}</b> left
+          </div>
+        </div>
+        <div className="flex shrink-0 items-center gap-3">
+          <div className="border-l border-white/[0.08] pl-3 text-right leading-none @max-[360px]:hidden!">
             <div className="text-[9px] font-medium uppercase tracking-[0.1em] text-muted-foreground">Time left</div>
             <div className="mt-1.5 text-[20px] font-semibold tabular-nums">{timeLeft}</div>
           </div>
+          <button
+            type="button"
+            onClick={onEnd}
+            aria-label="Stop monitoring"
+            title="Stop monitoring"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-destructive/50 bg-destructive/15 text-destructive transition hover:bg-destructive/25 active:scale-95"
+          >
+            <Square className="h-3.5 w-3.5 fill-current" />
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={onEnd}
-          className="flex h-10 w-full items-center justify-center gap-2 rounded-full border border-destructive/45 bg-destructive/12 text-[13.5px] font-semibold text-destructive transition hover:bg-destructive/20 active:scale-[.99]"
-        >
-          <Square className="h-3 w-3 fill-current" /> Stop
-        </button>
+      </div>
       </div>
     </div>
   );
