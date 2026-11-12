@@ -80,7 +80,7 @@ function NotificationsPage() {
         </button>
       </div>
 
-      <div className="mt-4 fold:grid fold:grid-cols-[minmax(0,340px)_minmax(0,1fr)] fold:items-start fold:gap-5">
+      <div className="mt-4 fold:grid fold:grid-cols-[minmax(0,340px)_minmax(0,1fr)] land:grid-cols-2 fold:items-start fold:gap-5 land:gap-x-6">
         {/* list */}
         <section>
           <div className="mb-3 inline-flex rounded-xl bg-muted/40 p-1">

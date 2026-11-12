@@ -40,7 +40,7 @@ function SettingsPage() {
         </button>
         <h1 className="text-base font-semibold">Settings</h1>
       </header>
-      <div className="p-4 space-y-4 fold:space-y-0 fold:columns-2 fold:gap-4 fold:[&>*]:break-inside-avoid fold:[&>*]:mb-4">
+      <div className="p-4 space-y-4 fold:space-y-0 fold:columns-2 fold:gap-4 land:gap-6 fold:[&>*]:break-inside-avoid fold:[&>*]:mb-4">
 
       <Section icon={Languages} title="Language">
         <Row label="App language">

@@ -94,7 +94,7 @@ function SupportPage() {
 
       <div className="relative p-4 pt-6 flex-1 fold:mx-auto fold:w-full fold:max-w-[1000px] fold:px-6 fold:pt-8">
         <div aria-hidden className="pointer-events-none absolute -top-10 -left-10 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
-        <div className="relative fold:grid fold:grid-cols-[minmax(0,290px)_minmax(0,1fr)] fold:items-start fold:gap-8">
+        <div className="relative fold:grid fold:grid-cols-[minmax(0,290px)_minmax(0,1fr)] land:grid-cols-2 fold:items-start fold:gap-8">
           <div className="fold:sticky fold:top-[72px]">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-primary">
             <span className="h-1.5 w-1.5 rounded-full bg-secondary" /> Help center

@@ -38,7 +38,7 @@ function WorkoutPage() {
   if (view.kind === "program") return <WorkoutProgramDetail onClose={() => setView({ kind: "list" })} onStartSession={(name) => setView({ kind: "session", name })} />;
 
   return (
-    <div className="space-y-4 fold:grid fold:grid-cols-2 fold:gap-4 fold:space-y-0 fold:items-start">
+    <div className="space-y-4 fold:grid fold:grid-cols-2 fold:gap-4 land:gap-x-6 fold:space-y-0 fold:items-start">
       <div className="fold:col-span-2">
         <h1 className="text-xl font-bold">Workout</h1>
         <p className="text-xs text-muted-foreground mt-0.5">Personalized routines from your posture data.</p>

@@ -122,7 +122,7 @@ function PostureMonitor() {
         )}
       </section>
 
-      <section className="glass-card p-4 fold:col-start-2 fold:row-start-2 fold:flex fold:flex-col">
+      <section className="glass-card p-4 fold:col-start-2 fold:row-start-2 fold:self-start">
         <div className="flex items-center gap-2 mb-3">
           <Activity className="h-4 w-4 text-primary" />
           <h2 className="text-sm font-semibold">History</h2>
@@ -137,7 +137,7 @@ function PostureMonitor() {
             <RotateCw className={`h-3.5 w-3.5 ${reloading ? "animate-spin" : ""}`} />
           </button>
         </div>
-        <div className="space-y-2 fold:grid fold:flex-1 fold:auto-rows-fr fold:gap-2 fold:space-y-0">
+        <div className="space-y-2">
           {history.map((m) => (
             <button key={m.date} onClick={() => setShowReport(true)}
               className="w-full text-left p-2.5 rounded-xl bg-card border border-border flex items-center gap-3 transition hover:border-primary/40">

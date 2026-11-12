@@ -126,7 +126,7 @@ function CommunityPage() {
   if (sortBy === "popular") filtered = [...filtered].sort((a, b) => b.likes - a.likes);
 
   return (
-    <div className="pb-20 fold:mx-auto fold:grid fold:max-w-[980px] fold:grid-cols-[220px_minmax(0,1fr)] fold:items-start fold:gap-6 fold:pb-6">
+    <div className="pb-20 fold:mx-auto fold:grid fold:max-w-[980px] fold:grid-cols-[220px_minmax(0,1fr)] land:grid-cols-2 fold:items-start fold:gap-6 fold:pb-6">
       <CommunitySide
         posts={posts}
         category={category} setCategory={setCategory}

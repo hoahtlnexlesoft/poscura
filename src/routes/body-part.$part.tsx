@@ -30,7 +30,7 @@ function BodyPartDetail() {
     "bg-success/15 text-success";
 
   return (
-    <div className="space-y-4 fold:grid fold:grid-cols-2 fold:gap-4 fold:space-y-0 fold:items-start">
+    <div className="space-y-4 fold:grid fold:grid-cols-2 fold:gap-4 land:gap-x-6 fold:space-y-0 fold:items-start">
       <div className="flex items-center justify-between fold:col-span-2">
         <Link to="/" className="inline-flex items-center gap-1 text-base font-semibold">
           <ChevronLeft className="h-5 w-5" /> {data.name}
