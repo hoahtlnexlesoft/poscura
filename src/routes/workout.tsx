@@ -6,6 +6,7 @@ import { WorkoutSession } from "@/components/WorkoutSession";
 import { WorkoutAssessment } from "@/components/WorkoutAssessment";
 import { WorkoutProgramDetail } from "@/components/WorkoutProgramDetail";
 import { ExerciseDetail } from "@/components/ExerciseDetail";
+import { NEXT_WORKOUT, TODAYS_WORKOUTS, TODAY_TIME } from "@/lib/todays-workouts";
 
 export const Route = createFileRoute("/workout")({
   validateSearch: z.object({ session: z.string().optional() }),
@@ -50,36 +51,40 @@ function WorkoutPage() {
       </div>
 
       <section className="glass-card p-4 space-y-3 fold:col-start-1 fold:row-start-2 fold:row-span-2">
-        <div className="flex items-center gap-2">
-          <Dumbbell className="h-4 w-4 text-primary" />
-          <h2 className="text-sm font-semibold">Today's Sessions</h2>
-        </div>
-        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 border border-primary/20 text-[11px] text-primary">
-          <Clock className="h-3.5 w-3.5 shrink-0" />
-          <span>Next: <span className="font-semibold">Neck mobility</span> at <span className="font-semibold">05:00 PM</span></span>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <div className="flex items-center gap-2">
+            <Dumbbell className="h-4 w-4 text-primary" />
+            <h2 className="text-sm font-semibold">Today's Sessions</h2>
+          </div>
+          <div className="flex min-w-0 flex-1 basis-full items-center gap-2 rounded-lg border border-primary/25 bg-primary/10 px-3 py-2 text-[11px] text-primary min-[520px]:basis-auto">
+            <Clock className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">Next: <span className="font-semibold">{NEXT_WORKOUT}</span> at <span className="font-semibold">{TODAY_TIME}</span></span>
+          </div>
         </div>
         <div className="space-y-2">
-          {today.map((w) => {
-            const isCompleted = w.status === "Completed";
-            const toneText = w.tone === "success" ? "text-success" : w.tone === "warning" ? "text-warning" : "text-destructive";
-            const ToneIcon = w.tone === "success" ? CheckCircle2 : w.tone === "warning" ? AlertTriangle : XCircle;
+          {TODAYS_WORKOUTS.map((w) => {
+            const completed = w.done >= w.sessions;
             return (
-              <div key={w.name} className="rounded-xl bg-card border border-border p-3 flex items-center gap-3">
-                <div className="flex-1 min-w-0 space-y-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="text-sm font-semibold truncate">{w.name}</h3>
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-medium ${isCompleted ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive"}`}>{w.status}</span>
-                  </div>
-                  <div className="text-[11px] text-muted-foreground">{w.time}</div>
-                  <div className={`flex items-center gap-1.5 text-[11px] font-medium ${toneText}`}>
-                    <ToneIcon className="h-3.5 w-3.5 shrink-0" />
-                    <span className="truncate">{w.message}</span>
+              <div key={w.name} className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
+                <div className="min-w-0 flex-1">
+                  <h3 className="truncate text-sm font-semibold">{w.name}</h3>
+                  <div className="mt-0.5 text-[11px] text-muted-foreground">Scheduled at {TODAY_TIME}</div>
+                  <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                    <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-medium ${completed ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive"}`}>
+                      {completed ? "Completed" : "Incompleted"}
+                    </span>
+                    <span className={`inline-flex items-center gap-1 text-[11px] font-medium ${completed ? "text-success" : "text-destructive"}`}>
+                      {completed ? <CheckCircle2 className="h-3.5 w-3.5" /> : <XCircle className="h-3.5 w-3.5" />}
+                      {completed ? "Great job!" : "Try your best!"} {w.done}/{w.sessions}
+                    </span>
                   </div>
                 </div>
-                <button onClick={() => isCompleted ? setView({ kind: "exercise", name: w.name }) : setView({ kind: "session", name: w.name })}
-                  aria-label={isCompleted ? "View" : "Start"}
-                  className="h-10 w-10 rounded-full border-2 border-primary text-primary flex items-center justify-center shrink-0">
-                  {isCompleted ? <Eye className="h-4 w-4" /> : <Play className="h-4 w-4 fill-current" />}
+                <button
+                  onClick={() => (completed ? setView({ kind: "exercise", name: w.name }) : setView({ kind: "session", name: w.name }))}
+                  className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-border bg-background px-3.5 text-xs font-semibold transition hover:border-primary/50 hover:text-primary"
+                >
+                  {completed ? <Eye className="h-3.5 w-3.5" /> : <Play className="h-3 w-3 fill-current" />}
+                  {completed ? "View" : "Start"}
                 </button>
               </div>
             );

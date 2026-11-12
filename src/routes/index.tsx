@@ -2,20 +2,12 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ChevronRight, Play, Clock } from "lucide-react";
 import { ScoreGauge } from "@/components/ScoreGauge";
 import bodyTorso from "@/assets/body-torso.png";
+import { NEXT_WORKOUT, TODAYS_WORKOUTS, TODAY_TIME } from "@/lib/todays-workouts";
 
 export const Route = createFileRoute("/")({ component: Dashboard });
 
-const todaysWorkouts = [
-  { name: "Squeeze Blades", session: "0/3", time: "05:15 AM" },
-  { name: "Neck Rotation", session: "0/1", time: "05:15 AM" },
-  { name: "Cat Cow", session: "0/3", time: "05:15 AM" },
-];
-
-const progress = [
-  { name: "Chin Tucks", done: 2, total: 4 },
-  { name: "Shoulder Rolls", done: 3, total: 5 },
-  { name: "Wall Angels", done: 2, total: 4 },
-];
+const progressDone = TODAYS_WORKOUTS.reduce((a, w) => a + w.programDone, 0);
+const progressTotal = TODAYS_WORKOUTS.reduce((a, w) => a + w.programTotal, 0);
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -79,22 +71,22 @@ function Dashboard() {
 
       <div className="space-y-4">
       <section className="glass-card p-4">
-        <h2 className="text-base font-semibold mb-3">Today's Sessions</h2>
+        <h2 className="text-base font-semibold mb-3">Today's Workouts</h2>
         <div className="rounded-xl bg-primary/10 border border-primary/30 p-3 mb-3">
           <div className="flex items-center gap-2 text-primary text-xs font-medium">
-            <Clock className="h-3.5 w-3.5" /> Upcoming: Neck mobility
+            <Clock className="h-3.5 w-3.5" /> Upcoming: {NEXT_WORKOUT}
           </div>
-          <div className="text-[11px] text-muted-foreground mt-0.5">Starts at 05:00 PM</div>
+          <div className="text-[11px] text-muted-foreground mt-0.5">Starts at {TODAY_TIME}</div>
         </div>
         <div className="space-y-2">
-          {todaysWorkouts.map((w) => (
+          {TODAYS_WORKOUTS.map((w) => (
             <div key={w.name} className="flex items-center gap-2 p-2.5 rounded-xl bg-card border border-border">
               <div className="flex-1 min-w-0">
-                <div className="font-medium text-sm">{w.name}</div>
-                <div className="text-[10px] text-muted-foreground">Session {w.session} · {w.time}</div>
+                <div className="font-medium text-sm truncate">{w.name}</div>
+                <div className="text-[10px] text-muted-foreground">Session {w.done}/{w.sessions} · {TODAY_TIME}</div>
               </div>
-              <Link to="/workout" search={{ session: w.name }} aria-label={`Start ${w.name}`} className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/30 transition hover:opacity-90 active:scale-95">
-                <Play className="h-3.5 w-3.5 fill-current" />
+              <Link to="/workout" search={{ session: w.name }} aria-label={`Start ${w.name}`} className="h-8 w-8 shrink-0 rounded-full border-2 border-primary text-primary flex items-center justify-center transition hover:bg-primary/10 active:scale-95">
+                <Play className="ml-px h-3 w-3 fill-current" />
               </Link>
             </div>
           ))}
@@ -104,18 +96,18 @@ function Dashboard() {
       <section className="glass-card p-4">
         <h2 className="text-base font-semibold mb-3">Workout Progress</h2>
         <div className="flex items-baseline gap-2 mb-1">
-          <span className="text-2xl font-bold">8</span>
-          <span className="text-xs text-muted-foreground">/16 sessions · 50%</span>
+          <span className="text-2xl font-bold">{progressDone}</span>
+          <span className="text-xs text-muted-foreground">/{progressTotal} sessions · {Math.round((progressDone / progressTotal) * 100)}%</span>
         </div>
         <div className="space-y-2 mt-3">
-          {progress.map((p) => (
+          {TODAYS_WORKOUTS.map((p) => (
             <div key={p.name}>
-              <div className="flex justify-between text-[11px] mb-1">
-                <span>{p.name}</span>
-                <span className="text-muted-foreground">{p.done}/{p.total}</span>
+              <div className="flex justify-between gap-2 text-[11px] mb-1">
+                <span className="truncate">{p.name}</span>
+                <span className="shrink-0 text-muted-foreground">{p.programDone}/{p.programTotal} sessions</span>
               </div>
               <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-primary to-secondary" style={{ width: `${(p.done / p.total) * 100}%` }} />
+                <div className="h-full bg-gradient-to-r from-primary to-secondary" style={{ width: `${(p.programDone / p.programTotal) * 100}%` }} />
               </div>
             </div>
           ))}
