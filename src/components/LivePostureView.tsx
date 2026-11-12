@@ -11,51 +11,60 @@ import { cn } from "@/lib/utils";
  * ---------------------------------------------------------------------- */
 
 type Level = "good" | "adjust" | "poor";
+type Area = "shoulders" | "torso" | "neck";
 type Pose = { lean: number; neck: number; shrug: number };
 
 interface Phase {
   key: string;
   level: Level;
   /** coaching banner (none while posture is simply good) */
-  banner?: { tone: "warn" | "bad" | "ok"; kicker?: string; title: string; note?: string };
+  banner?: {
+    tone: "warn" | "bad" | "ok"; kicker?: string; title: string; note?: string;
+    /** other areas still off, e.g. "+1 more: Head forward 20°" */
+    more?: string;
+    /** what was just fixed before this one, e.g. "Leaning forward fixed. Now this one." */
+    fixed?: string;
+  };
   status: { word: string; note: string };
   pose: Pose;
   score: number;
-  /** which angle line is flagged */
-  flag?: "shoulders" | "torso";
+  /** which angle lines are flagged */
+  flags?: Area[];
   ms: number;
 }
 
+const GOOD = { word: "Good", note: "Keep it up." };
+const BETTER = { tone: "ok" as const, title: "Better. Keep it there.", note: "Corrected in 5 s." };
+
 const PHASES: Phase[] = [
+  { key: "good", level: "good", score: 82, ms: 6000, pose: { lean: 4, neck: 12, shrug: 0 }, status: GOOD },
   {
-    key: "poor", level: "poor", flag: "torso", score: 54, ms: 7000,
-    pose: { lean: 32, neck: 48, shrug: 2 },
-    banner: { tone: "bad", kicker: "Spine & Torso · Leaning forward 32°", title: "Sit back so the chair supports your lower back." },
-    status: { word: "Poor", note: "Leaning forward 32°" },
-  },
-  {
-    key: "fixed-1", level: "good", score: 76, ms: 4000,
-    pose: { lean: 5, neck: 13, shrug: 0 },
-    banner: { tone: "ok", title: "Better. Keep it there.", note: "Corrected in 5 s." },
-    status: { word: "Good", note: "Keep it up." },
-  },
-  {
-    key: "good", level: "good", score: 82, ms: 7000,
-    pose: { lean: 4, neck: 12, shrug: 0 },
-    status: { word: "Good", note: "Keep it up." },
-  },
-  {
-    key: "adjust", level: "adjust", flag: "shoulders", score: 70, ms: 6000,
+    key: "shoulders", level: "adjust", flags: ["shoulders"], score: 70, ms: 6000,
     pose: { lean: 7, neck: 15, shrug: 12 },
     banner: { tone: "warn", kicker: "Shoulders & Upper Back · Shoulders raised 14°", title: "Let your shoulders drop away from your ears." },
     status: { word: "Adjust", note: "Shoulders raised 14°" },
   },
+  { key: "fixed-1", level: "good", score: 78, ms: 4000, pose: { lean: 5, neck: 13, shrug: 0 }, banner: BETTER, status: GOOD },
   {
-    key: "fixed-2", level: "good", score: 78, ms: 4000,
-    pose: { lean: 5, neck: 13, shrug: 0 },
-    banner: { tone: "ok", title: "Better. Keep it there.", note: "Corrected in 5 s." },
-    status: { word: "Good", note: "Keep it up." },
+    key: "lean", level: "poor", flags: ["torso"], score: 54, ms: 6500,
+    pose: { lean: 32, neck: 48, shrug: 2 },
+    banner: { tone: "bad", kicker: "Spine & Torso · Leaning forward 32°", title: "Sit back so the chair supports your lower back." },
+    status: { word: "Poor", note: "Leaning forward 32°" },
   },
+  { key: "fixed-2", level: "good", score: 77, ms: 4000, pose: { lean: 5, neck: 13, shrug: 0 }, banner: BETTER, status: GOOD },
+  {
+    key: "lean-head", level: "poor", flags: ["torso", "neck"], score: 48, ms: 6500,
+    pose: { lean: 30, neck: 50, shrug: 2 },
+    banner: { tone: "bad", kicker: "Spine & Torso · Leaning forward 30°", title: "Sit back so the chair supports your lower back.", more: "+1 more: Head forward 20°" },
+    status: { word: "Poor", note: "2 areas · Leaning forward 30°, Head forward 20°" },
+  },
+  {
+    key: "head", level: "poor", flags: ["neck"], score: 62, ms: 6000,
+    pose: { lean: 6, neck: 26, shrug: 0 },
+    banner: { tone: "bad", kicker: "Head & Neck · Head forward 20°", title: "Chin back a little, ears over shoulders.", fixed: "Leaning forward fixed. Now this one." },
+    status: { word: "Poor", note: "Head forward 20°" },
+  },
+  { key: "fixed-3", level: "good", score: 79, ms: 4000, pose: { lean: 5, neck: 13, shrug: 0 }, banner: BETTER, status: GOOD },
 ];
 
 const LEVEL_TEXT: Record<Level, string> = { good: "text-success", adjust: "text-warning", poor: "text-destructive" };
@@ -183,10 +192,11 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
 
   const b = useMemo(() => body(pose), [pose]);
   const torsoDeg = Math.round(pose.lean);
-  const neckDeg = Math.round(pose.neck);
+  const neckDeg = Math.round(pose.neck - pose.lean); // head forward, measured against the torso
 
-  const lineColor = (f: Phase["flag"]) =>
-    phase.flag === f ? (phase.level === "poor" ? "var(--color-destructive)" : "var(--color-warning)") : "var(--color-primary)";
+  const flagged = (a: Area) => !!phase.flags?.includes(a);
+  const lineColor = (a: Area) =>
+    flagged(a) ? (phase.level === "poor" ? "var(--color-destructive)" : "var(--color-warning)") : "var(--color-primary)";
 
   return (
     <div>
@@ -304,16 +314,16 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
 
             {/* torso + neck + thigh */}
             <line x1={HIP.x} y1={HIP.y} x2={b.c7.x} y2={b.c7.y} stroke={lineColor("torso")} strokeWidth="3.5" strokeLinecap="round" filter="url(#lp-glow)" />
-            <line x1={b.c7.x} y1={b.c7.y} x2={b.ear.x} y2={b.ear.y} stroke="var(--color-primary)" strokeWidth="3.5" strokeLinecap="round" filter="url(#lp-glow)" />
+            <line x1={b.c7.x} y1={b.c7.y} x2={b.ear.x} y2={b.ear.y} stroke={lineColor("neck")} strokeWidth="3.5" strokeLinecap="round" filter="url(#lp-glow)" />
             <line x1={b.c7.x} y1={b.c7.y} x2={b.shoulder.x} y2={b.shoulder.y} stroke={lineColor("shoulders")} strokeWidth="3.5" strokeLinecap="round" filter="url(#lp-glow)" />
             <line x1={HIP.x} y1={HIP.y} x2={KNEE.x} y2={KNEE.y} stroke="var(--color-primary)" strokeOpacity="0.7" strokeWidth="3" strokeLinecap="round" />
 
             {/* joints */}
             {[
-              { p: b.ear, c: "var(--color-primary)", hot: false },
-              { p: b.c7, c: "var(--color-primary)", hot: false },
-              { p: b.shoulder, c: lineColor("shoulders"), hot: phase.flag === "shoulders" },
-              { p: HIP, c: lineColor("torso"), hot: phase.flag === "torso" },
+              { p: b.ear, c: lineColor("neck"), hot: flagged("neck") },
+              { p: b.c7, c: flagged("neck") ? lineColor("neck") : "var(--color-primary)", hot: flagged("neck") },
+              { p: b.shoulder, c: lineColor("shoulders"), hot: flagged("shoulders") },
+              { p: HIP, c: lineColor("torso"), hot: flagged("torso") },
               { p: KNEE, c: "var(--color-primary)", hot: false },
             ].map((j, i) => (
               <g key={i}>
@@ -329,9 +339,9 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
             </g>
 
             {/* angle values */}
-            <AngleBadge x={(HIP.x + b.c7.x) / 2 + 16} y={(HIP.y + b.c7.y) / 2} value={torsoDeg} color={lineColor("torso")} big={phase.flag === "torso"} />
-            <AngleBadge x={Math.max(b.ear.x, b.c7.x) + 14} y={(b.ear.y + b.c7.y) / 2} value={neckDeg} color="var(--color-primary)" />
-            {phase.flag === "shoulders" && (
+            <AngleBadge x={(HIP.x + b.c7.x) / 2 + 16} y={(HIP.y + b.c7.y) / 2} value={torsoDeg} color={lineColor("torso")} big={flagged("torso")} />
+            <AngleBadge x={Math.max(b.ear.x, b.c7.x) + 14} y={(b.ear.y + b.c7.y) / 2} value={neckDeg} color={lineColor("neck")} big={flagged("neck")} />
+            {flagged("shoulders") && (
               <AngleBadge x={b.shoulder.x - 50} y={b.shoulder.y + 8} value={14} color={lineColor("shoulders")} big />
             )}
           </g>
@@ -406,7 +416,7 @@ function AngleBadge({ x, y, value, color, big }: { x: number; y: number; value: 
   );
 }
 
-function CoachBanner({ tone, kicker, title, note }: NonNullable<Phase["banner"]>) {
+function CoachBanner({ tone, kicker, title, note, more, fixed }: NonNullable<Phase["banner"]>) {
   const styles = {
     warn: { box: "border-warning/80 bg-black/70", icon: <Eye className="h-5 w-5 text-warning" />, kicker: "text-warning" },
     bad: { box: "border-destructive/80 bg-black/70", icon: <AlertTriangle className="h-5 w-5 text-destructive" />, kicker: "text-destructive" },
@@ -419,6 +429,12 @@ function CoachBanner({ tone, kicker, title, note }: NonNullable<Phase["banner"]>
         {kicker && <div className={cn("text-[9.5px] font-semibold uppercase tracking-wide", styles.kicker)}>{kicker}</div>}
         <div className="text-[15px] font-semibold leading-snug text-white">{title}</div>
         {note && <div className="mt-0.5 text-[11px] text-white/60">{note}</div>}
+        {more && <div className="mt-1 text-[11px] font-medium text-white/85">{more}</div>}
+        {fixed && (
+          <div className="mt-1 flex items-center gap-1 text-[11px] font-medium text-success">
+            <CheckCircle2 className="h-3 w-3" /> {fixed}
+          </div>
+        )}
       </div>
     </div>
   );
