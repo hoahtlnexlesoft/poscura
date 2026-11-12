@@ -212,6 +212,21 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext }:
         </div>
       </section>
 
+      <section className="glass-card p-4">
+        <button onClick={() => setChartOpen((v) => !v)} className="w-full flex items-center justify-between">
+          <h2 className="font-semibold text-sm">Accuracy Over Time</h2>
+          <ChevronDown className={`h-4 w-4 transition ${chartOpen ? "" : "-rotate-90"}`} />
+        </button>
+        {chartOpen && (
+          <div className="mt-3">
+            <AccuracyChart data={accuracySeries} onPointClick={(i, v) => setSessionDetail({ date: `Session ${i + 1}`, time: "06:00 PM", score: v })} />
+          </div>
+        )}
+      </section>
+
+      </div>
+
+      <div className="space-y-4">
       <section className="rounded-2xl border-2 border-secondary/30 bg-gradient-to-br from-secondary/10 to-transparent p-4">
         <div className="flex items-center gap-2 mb-3">
           <Dumbbell className="h-4 w-4 text-secondary" />
@@ -228,20 +243,6 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext }:
         </div>
       </section>
 
-      </div>
-
-      <div className="space-y-4">
-      <section className="glass-card p-4">
-        <button onClick={() => setChartOpen((v) => !v)} className="w-full flex items-center justify-between">
-          <h2 className="font-semibold text-sm">Accuracy Over Time</h2>
-          <ChevronDown className={`h-4 w-4 transition ${chartOpen ? "" : "-rotate-90"}`} />
-        </button>
-        {chartOpen && (
-          <div className="mt-3">
-            <AccuracyChart data={accuracySeries} onPointClick={(i, v) => setSessionDetail({ date: `Session ${i + 1}`, time: "06:00 PM", score: v })} />
-          </div>
-        )}
-      </section>
 
       <section className="glass-card p-4">
         <h2 className="font-semibold text-sm mb-3">Exercise Evaluation</h2>

@@ -68,11 +68,11 @@ function PostureMonitor() {
   ];
 
   return (
-    <div data-fit-bound className="space-y-4 fold:grid fold:grid-cols-[auto_minmax(0,340px)] fold:grid-rows-[auto_1fr] fold:justify-center fold:gap-5 fold:space-y-0 fold:items-stretch">
+    <div data-fit-bound className="space-y-4 fold:grid fold:grid-cols-[auto_minmax(0,1fr)] land:grid-cols-2 fold:grid-rows-[auto_1fr] land:gap-x-6 fold:gap-5 fold:space-y-0 fold:items-stretch">
       <div className="fold:col-start-2 fold:row-start-1 fold:self-start"><MonitoringTimeLeft /></div>
 
 
-      <section className="rounded-2xl border border-border bg-gradient-to-br from-card via-background to-background overflow-hidden fold:col-start-1 fold:row-start-1 fold:row-span-2 fold:w-fit fold:self-start rail:mx-auto rail:w-fit">
+      <section className="rounded-2xl border border-border bg-gradient-to-br from-card via-background to-background overflow-hidden fold:col-start-1 fold:row-start-1 fold:row-span-2 fold:w-fit fold:self-start rail:mx-auto rail:w-fit fold:mx-0!">
         {!running ? (
           <>
           <div ref={startFit.wrapRef} className="flex justify-center bg-[radial-gradient(120%_70%_at_50%_45%,color-mix(in_oklab,var(--color-primary)_7%,transparent),transparent_70%)]">
