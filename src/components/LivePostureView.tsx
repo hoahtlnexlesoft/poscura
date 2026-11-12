@@ -205,7 +205,7 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
     flagged(a) ? (phase.level === "poor" ? "var(--color-destructive)" : "var(--color-warning)") : "var(--color-primary)";
 
   const scene = (
-        <svg viewBox="86 60 222 395" preserveAspectRatio="xMidYMax slice" className="absolute inset-0 h-full w-full" role="img" aria-label="Seated posture with angle lines">
+        <svg viewBox="58 136 268 476" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 h-full w-full" role="img" aria-label="Seated posture with angle lines">
           <defs>
             <radialGradient id="lp-room" cx="50%" cy="45%" r="45%">
               <stop offset="0" stopColor="#1b2840" />
@@ -275,8 +275,8 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
           <g>
             <rect x="238" y="466" width="9" height="108" fill="#8d96a6" />
             <rect x="236" y="500" width="13" height="26" rx="3" fill="#2a2f38" />
-            <path d="M 196 588 L 290 588 L 284 578 L 202 578 Z" fill="#2a2f38" />
-            <circle cx="200" cy="592" r="5" fill="#1b1f26" /><circle cx="286" cy="592" r="5" fill="#1b1f26" />
+            <path d="M 242 572 L 194 590 M 243 572 L 292 590 M 243 572 L 250 594" stroke="#2a2f38" strokeWidth="7" strokeLinecap="round" />
+            <circle cx="194" cy="594" r="5" fill="#1b1f26" /><circle cx="292" cy="594" r="5" fill="#1b1f26" /><circle cx="250" cy="598" r="5" fill="#1b1f26" />
             <path d="M 184 446 C 190 436 212 440 240 440 C 268 440 290 432 300 440 C 306 450 298 464 280 466 C 254 470 214 470 196 464 C 184 460 180 452 184 446 Z" fill="#e8e1d2" />
             <path d="M 188 458 C 214 466 262 467 296 452" stroke="#b9b09d" strokeWidth="2" fill="none" />
           </g>
@@ -301,12 +301,21 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
           <path d={b.torso} fill="none" stroke="#ff9aa0" strokeOpacity="0.16" strokeWidth="1.5" />
           {/* shirt shading along the back */}
           <path d={b.torso} fill="url(#lp-shade)" />
+          {/* loose tee: soft folds across the back and above the waist */}
+          <g stroke="#3a0e15" strokeOpacity="0.28" strokeWidth="2" fill="none" strokeLinecap="round">
+            <path d={`M ${b.mid.x + 14} ${b.mid.y - 30} q -8 14 -2 30`} />
+            <path d={`M ${b.mid.x - 6} ${b.mid.y + 26} q 14 8 30 4`} />
+            <path d={`M ${b.mid.x - 14} ${b.mid.y + 40} q 16 6 34 0`} />
+          </g>
 
-          {/* legs: shorts to just above the knee, bare shins, sneakers */}
-          <path d={`M ${KNEE.x + 4} ${KNEE.y} L ${ANKLE.x} ${ANKLE.y}`} stroke="url(#lp-skin)" strokeWidth="25" strokeLinecap="round" />
+          {/* legs: loose shorts to just above the knee, calves, socks and sneakers */}
+          <path d={`M ${KNEE.x - 8} ${KNEE.y - 6} C ${KNEE.x - 16} ${KNEE.y + 40}, ${ANKLE.x - 12} ${ANKLE.y - 50}, ${ANKLE.x - 7} ${ANKLE.y - 4} L ${ANKLE.x + 9} ${ANKLE.y - 4} C ${ANKLE.x + 14} ${ANKLE.y - 60}, ${KNEE.x + 26} ${KNEE.y + 30}, ${KNEE.x + 16} ${KNEE.y - 8} Z`} fill="url(#lp-skin)" />
           <path d={`M ${HIP.x + 4} ${HIP.y + 4} L ${KNEE.x} ${KNEE.y}`} stroke="url(#lp-skin)" strokeWidth="38" strokeLinecap="round" />
-          <path d={`M ${HIP.x + 4} ${HIP.y + 4} L ${HIP.x + (KNEE.x - HIP.x) * 0.78} ${HIP.y + (KNEE.y - HIP.y) * 0.78}`} stroke="url(#lp-pants)" strokeWidth="44" strokeLinecap="round" />
+          <path d={`M ${HIP.x + 6} ${HIP.y + 2} L ${HIP.x + (KNEE.x - HIP.x) * 0.8} ${HIP.y + (KNEE.y - HIP.y) * 0.8}`} stroke="url(#lp-pants)" strokeWidth="46" strokeLinecap="round" />
+          <path d={`M ${HIP.x + (KNEE.x - HIP.x) * 0.8 - 2} ${HIP.y + (KNEE.y - HIP.y) * 0.8 - 22} L ${HIP.x + (KNEE.x - HIP.x) * 0.8 + 3} ${HIP.y + (KNEE.y - HIP.y) * 0.8 + 22}`} stroke="#4a121a" strokeOpacity="0.5" strokeWidth="2" />
+          <path d={`M ${HIP.x - 20} ${HIP.y - 4} Q ${HIP.x - 50} ${HIP.y + 6} ${HIP.x - 66} ${HIP.y + 2}`} stroke="#4a121a" strokeOpacity="0.35" strokeWidth="2" fill="none" />
           <path d={`M ${HIP.x + 18} ${HIP.y - 12} Q ${HIP.x - 10} ${HIP.y - 18} ${HIP.x - 38} ${HIP.y - 8}`} stroke="#3a0e15" strokeOpacity="0.55" strokeWidth="3" fill="none" strokeLinecap="round" />
+          <rect x={ANKLE.x - 8} y={ANKLE.y - 10} width="18" height="12" rx="3" fill="#e9ebef" />
           <path d={`M ${ANKLE.x + 12} ${ANKLE.y - 2} C ${ANKLE.x - 2} ${ANKLE.y - 6}, ${TOE.x - 8} ${TOE.y - 8}, ${TOE.x - 10} ${TOE.y + 1} L ${ANKLE.x + 13} ${ANKLE.y + 13} Z`} fill="#c9ccd3" />
           <path d={`M ${TOE.x - 10} ${TOE.y + 1} L ${ANKLE.x + 13} ${ANKLE.y + 13}`} stroke="#8a8f99" strokeWidth="3" />
 
@@ -340,6 +349,7 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
           <path d={`M ${b.elb.x} ${b.elb.y} L ${WRIST.x} ${WRIST.y}`} stroke="url(#lp-skin)" strokeWidth="16" strokeLinecap="round" />
           {/* short t-shirt sleeve over the upper arm */}
           <path d={`M ${b.shoulder.x} ${b.shoulder.y - 2} L ${b.shoulder.x + (b.elb.x - b.shoulder.x) * 0.5} ${b.shoulder.y + (b.elb.y - b.shoulder.y) * 0.5}`} stroke="url(#lp-top)" strokeWidth="27" strokeLinecap="round" />
+          <path d={`M ${b.shoulder.x + (b.elb.x - b.shoulder.x) * 0.47} ${b.shoulder.y + (b.elb.y - b.shoulder.y) * 0.47} L ${b.shoulder.x + (b.elb.x - b.shoulder.x) * 0.52} ${b.shoulder.y + (b.elb.y - b.shoulder.y) * 0.52}`} stroke="#4a121a" strokeOpacity="0.6" strokeWidth="27" />
           <path d={`M ${WRIST.x + 4} ${WRIST.y - 6} C ${WRIST.x - 10} ${WRIST.y - 8}, ${WRIST.x - 24} ${WRIST.y - 3}, ${WRIST.x - 25} ${WRIST.y + 3} C ${WRIST.x - 22} ${WRIST.y + 8}, ${WRIST.x - 6} ${WRIST.y + 9}, ${WRIST.x + 4} ${WRIST.y + 6} Z`} fill="url(#lp-skin)" />
 
           {/* ---------- angle lines (same marks as the running app) ---------- */}
@@ -389,7 +399,7 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
       <div ref={wrapRef} className="relative isolate flex justify-center overflow-hidden bg-[#04070d]">
         {/* blurred copy of the camera fills the space beside the 9:16 frame */}
         <div aria-hidden className="pointer-events-none absolute -inset-6 -z-10 scale-110 opacity-80 blur-2xl saturate-[1.3]">
-          {cloneElement(scene, { viewBox: "40 60 300 395", preserveAspectRatio: "xMidYMid slice", role: undefined, "aria-label": undefined })}
+          {cloneElement(scene, { viewBox: "0 120 400 500", preserveAspectRatio: "xMidYMid slice", role: undefined, "aria-label": undefined })}
         </div>
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-[#04070d]/40" />
       <div

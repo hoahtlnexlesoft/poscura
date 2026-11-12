@@ -83,9 +83,9 @@ function PostureMonitor() {
               Setup Guide
             </button>
             <Camera className="h-12 w-12 text-muted-foreground/40" strokeWidth={1.5} />
-            <div className="text-sm text-muted-foreground">Camera feed will appear here</div>
+            <div className="max-w-[220px] text-sm text-muted-foreground">Camera feed will appear here</div>
             <button onClick={handleStart}
-              className="mt-2 px-6 py-3 rounded-full bg-gradient-to-r from-primary to-secondary text-primary-foreground font-semibold text-sm flex items-center gap-2 shadow-lg glow-primary">
+              className="mt-2 h-11 shrink-0 whitespace-nowrap px-5 rounded-full bg-gradient-to-r from-primary to-secondary text-primary-foreground font-semibold text-sm flex items-center gap-2 shadow-lg glow-primary">
               <Play className="h-4 w-4 fill-current" /> Start monitoring
             </button>
           </div>
