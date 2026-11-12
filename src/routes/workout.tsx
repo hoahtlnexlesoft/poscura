@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
 import { useState } from "react";
 import { Play, Calendar, Dumbbell, Clock, CheckCircle2, XCircle, AlertTriangle, Eye, ChevronRight } from "lucide-react";
 import { WorkoutSession } from "@/components/WorkoutSession";
@@ -6,7 +7,10 @@ import { WorkoutAssessment } from "@/components/WorkoutAssessment";
 import { WorkoutProgramDetail } from "@/components/WorkoutProgramDetail";
 import { ExerciseDetail } from "@/components/ExerciseDetail";
 
-export const Route = createFileRoute("/workout")({ component: WorkoutPage });
+export const Route = createFileRoute("/workout")({
+  validateSearch: z.object({ session: z.string().optional() }),
+  component: WorkoutPage,
+});
 
 type TodayWorkout = {
   name: string; time: string;
@@ -30,7 +34,8 @@ type View =
   | { kind: "program" };
 
 function WorkoutPage() {
-  const [view, setView] = useState<View>({ kind: "list" });
+  const { session } = Route.useSearch();
+  const [view, setView] = useState<View>(session ? { kind: "session", name: session } : { kind: "list" });
 
   if (view.kind === "session") return <WorkoutSession workoutName={view.name} onClose={() => setView({ kind: "list" })} onFinish={(url) => setView({ kind: "assessment", name: view.name, recordedUrl: url })} />;
   if (view.kind === "assessment") return <WorkoutAssessment workoutName={view.name} recordedVideoUrl={view.recordedUrl} onClose={() => setView({ kind: "list" })} />;

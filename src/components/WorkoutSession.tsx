@@ -112,63 +112,78 @@ export function WorkoutSession({ workoutName, videoSrc, onClose, onFinish }: Pro
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <button onClick={onClose} className="inline-flex items-center gap-1 text-sm text-muted-foreground">
-          <ChevronLeft className="h-4 w-4" /> Back
+      <div className="flex items-center gap-3">
+        <button onClick={onClose} aria-label="Back" className="flex h-9 w-9 -ml-1.5 items-center justify-center rounded-full hover:bg-muted">
+          <ChevronLeft className="h-5 w-5" />
         </button>
-        <div className="text-xs text-muted-foreground truncate">{workoutName}</div>
+        <div className="min-w-0 flex-1">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Guided session</div>
+          <h1 className="truncate text-lg font-bold leading-tight">{workoutName}</h1>
+        </div>
+        {running && (
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-destructive/40 bg-destructive/15 px-2.5 py-1 text-[11px] font-semibold text-destructive">
+            <span className="h-1.5 w-1.5 rounded-full bg-destructive animate-pulse" /> REC {mm}:{ss}
+          </span>
+        )}
       </div>
 
-      <div className="glass-card overflow-hidden">
-        <div className="aspect-video bg-black relative">
-          <video ref={workoutVideoRef} src={videoSrc} className="w-full h-full object-contain" playsInline muted loop />
+      <div className="grid gap-3 land:grid-cols-2 land:gap-x-6">
+        {/* guide video */}
+        <div className="relative aspect-video overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-[#0d1a33] via-[#0a1222] to-[#070b14] land:aspect-auto land:h-[calc(100dvh-170px)]">
+          {videoSrc && <video ref={workoutVideoRef} src={videoSrc} className="absolute inset-0 h-full w-full object-cover" playsInline muted loop />}
+          <div aria-hidden className="pointer-events-none absolute -left-10 -top-10 h-40 w-40 rounded-full bg-primary/15 blur-3xl" />
+          <span className="absolute left-3 top-3 rounded-full bg-black/45 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-white/80 backdrop-blur">Guide</span>
           {!running && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-white/90">
-              <div className="text-center">
-                <Play className="h-10 w-10 mx-auto mb-2 opacity-80" />
-                <div className="text-xs">Press Start to begin</div>
-              </div>
-            </div>
-          )}
-        </div>
-        <div className="aspect-video bg-gradient-to-br from-muted via-card to-background relative">
-          <video ref={camRef} className="w-full h-full object-cover" playsInline muted />
-          {!camReady && (
-            <div className="absolute inset-0 flex items-center justify-center text-center text-muted-foreground">
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2.5 text-center">
+              <span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/15 bg-white/10 backdrop-blur">
+                <Play className="ml-0.5 h-6 w-6 fill-white text-white" />
+              </span>
               <div>
-                <Camera className="h-8 w-8 mx-auto mb-1" />
-                <div className="text-[11px]">Allow camera to record</div>
+                <div className="text-sm font-semibold text-white">{workoutName}</div>
+                <div className="mt-0.5 text-[11px] text-white/55">The guide plays when you press Start</div>
               </div>
-            </div>
-          )}
-          {running && (
-            <div className="absolute top-2 left-2 inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-destructive/20 border border-destructive/40 text-destructive text-[11px] font-medium">
-              <span className="h-2 w-2 rounded-full bg-destructive animate-pulse" /> REC
             </div>
           )}
         </div>
 
-        <div className="flex items-center justify-between p-4 border-t border-border">
-          <div>
-            <div className="text-[10px] text-muted-foreground">Elapsed</div>
-            <div className="text-xl font-bold tabular-nums">{mm}:{ss}</div>
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <button onClick={toggleVoice}
-              className={`h-10 w-10 rounded-full border-2 flex items-center justify-center ${voiceOn ? "border-primary bg-primary/15 text-primary" : "border-primary text-primary"}`}>
-              {voiceOn ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
-            </button>
-            {running ? (
-              <button onClick={handleStop} className="px-6 py-2 rounded-full bg-destructive text-destructive-foreground text-sm font-medium flex items-center gap-2 shadow-lg">
-                <Square className="h-3.5 w-3.5 fill-current" /> Stop
-              </button>
-            ) : (
-              <button onClick={handleStart} className="px-6 py-2 rounded-full bg-gradient-to-r from-primary to-secondary text-primary-foreground text-sm font-medium flex items-center gap-2 shadow-lg glow-primary">
-                <Play className="h-3.5 w-3.5 fill-current" /> Start
-              </button>
+        {/* your camera + controls */}
+        <div className="flex flex-col gap-3 land:h-[calc(100dvh-170px)]">
+          <div className="relative aspect-video overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-card via-background to-background land:aspect-auto land:flex-1">
+            <video ref={camRef} className="absolute inset-0 h-full w-full object-cover [transform:scaleX(-1)]" playsInline muted />
+            <span className="absolute left-3 top-3 rounded-full bg-black/45 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-white/80 backdrop-blur">You</span>
+            {!camReady && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 text-center text-muted-foreground">
+                <Camera className="h-7 w-7" />
+                <div className="text-[11px]">Allow camera access to record your form</div>
+              </div>
             )}
           </div>
-          <div className="w-10" />
+
+          <div className="glass-card grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 py-3">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleVoice}
+                aria-label={voiceOn ? "Turn voice control off" : "Turn voice control on"}
+                className={`flex h-10 w-10 items-center justify-center rounded-full border transition ${voiceOn ? "border-primary bg-primary/15 text-primary" : "border-border text-muted-foreground hover:text-foreground"}`}
+              >
+                {voiceOn ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
+              </button>
+              <span className="hidden text-[11px] leading-tight text-muted-foreground min-[380px]:block">{voiceOn ? "Say \u201cstop\u201d" : "Voice off"}</span>
+            </div>
+            {running ? (
+              <button onClick={handleStop} aria-label="Stop" className="flex h-14 w-14 items-center justify-center rounded-full border border-destructive/50 bg-destructive/15 text-destructive shadow-[0_0_0_5px_color-mix(in_oklab,var(--color-destructive)_8%,transparent)] transition hover:bg-destructive/25 active:scale-95">
+                <Square className="h-5 w-5 fill-current" />
+              </button>
+            ) : (
+              <button onClick={handleStart} aria-label="Start" className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary text-white shadow-[0_10px_30px_-10px] shadow-primary transition hover:opacity-95 active:scale-95">
+                <Play className="ml-0.5 h-5 w-5 fill-current" />
+              </button>
+            )}
+            <div className="text-right leading-none">
+              <div className="text-[9px] font-medium uppercase tracking-[0.1em] text-muted-foreground">Elapsed</div>
+              <div className="mt-1.5 text-[20px] font-semibold tabular-nums">{mm}:{ss}</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

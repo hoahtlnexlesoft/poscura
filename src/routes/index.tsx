@@ -93,9 +93,9 @@ function Dashboard() {
                 <div className="font-medium text-sm">{w.name}</div>
                 <div className="text-[10px] text-muted-foreground">Session {w.session} · {w.time}</div>
               </div>
-              <button className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/30">
+              <Link to="/workout" search={{ session: w.name }} aria-label={`Start ${w.name}`} className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/30 transition hover:opacity-90 active:scale-95">
                 <Play className="h-3.5 w-3.5 fill-current" />
-              </button>
+              </Link>
             </div>
           ))}
         </div>
