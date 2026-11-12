@@ -3,6 +3,7 @@ import { z } from "zod";
 import { useState } from "react";
 import { Play, Calendar, Dumbbell, Clock, CheckCircle2, XCircle, AlertTriangle, Eye, ChevronRight } from "lucide-react";
 import { WorkoutSession } from "@/components/WorkoutSession";
+import { ExerciseIntro } from "@/components/ExerciseIntro";
 import { WorkoutAssessment } from "@/components/WorkoutAssessment";
 import { WorkoutProgramDetail } from "@/components/WorkoutProgramDetail";
 import { ExerciseDetail } from "@/components/ExerciseDetail";
@@ -29,6 +30,7 @@ const today: TodayWorkout[] = [
 
 type View =
   | { kind: "list" }
+  | { kind: "intro"; name: string }
   | { kind: "session"; name: string }
   | { kind: "assessment"; name: string; recordedUrl: string | null }
   | { kind: "exercise"; name: string }
@@ -36,12 +38,16 @@ type View =
 
 function WorkoutPage() {
   const { session } = Route.useSearch();
-  const [view, setView] = useState<View>(session ? { kind: "session", name: session } : { kind: "list" });
+  const [view, setView] = useState<View>(session ? { kind: "intro", name: session } : { kind: "list" });
 
+  if (view.kind === "intro") {
+    const w = TODAYS_WORKOUTS.find((x) => x.name === view.name);
+    return <ExerciseIntro name={view.name} session={(w?.done ?? 0) + 1} sessions={w?.sessions ?? 1} onBack={() => setView({ kind: "list" })} onStart={() => setView({ kind: "session", name: view.name })} />;
+  }
   if (view.kind === "session") return <WorkoutSession workoutName={view.name} onClose={() => setView({ kind: "list" })} onFinish={(url) => setView({ kind: "assessment", name: view.name, recordedUrl: url })} />;
   if (view.kind === "assessment") return <WorkoutAssessment workoutName={view.name} recordedVideoUrl={view.recordedUrl} onClose={() => setView({ kind: "list" })} />;
   if (view.kind === "exercise") return <ExerciseDetail exerciseName={view.name} badge="Completed" onClose={() => setView({ kind: "list" })} />;
-  if (view.kind === "program") return <WorkoutProgramDetail onClose={() => setView({ kind: "list" })} onStartSession={(name) => setView({ kind: "session", name })} />;
+  if (view.kind === "program") return <WorkoutProgramDetail onClose={() => setView({ kind: "list" })} onStartSession={(name) => setView({ kind: "intro", name })} />;
 
   return (
     <div className="space-y-4 fold:grid fold:grid-cols-2 fold:gap-4 land:gap-x-6 fold:space-y-0 fold:items-start">
@@ -80,7 +86,7 @@ function WorkoutPage() {
                   </div>
                 </div>
                 <button
-                  onClick={() => (completed ? setView({ kind: "exercise", name: w.name }) : setView({ kind: "session", name: w.name }))}
+                  onClick={() => (completed ? setView({ kind: "exercise", name: w.name }) : setView({ kind: "intro", name: w.name }))}
                   className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-border bg-background px-3.5 text-xs font-semibold transition hover:border-primary/50 hover:text-primary"
                 >
                   {completed ? <Eye className="h-3.5 w-3.5" /> : <Play className="h-3 w-3 fill-current" />}
