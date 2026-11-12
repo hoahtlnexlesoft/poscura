@@ -1051,7 +1051,8 @@
     return out.sort(function (a, b) { return (b.r.at || 0) - (a.r.at || 0); });
   }
   function verb(x) { return x.kind === 'comment' ? 'commented on ' + labelFor(x.t.page) : x.kind === 'mention' ? 'mentioned you' : x.kind === 'reply-you' ? 'replied to your comment' : 'replied in a thread'; }
-  function unread() { return inbox().filter(function (x) { return !SEEN[x.r.id]; }); }
+  // a resolved thread is handled, so it no longer counts as unread (a new @mention still does)
+  function unread() { return inbox().filter(function (x) { return !SEEN[x.r.id] && (!x.t.resolved || x.kind === 'mention'); }); }
   function unreadIn(id) { return unread().filter(function (x) { return x.t.id === id; }).length; }
   function markSeen(id) {
     var ch = false; inbox().forEach(function (x) { if ((!id || x.t.id === id) && !SEEN[x.r.id]) { SEEN[x.r.id] = 1; ch = true; } });
