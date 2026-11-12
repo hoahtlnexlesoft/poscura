@@ -136,7 +136,7 @@
     { id:"zflip",  name:"Galaxy Z Flip",     w:360, h:780, kind:"punch",  unit:"dp", color:"#5b6b8c", crease:"h" },
     { id:"duo-c",  name:"iPhone Duo · folded",   w:420, h:600, kind:"duo", unit:"pt", color:"#8d8577", layout:"rail" },
     { id:"duo-o",  name:"iPhone Duo · unfolded", w:744, h:968, kind:"fold",   unit:"pt", color:"#8d8577", crease:"v", rotate:true },
-    { id:"zfold-c", name:"Galaxy Z Fold · folded", w:344, h:882, kind:"punch", unit:"dp", color:"#4a4f57", radius:30, scr:18, hingeL:true },
+    { id:"zfold-c", name:"Galaxy Z Fold · folded", w:392, h:592, kind:"punch", unit:"dp", color:"#a79cc4", tone:"#6f6688", radius:34, scr:24, hingeL:true },
     { id:"zfold",  name:"Galaxy Z Fold · unfolded",         w:707, h:823, kind:"fold",   unit:"dp", color:"#4a4f57", tone:"#2c3036", android:true, crease:"v", rotate:true }
   ];
 
@@ -223,7 +223,7 @@
       }
     } else {
       ow = d.w + 28; oh = d.h + 30; sl = 14; st = 15; radius = d.radius || 52; scr = d.scr || 40; top = 40; bot = 24;
-      bg = "linear-gradient(145deg," + d.color + ",#24272c)";
+      bg = "linear-gradient(145deg," + d.color + "," + (d.tone || "#24272c") + ")";
       sb = '<div class="statusbar" style="height:40px;padding:0 24px;font-family:Roboto,system-ui,sans-serif;font-weight:500;font-size:14px"><span class="clock">' + clock() + '</span><span class="sb-icons">' + I.aWifi + I.aSig + I.aBatt + "</span></div>";
       hb = '<div class="homebar" style="height:24px"><i style="width:108px;height:4px"></i></div>';
       cut = '<div class="cut" style="left:50%;top:12px;transform:translateX(-50%);width:18px;height:18px;border-radius:50%"></div>';
