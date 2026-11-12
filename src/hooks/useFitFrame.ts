@@ -20,8 +20,9 @@ export function useFitFrame(belowRef?: React.RefObject<HTMLElement | null>, rati
     const availH = Math.max(minH, window.innerHeight - top - below - padBottom - 2);
     // On foldables the card shrinks to the 9:16 frame, so size from the layout bound, not the card itself.
     const bound = el.closest("[data-fit-bound]") as HTMLElement | null;
-    const wide = window.matchMedia("(min-width: 600px)").matches;
-    const maxW = bound && wide ? bound.clientWidth * 0.6 : el.clientWidth;
+    const twoCol = window.matchMedia("(min-width: 600px)").matches;
+    const rail = document.documentElement.dataset.layout === "rail";
+    const maxW = bound && (twoCol || rail) ? bound.clientWidth * (twoCol ? 0.6 : 1) - 2 : el.clientWidth;
     const w = Math.min(maxW, availH * ratio);
     const next = { w: Math.round(w), h: Math.round(w / ratio) };
     setBox((b) => (b && b.w === next.w && b.h === next.h ? b : next));
