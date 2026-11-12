@@ -481,7 +481,7 @@ function CoachBanner({ tone, kicker, title, note, more, fixed }: NonNullable<Pha
   }
   return (
     <div
-      className="flex items-start gap-2.5 rounded-2xl border-[1.5px] bg-black/75 px-3.5 py-3 backdrop-blur-md animate-in fade-in slide-in-from-bottom-2 duration-300"
+      className="flex items-start gap-2.5 rounded-2xl border-[1.5px] border-dashed bg-black/75 px-3.5 py-3 backdrop-blur-md animate-in fade-in slide-in-from-bottom-2 duration-300"
       style={{
         borderColor: `color-mix(in oklab, ${t.color} 85%, transparent)`,
         boxShadow: `0 12px 32px -14px color-mix(in oklab, ${t.color} 55%, transparent)`,
