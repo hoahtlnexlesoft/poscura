@@ -70,18 +70,21 @@ function PostureMonitor() {
         {!running ? (
           <div ref={startFit.wrapRef} className="flex justify-center bg-[radial-gradient(120%_70%_at_50%_45%,color-mix(in_oklab,var(--color-primary)_7%,transparent),transparent_70%)]">
           <div
-            className="relative aspect-[9/16] max-w-full flex flex-col items-center justify-center gap-3 px-4 text-center bg-gradient-to-b from-card/80 via-background/60 to-background/60 shadow-[0_0_0_1px_rgba(255,255,255,0.05)]"
+            className="@container relative aspect-[9/16] max-w-full flex flex-col items-center justify-center gap-3 px-4 text-center bg-gradient-to-b from-card/80 via-background/60 to-background/60 shadow-[0_0_0_1px_rgba(255,255,255,0.05)]"
             style={startFit.box ? { width: startFit.box.w, height: startFit.box.h } : { width: "min(100%, calc(max(320px, 100dvh - 250px) * 9 / 16))" }}
           >
-            <button
-              onClick={() => setShowCameraSetting(true)}
-              className="absolute top-3 left-3 inline-flex items-center gap-1 px-2 py-1 rounded-md bg-background/80 backdrop-blur-sm border border-border text-[10px] text-muted-foreground"
-            >
-              <Settings className="h-3 w-3" /> {cameraSource}
-            </button>
-            <button className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-1 rounded-md bg-background/80 backdrop-blur-sm border border-border text-[10px] text-muted-foreground">
-              Setup Guide
-            </button>
+            <div className="absolute inset-x-3 top-3 flex items-center justify-between gap-2">
+              <button
+                onClick={() => setShowCameraSetting(true)}
+                aria-label="Camera setting"
+                className="inline-flex min-w-0 items-center gap-1 px-2 py-1 rounded-md bg-background/80 backdrop-blur-sm border border-border text-[10px] text-muted-foreground"
+              >
+                <Settings className="h-3 w-3 shrink-0" /> <span className="truncate @max-[300px]:hidden!">{cameraSource}</span>
+              </button>
+              <button className="inline-flex shrink-0 items-center gap-1 px-2 py-1 rounded-md bg-background/80 backdrop-blur-sm border border-border text-[10px] text-muted-foreground">
+                Setup Guide
+              </button>
+            </div>
             <Camera className="h-12 w-12 text-muted-foreground/40" strokeWidth={1.5} />
             <div className="max-w-[220px] text-sm text-muted-foreground">Camera feed will appear here</div>
             <button onClick={handleStart}
