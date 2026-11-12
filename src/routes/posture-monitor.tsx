@@ -68,9 +68,9 @@ function PostureMonitor() {
 
       <section className="rounded-2xl border border-border bg-gradient-to-br from-card via-background to-background overflow-hidden fold:col-start-1">
         {!running ? (
-          <div ref={startFit.wrapRef} className="flex justify-center bg-[#04070d]">
+          <div ref={startFit.wrapRef} className="flex justify-center bg-[radial-gradient(120%_70%_at_50%_45%,color-mix(in_oklab,var(--color-primary)_7%,transparent),transparent_70%)]">
           <div
-            className="relative aspect-[9/16] max-w-full flex flex-col items-center justify-center gap-3 px-4 text-center bg-gradient-to-b from-card via-background to-background"
+            className="relative aspect-[9/16] max-w-full flex flex-col items-center justify-center gap-3 px-4 text-center bg-gradient-to-b from-card/80 via-background/60 to-background/60 shadow-[0_0_0_1px_rgba(255,255,255,0.05)]"
             style={startFit.box ? { width: startFit.box.w, height: startFit.box.h } : { width: "min(100%, calc(max(320px, 100dvh - 250px) * 9 / 16))" }}
           >
             <button

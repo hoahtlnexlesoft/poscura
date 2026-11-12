@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { cloneElement, useEffect, useMemo, useRef, useState } from "react";
 import { AlertTriangle, Check, CheckCircle2, Clock, Eye, Square } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useFitFrame } from "@/hooks/useFitFrame";
@@ -202,27 +202,7 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
   const lineColor = (a: Area) =>
     flagged(a) ? (phase.level === "poor" ? "var(--color-destructive)" : "var(--color-warning)") : "var(--color-primary)";
 
-  return (
-    <div>
-      {/* ---------- live view ---------- */}
-      {/* 9:16 camera frame, sized by the screen height so the status bar stays in view */}
-      <div ref={wrapRef} className="flex justify-center bg-[#04070d]">
-      <div
-        className="@container relative aspect-[9/16] max-w-full overflow-hidden bg-[#070b14]"
-        style={box ? { width: box.w, height: box.h } : { width: "min(100%, calc(max(320px, 100dvh - 290px) * 9 / 16))" }}
-      >
-        {/* state tint */}
-        <div
-          className="absolute inset-0 transition-opacity duration-700"
-          style={{
-            opacity: phase.level === "good" ? 0 : 1,
-            background:
-              phase.level === "poor"
-                ? "radial-gradient(120% 80% at 50% 45%, color-mix(in oklab, var(--color-destructive) 30%, transparent), transparent 70%)"
-                : "radial-gradient(120% 80% at 50% 45%, color-mix(in oklab, var(--color-warning) 22%, transparent), transparent 70%)",
-          }}
-        />
-
+  const scene = (
         <svg viewBox="86 60 222 395" preserveAspectRatio="xMidYMax slice" className="absolute inset-0 h-full w-full" role="img" aria-label="Seated posture with angle lines">
           <defs>
             <radialGradient id="lp-room" cx="50%" cy="45%" r="45%">
@@ -371,6 +351,35 @@ export function LivePostureView({ timeLeft, onEnd }: { timeLeft: string; onEnd: 
             )}
           </g>
         </svg>
+  );
+
+  return (
+    <div>
+      {/* ---------- live view ---------- */}
+      {/* 9:16 camera frame, sized by the screen height so the status bar stays in view */}
+      <div ref={wrapRef} className="relative isolate flex justify-center overflow-hidden bg-[#04070d]">
+        {/* blurred copy of the camera fills the space beside the 9:16 frame */}
+        <div aria-hidden className="pointer-events-none absolute -inset-6 -z-10 scale-110 opacity-80 blur-2xl saturate-[1.3]">
+          {cloneElement(scene, { viewBox: "40 60 300 395", preserveAspectRatio: "xMidYMid slice", role: undefined, "aria-label": undefined })}
+        </div>
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-[#04070d]/40" />
+      <div
+        className="@container relative aspect-[9/16] shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_0_40px_rgba(0,0,0,0.55)] max-w-full overflow-hidden bg-[#070b14]"
+        style={box ? { width: box.w, height: box.h } : { width: "min(100%, calc(max(320px, 100dvh - 290px) * 9 / 16))" }}
+      >
+        {/* state tint */}
+        <div
+          className="absolute inset-0 transition-opacity duration-700"
+          style={{
+            opacity: phase.level === "good" ? 0 : 1,
+            background:
+              phase.level === "poor"
+                ? "radial-gradient(120% 80% at 50% 45%, color-mix(in oklab, var(--color-destructive) 30%, transparent), transparent 70%)"
+                : "radial-gradient(120% 80% at 50% 45%, color-mix(in oklab, var(--color-warning) 22%, transparent), transparent 70%)",
+          }}
+        />
+
+        {scene}
 
         {/* coaching card over the empty room above the head */}
         {phase.banner && (
