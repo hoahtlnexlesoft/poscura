@@ -822,7 +822,9 @@
     return out;
   }
   function shiftFloaters(force) {
-    var c = ctx(), docs = [[document, window]]; if (c.frame) docs.push([c.doc, c.win]);
+    // Poscura: the app runs inside a phone frame, far from the review rail, so only the viewer page is checked.
+    // (Shifting elements inside the app overrode its own translate, e.g. the centred nav rail.)
+    var docs = [[document, window]];
     var key = docs.map(function (d) { return d[0].URL; }).join('|');
     if (force || key !== fixedDocs || Date.now() - fixedAt > 1500) {
       fixedCache.forEach(function (el) { if (!el.isConnected) return; el.style.translate = ''; });
