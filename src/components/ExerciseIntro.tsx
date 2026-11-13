@@ -37,7 +37,7 @@ export function ExerciseIntro({
 
       <div className="mt-2 land:grid land:grid-cols-2 hinge-split land:items-start land:gap-x-6">
         {/* left: title, demo, numbers */}
-        <div className="land:sticky land:top-[72px]">
+        <div>
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <h1 className="text-2xl font-bold leading-tight tracking-tight">{name}</h1>
@@ -46,7 +46,7 @@ export function ExerciseIntro({
             <span className="mt-1 shrink-0 rounded-full bg-muted/60 px-3 py-1 text-xs font-medium">Session {session} of {sessions}</span>
           </div>
 
-          <div className="relative mt-4 aspect-[16/10] overflow-hidden rounded-2xl border border-border bg-[radial-gradient(60%_70%_at_50%_45%,#11223f,#05080f)]">
+          <div className="relative mt-4 aspect-[16/10] land:aspect-[16/9] overflow-hidden rounded-2xl border border-border bg-[radial-gradient(60%_70%_at_50%_45%,#11223f,#05080f)]">
             <Figure motion={g.motion} />
           </div>
           <p className="mt-2 text-xs text-muted-foreground">Preview loop · the full demo video is coming.</p>

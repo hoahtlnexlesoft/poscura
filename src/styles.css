@@ -221,8 +221,11 @@ html[data-immersive] [data-app-shell] > main, html[data-sub] [data-app-shell] > 
 /* iPhone Duo vertical controls (HIG "Designing for iPhone Duo"): the trailing edge stacks, top to bottom,
    camera → status bar → toolbar → tab bar. The tab bar sits at the bottom, the toolbar right under the status bar. */
 [data-side-toolbar] { display: none; }
-html[data-side]:not([data-immersive]) [data-side-toolbar] { display: flex; }
-html[data-side]:not([data-immersive]) [data-tb-inline] { display: none !important; }
-/* sub pages hide the tab bar but keep the trailing column (status bar + toolbar), so content stays clear of it */
-html[data-side][data-sub]:not([data-immersive]) [data-app-shell] { padding-right: 92px !important; }
+html[data-side] [data-side-toolbar] { display: flex; }
+html[data-side] [data-tb-inline] { display: none !important; }
+/* sub pages and inner flows hide the tab bar but keep the trailing column (status bar + toolbar),
+   so content stays clear of it (the full-screen guided session covers everything at z-60) */
+html[data-side][data-sub] [data-app-shell], html[data-side][data-immersive] [data-app-shell] { padding-right: 92px !important; }
+/* sign-in and onboarding have no toolbar, but still leave the trailing column to the camera and status bar */
+html[data-side] [data-app-shell]:not([class*="pr-"]) { padding-right: 76px; }
 html[data-side] [data-app-nav] { top: auto !important; bottom: 12px !important; --tw-translate-y: 0px !important; translate: 0 0 !important; }
