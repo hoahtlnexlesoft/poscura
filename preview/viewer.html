@@ -136,8 +136,8 @@
     { id:"zflip",  name:"Galaxy Z Flip",     w:360, h:780, kind:"punch",  unit:"dp", color:"#5b6b8c", crease:"h" },
     { id:"duo-c",  name:"iPhone Duo · folded",   w:420, h:600, kind:"duo", unit:"pt", color:"#8d8577", layout:"rail" },
     { id:"duo-o",  name:"iPhone Duo · unfolded", w:744, h:968, kind:"fold",   unit:"pt", color:"#8d8577", crease:"v", rotate:true },
-    { id:"zfold-c", name:"Galaxy Z Fold · folded", w:412, h:600, kind:"punch", unit:"dp", color:"#dcd9e3", tone:"#a19dad", radius:30, scr:12, layout:"rail", stack:true },
-    { id:"zfold",  name:"Galaxy Z Fold · unfolded",         w:707, h:823, kind:"fold",   unit:"dp", color:"#4a4f57", tone:"#2c3036", android:true, crease:"v", rotate:true }
+    { id:"zfold-c", name:"Galaxy Z Fold · folded", w:412, h:600, kind:"punch", unit:"dp", color:"#3c3f45", tone:"#141619", radius:30, scr:12, layout:"rail", stack:true },
+    { id:"zfold",  name:"Galaxy Z Fold · unfolded",         w:707, h:823, kind:"fold",   unit:"dp", color:"#3c3f45", tone:"#141619", android:true, silver:true, crease:"v", rotate:true }
   ];
 
   var store = {
@@ -200,7 +200,7 @@
         '<span style="position:absolute;left:-4px;top:12px;bottom:12px;width:7px;border-radius:4px;background:linear-gradient(90deg,#1c1d20,#6a6357 55%,#2c2925)"></span>';
     } else if (k === "fold") {
       ow = d.w + (d.android ? 20 : 28); oh = d.h + (d.android ? 20 : 28); sl = st = d.android ? 10 : 14; radius = d.android ? 20 : 44; scr = d.android ? 12 : 30;
-      bg = "linear-gradient(145deg," + d.color + "," + (d.tone || "#514b42") + " 40%,#1f2226)";
+      bg = d.silver ? "linear-gradient(145deg," + d.color + "," + d.tone + ")" : "linear-gradient(145deg," + d.color + "," + (d.tone || "#514b42") + " 40%,#1f2226)";
       if (d.android) {
         top = 36; bot = 22;
         sb = '<div class="statusbar" style="height:36px;padding:0 24px;font-family:Roboto,system-ui,sans-serif;font-weight:500;font-size:14px"><span class="clock">' + clock() + '</span><span class="sb-icons">' + I.aWifi + I.aSig + I.aBatt + "</span></div>";
@@ -210,16 +210,17 @@
         sb = '<div class="statusbar" style="height:44px;padding:0 36px;font-size:16px"><span class="clock">' + clock() + '</span><span class="sb-icons">' + I.sig + I.wifi + I.batt + "</span></div>";
         hb = '<div class="homebar" style="height:20px"><i style="width:180px;height:5px"></i></div>';
       }
-      var c4 = d.android ? "#3b3f46" : "#5a544b";
+      var c4 = d.silver ? "#2c2f35" : d.android ? "#3b3f46" : "#5a544b";
+      var hg = d.silver ? "linear-gradient(90deg,#16181b,#5a5f68,#16181b)" : "linear-gradient(90deg,#1c1d20," + (d.android ? "#565b63" : "#6a6357") + ",#1c1d20)";
       if (!d.land) {
         cut = '<div class="cut" style="left:75%;top:13px;transform:translateX(-50%);width:16px;height:16px;border-radius:50%"></div>';
         extra = '<span class="sidebtn" style="background:'+c4+';right:-3px;top:120px;height:60px"></span><span class="sidebtn" style="background:'+c4+';top:-3px;left:80px;width:70px;height:4px"></span><div class="shell"></div>' +
-          '<span style="position:absolute;left:50%;top:-3px;bottom:-3px;width:6px;transform:translateX(-50%);background:linear-gradient(90deg,#1c1d20,' + (d.android ? '#565b63' : '#6a6357') + ',#1c1d20);border-radius:3px"></span>';
+          '<span style="position:absolute;left:50%;top:-3px;bottom:-3px;width:' + (d.silver ? 4 : 6) + 'px;transform:translateX(-50%);background:' + hg + ';border-radius:3px"></span>';
       } else {
         // landscape book fold: hinge stays vertical in the middle, camera top of the right panel
         cut = '<div class="cut" style="left:75%;top:13px;transform:translateX(-50%);width:16px;height:16px;border-radius:50%"></div>';
         extra = '<span class="sidebtn" style="background:'+c4+';right:-3px;top:110px;height:60px"></span><span class="sidebtn" style="background:'+c4+';top:-3px;right:120px;width:70px;height:4px"></span><div class="shell"></div>' +
-          '<span style="position:absolute;left:50%;top:-3px;bottom:-3px;width:6px;transform:translateX(-50%);background:linear-gradient(90deg,#1c1d20,' + (d.android ? '#565b63' : '#6a6357') + ',#1c1d20);border-radius:3px"></span>';
+          '<span style="position:absolute;left:50%;top:-3px;bottom:-3px;width:' + (d.silver ? 4 : 6) + 'px;transform:translateX(-50%);background:' + hg + ';border-radius:3px"></span>';
       }
     } else {
       ow = d.w + 28; oh = d.h + 30; sl = 14; st = 15; radius = d.radius || 52; scr = d.scr || 40; top = 40; bot = 24;
@@ -239,7 +240,7 @@
       // folded book-style phone: hinge spine along the left edge
       if (d.hingeL) extra += '<span style="position:absolute;left:-4px;top:18px;bottom:18px;width:7px;border-radius:4px;background:linear-gradient(90deg,#16181c,#565b63 55%,#2a2d33)"></span>';
     }
-    html = '<div class="device" style="width:' + ow + "px;height:" + oh + "px;border-radius:" + (typeof radius === "number" ? radius + "px" : radius) + ";background:" + bg + ';box-shadow:' + (d.stack ? '0 0 0 1px #c3bfcc,inset 0 1px 0 rgba(255,255,255,.6)' : '0 0 0 2px #3a3d45,0 40px 80px rgba(0,0,0,.6)') + '">' + extra +
+    html = '<div class="device" style="width:' + ow + "px;height:" + oh + "px;border-radius:" + (typeof radius === "number" ? radius + "px" : radius) + ";background:" + bg + ';box-shadow:' + (d.stack || d.silver ? '0 0 0 1px #50545c,inset 0 1px 0 rgba(255,255,255,.14)' + (d.silver ? ',0 40px 80px rgba(0,0,0,.6)' : '') : '0 0 0 2px #3a3d45,0 40px 80px rgba(0,0,0,.6)') + '">' + extra +
       '<div class="screen" style="left:' + sl + "px;top:" + st + "px;width:" + d.w + "px;height:" + d.h + "px;border-radius:" + (typeof scr === "number" ? scr + "px" : scr) + '">' +
       sb + '<iframe title="Poscura" id="app"></iframe>' + hb + cut + crease(d) + "</div></div>" + hingeEdges(d, ow, oh);
     // folded phone: the back half peeks out below and to the right, with a seam and a hinge spine on the left
@@ -247,8 +248,8 @@
     if (d.stack) {
       // folded: the back half sits right behind the front one; its edge shows as a second metal band on the right and bottom, split by a seam
       var R = (typeof radius === "number" ? radius + "px" : radius);
-      back = '<div aria-hidden="true" style="position:absolute;left:0;top:2px;width:' + (ow + 10) + 'px;height:' + (oh + 4) + 'px;border-radius:' + R + ';background:linear-gradient(90deg,#8e8a99 0%,#c9c5d2 70%,#eeecf3 88%,#a9a5b4 100%);box-shadow:0 40px 80px rgba(0,0,0,.6),inset -1px -1px 0 rgba(0,0,0,.25)"></div>' +
-        '<div aria-hidden="true" style="position:absolute;left:0;top:0;width:' + (ow + 1) + 'px;height:' + (oh + 1) + 'px;border-radius:' + R + ';box-shadow:1.5px 1.5px 0 rgba(40,38,50,.55)"></div>';
+      back = '<div aria-hidden="true" style="position:absolute;left:0;top:2px;width:' + (ow + 10) + 'px;height:' + (oh + 4) + 'px;border-radius:' + R + ';background:linear-gradient(90deg,#1c1e22 0%,#3e424a 70%,#6a6f78 88%,#2a2d33 100%);box-shadow:0 40px 80px rgba(0,0,0,.6),inset -1px -1px 0 rgba(0,0,0,.25)"></div>' +
+        '<div aria-hidden="true" style="position:absolute;left:0;top:0;width:' + (ow + 1) + 'px;height:' + (oh + 1) + 'px;border-radius:' + R + ';box-shadow:1.5px 1.5px 0 rgba(0,0,0,.75)"></div>';
     }
     scaler.innerHTML = '<div style="position:relative">' + back + html + "</div>";
     size = { w:ow, h:oh };
