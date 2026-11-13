@@ -583,35 +583,35 @@ function CoachBanner({ tone, kicker, title, note, more, fixed }: NonNullable<Pha
   const issue = issueRaw?.replace(/\s*\d+°/, "");
   return (
     <div
-      className="relative overflow-hidden rounded-[18px] backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-300"
+      className="relative overflow-hidden rounded-[14px] backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-300"
       style={{
         background: `linear-gradient(100deg, color-mix(in oklab, ${t.color} 20%, #0a0f19) 0%, rgba(10,15,25,.86) 55%)`,
         boxShadow: `inset 0 0 0 1px color-mix(in oklab, ${t.color} 30%, rgba(255,255,255,.06)), 0 16px 36px -18px color-mix(in oklab, ${t.color} 60%, transparent)`,
       }}
     >
-      <span aria-hidden className="absolute inset-y-3 left-0 w-[3px] rounded-r-full" style={{ background: t.color }} />
-      <div className="py-3 pl-4 pr-3.5 @max-[300px]:py-2.5 @max-[300px]:pl-3.5">
+      <span aria-hidden className="absolute inset-y-2.5 left-0 w-[2.5px] rounded-r-full" style={{ background: t.color }} />
+      <div className="py-2.5 pl-3.5 pr-3 @max-[300px]:py-2 @max-[300px]:pl-3">
         {issue && (
           <div className="flex items-center gap-2">
             <span
-              className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full @max-[300px]:hidden!"
+              className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full @max-[300px]:hidden!"
               style={{ background: `color-mix(in oklab, ${t.color} 22%, transparent)`, color: t.color }}
             >
               <Icon className="h-3.5 w-3.5" strokeWidth={2.2} />
             </span>
-            <span className="shrink-0 whitespace-nowrap text-[12.5px] font-semibold" style={{ color: t.color }}>{issue}</span>
+            <span className="shrink-0 whitespace-nowrap text-[11.5px] font-semibold" style={{ color: t.color }}>{issue}</span>
             {area && <span className="min-w-0 truncate text-[11px] text-white/40 @max-[340px]:hidden!">{area}</span>}
             {deg && (
-              <span className="ml-auto shrink-0 text-[17px] font-bold leading-none tabular-nums" style={{ color: t.color }}>
+              <span className="ml-auto shrink-0 text-[14px] font-bold leading-none tabular-nums" style={{ color: t.color }}>
                 {deg}°
               </span>
             )}
           </div>
         )}
-        <p className="mt-2 text-[clamp(15px,2dvh,17px)] font-medium leading-snug tracking-[-0.01em] text-white @max-[300px]:mt-1.5 @max-[300px]:text-[13.5px]!">{title}</p>
-        {note && <p className="mt-1 text-[11.5px] text-white/55">{note}</p>}
+        <p className="mt-1 text-[13px] font-medium leading-snug text-white @max-[300px]:text-[12.5px]!">{title}</p>
+        {note && <p className="mt-0.5 text-[10.5px] text-white/55">{note}</p>}
         {(more || fixed) && (
-          <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-white/[0.07] pt-2 text-[11.5px]">
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-white/[0.07] pt-1.5 text-[10.5px]">
             {fixed && (
               <span className="inline-flex items-center gap-1 text-success"><CheckCircle2 className="h-3.5 w-3.5" /> {fixed}</span>
             )}
