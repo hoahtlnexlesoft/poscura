@@ -17,7 +17,7 @@ export function useFitFrame(belowRef?: React.RefObject<HTMLElement | null>, rati
     const top = el.getBoundingClientRect().top + window.scrollY;
     const below = belowRef?.current?.offsetHeight ?? 0;
     // 2px for the card's borders
-    const availH = Math.max(minH, window.innerHeight - top - below - padBottom - 2);
+    const availH = Math.max(minH, window.innerHeight - top - below - padBottom - 4);
     // On foldables the card shrinks to the 9:16 frame, so size from the layout bound, not the card itself.
     const bound = el.closest("[data-fit-bound]") as HTMLElement | null;
     const twoCol = window.matchMedia("(min-width: 600px)").matches;
@@ -25,7 +25,8 @@ export function useFitFrame(belowRef?: React.RefObject<HTMLElement | null>, rati
     const maxW = bound && (twoCol || rail) ? bound.clientWidth * (twoCol ? 0.6 : 1) - 2 : el.clientWidth;
     const w = Math.min(maxW, availH * ratio);
     const next = { w: Math.round(w), h: Math.round(w / ratio) };
-    setBox((b) => (b && b.w === next.w && b.h === next.h ? b : next));
+    // ignore 1–2px wobble (e.g. a scrollbar appearing) so a resize can't feed back into itself and make the frame jitter
+    setBox((b) => (b && Math.abs(b.w - next.w) <= 2 && Math.abs(b.h - next.h) <= 3 ? b : next));
   }, [belowRef, ratio, minH]);
 
   useEffect(() => {

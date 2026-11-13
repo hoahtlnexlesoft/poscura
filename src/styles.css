@@ -231,3 +231,6 @@ html[data-side] [data-app-shell]:not([class*="pr-"]) { padding-right: 76px; }
 html[data-side] [data-app-nav] { top: auto !important; bottom: 12px !important; --tw-translate-y: 0px !important; translate: 0 0 !important; }
 /* guided session covers the app, so its top-right controls and camera preview step clear of the camera / status column */
 html[data-side] [data-ws-top], html[data-side] [data-ws-pip] { right: 76px !important; }
+
+/* a scrollbar appearing must not change the layout width (it would resize the fitted camera frame and loop) */
+html { scrollbar-gutter: stable; }
