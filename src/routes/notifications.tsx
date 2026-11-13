@@ -53,8 +53,44 @@ function NotificationsPage() {
     navigate({ to: n.action.to, search: n.action.search as never });
   };
 
+  const markAll = () => setItems((xs) => xs.map((x) => ({ ...x, unread: false })));
+  const TABS = [
+    { id: "all" as const, label: "All", count: items.length },
+    { id: "unread" as const, label: "Unread", count: unread },
+  ];
+
   return (
-    <div className="fold:max-w-[640px]">
+    <div className="fold:max-w-[640px] land:max-w-none hinge-split land:items-start">
+      {/* open foldables: the left pane holds the page header and filters, the list sits on the right of the hinge */}
+      <aside className="hidden land:flex land:sticky land:top-4 flex-col">
+        <Link to="/" className="inline-flex w-fit items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+          <ChevronLeft className="h-4 w-4" /> Back
+        </Link>
+        <h1 className="mt-3 text-[26px] font-bold tracking-tight">Notifications</h1>
+        <p className="mt-0.5 text-sm text-muted-foreground">Stay on top of your posture journey.</p>
+
+        <div className="glass-card mt-5 p-1.5">
+          {TABS.map((t) => (
+            <button key={t.id} onClick={() => setTab(t.id)}
+              className={cn("flex w-full items-center justify-between rounded-xl px-3.5 py-3 text-sm font-medium transition",
+                tab === t.id ? "bg-primary/12 text-foreground" : "text-muted-foreground hover:bg-muted/30 hover:text-foreground")}>
+              <span className="flex items-center gap-2.5">
+                <span className={cn("h-1.5 w-1.5 rounded-full", tab === t.id ? "bg-primary" : "bg-transparent")} />
+                {t.label}
+              </span>
+              <span className={cn("min-w-6 rounded-full px-2 text-center text-[11px] leading-5 tabular-nums",
+                tab === t.id ? "bg-primary text-primary-foreground" : "bg-muted/60 text-muted-foreground")}>{t.count}</span>
+            </button>
+          ))}
+        </div>
+
+        <button onClick={markAll} disabled={!unread}
+          className="mt-3 inline-flex h-10 items-center justify-center gap-1.5 rounded-xl border border-border text-sm font-medium text-primary transition hover:bg-primary/10 disabled:opacity-40">
+          <CheckCheck className="h-4 w-4" /> Mark all read
+        </button>
+      </aside>
+
+      <div className="land:hidden">
       <div className="flex items-center justify-between">
         <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
           <ChevronLeft className="h-4 w-4" /> Back
@@ -67,18 +103,19 @@ function NotificationsPage() {
           <p className="text-xs text-muted-foreground">Stay on top of your posture journey.</p>
         </div>
         <button
-          onClick={() => setItems((xs) => xs.map((x) => ({ ...x, unread: false })))}
+          onClick={markAll}
           disabled={!unread}
           className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-primary transition hover:bg-primary/10 disabled:opacity-40"
         >
           <CheckCheck className="h-3.5 w-3.5" /> Mark all read
         </button>
       </div>
+      </div>
 
-      <div className="mt-4">
+      <div className="mt-4 land:mt-0">
         {/* list */}
         <section>
-          <div className="mb-3 inline-flex rounded-xl bg-muted/40 p-1">
+          <div className="mb-3 inline-flex rounded-xl bg-muted/40 p-1 land:hidden">
             {(["all", "unread"] as const).map((t) => (
               <button
                 key={t}
@@ -96,6 +133,10 @@ function NotificationsPage() {
             ))}
           </div>
 
+          <div className="mb-3 hidden items-baseline justify-between land:flex">
+            <h2 className="text-sm font-semibold">{tab === "all" ? "All notifications" : "Unread"}</h2>
+            <span className="text-xs text-muted-foreground">{list.length} {list.length === 1 ? "item" : "items"}</span>
+          </div>
           {list.length === 0 ? (
             <div className="glass-card flex flex-col items-center gap-2 py-12 text-center">
               <BellOff className="h-6 w-6 text-muted-foreground" />
