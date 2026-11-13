@@ -136,7 +136,7 @@
     { id:"zflip",  name:"Galaxy Z Flip",     w:360, h:780, kind:"punch",  unit:"dp", color:"#5b6b8c", crease:"h" },
     { id:"duo-c",  name:"iPhone Duo · folded",   w:420, h:600, kind:"duo", unit:"pt", color:"#8d8577", layout:"rail" },
     { id:"duo-o",  name:"iPhone Duo · unfolded", w:744, h:968, kind:"fold",   unit:"pt", color:"#8d8577", crease:"v", rotate:true },
-    { id:"zfold-c", name:"Galaxy Z Fold · folded", w:412, h:600, kind:"punch", unit:"dp", color:"#4a4f57", tone:"#2c3036", radius:20, scr:12, layout:"rail", stack:true },
+    { id:"zfold-c", name:"Galaxy Z Fold · folded", w:412, h:600, kind:"punch", unit:"dp", color:"#dcd9e3", tone:"#a19dad", radius:30, scr:12, layout:"rail", stack:true },
     { id:"zfold",  name:"Galaxy Z Fold · unfolded",         w:707, h:823, kind:"fold",   unit:"dp", color:"#4a4f57", tone:"#2c3036", android:true, crease:"v", rotate:true }
   ];
 
@@ -239,16 +239,16 @@
       // folded book-style phone: hinge spine along the left edge
       if (d.hingeL) extra += '<span style="position:absolute;left:-4px;top:18px;bottom:18px;width:7px;border-radius:4px;background:linear-gradient(90deg,#16181c,#565b63 55%,#2a2d33)"></span>';
     }
-    html = '<div class="device" style="width:' + ow + "px;height:" + oh + "px;border-radius:" + (typeof radius === "number" ? radius + "px" : radius) + ";background:" + bg + ';box-shadow:0 0 0 2px #3a3d45,0 40px 80px rgba(0,0,0,.6)">' + extra +
+    html = '<div class="device" style="width:' + ow + "px;height:" + oh + "px;border-radius:" + (typeof radius === "number" ? radius + "px" : radius) + ";background:" + bg + ';box-shadow:' + (d.stack ? '0 0 0 1px #c3bfcc,inset 0 1px 0 rgba(255,255,255,.6)' : '0 0 0 2px #3a3d45,0 40px 80px rgba(0,0,0,.6)') + '">' + extra +
       '<div class="screen" style="left:' + sl + "px;top:" + st + "px;width:" + d.w + "px;height:" + d.h + "px;border-radius:" + (typeof scr === "number" ? scr + "px" : scr) + '">' +
       sb + '<iframe title="Poscura" id="app"></iframe>' + hb + cut + crease(d) + "</div></div>" + hingeEdges(d, ow, oh);
     // folded phone: the back half peeks out below and to the right, with a seam and a hinge spine on the left
     var back = "";
     if (d.stack) {
+      // folded: the back half sits right behind the front one; its edge shows as a second metal band on the right and bottom, split by a seam
       var R = (typeof radius === "number" ? radius + "px" : radius);
-      back = '<div aria-hidden="true" style="position:absolute;left:7px;top:9px;width:' + ow + 'px;height:' + oh + 'px;border-radius:' + R + ';background:linear-gradient(145deg,#5a5f68,#2a2d33);box-shadow:0 0 0 2px #3a3e46,0 40px 80px rgba(0,0,0,.6)"></div>' +
-        '<div aria-hidden="true" style="position:absolute;left:3.5px;top:4.5px;width:' + ow + 'px;height:' + oh + 'px;border-radius:' + R + ';box-shadow:0 0 0 1.5px rgba(255,255,255,.14)"></div>' +
-        '<div aria-hidden="true" style="position:absolute;left:-7px;top:' + (oh * 0.04) + 'px;height:' + (oh * 0.92 + 9) + 'px;width:14px;border-radius:8px;background:linear-gradient(90deg,#1a1c20,#8a9099 40%,#4a4f57 70%,#202328);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)"></div>';
+      back = '<div aria-hidden="true" style="position:absolute;left:0;top:2px;width:' + (ow + 10) + 'px;height:' + (oh + 4) + 'px;border-radius:' + R + ';background:linear-gradient(90deg,#8e8a99 0%,#c9c5d2 70%,#eeecf3 88%,#a9a5b4 100%);box-shadow:0 40px 80px rgba(0,0,0,.6),inset -1px -1px 0 rgba(0,0,0,.25)"></div>' +
+        '<div aria-hidden="true" style="position:absolute;left:0;top:0;width:' + (ow + 1) + 'px;height:' + (oh + 1) + 'px;border-radius:' + R + ';box-shadow:1.5px 1.5px 0 rgba(40,38,50,.55)"></div>';
     }
     scaler.innerHTML = '<div style="position:relative">' + back + html + "</div>";
     size = { w:ow, h:oh };
