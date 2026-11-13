@@ -221,8 +221,9 @@
         extra = '<span class="sidebtn" style="background:'+c4+';right:-3px;top:120px;height:60px"></span><span class="sidebtn" style="background:'+c4+';top:-3px;left:80px;width:70px;height:4px"></span><div class="shell"></div>' +
           '<span style="position:absolute;left:50%;top:-3px;bottom:-3px;width:' + (d.silver ? 4 : 6) + 'px;transform:translateX(-50%);background:' + hg + ';border-radius:3px"></span>';
       } else {
-        // landscape book fold: hinge stays vertical in the middle, camera top of the right panel
-        cut = '<div class="cut" style="left:75%;top:13px;transform:translateX(-50%);width:16px;height:16px;border-radius:50%"></div>';
+        // landscape book fold: hinge stays vertical in the middle; Galaxy shows a punch-hole on the right panel,
+        // iPhone Duo hides its inner camera under the display (Apple newsroom, Sep 2026)
+        cut = d.android ? '<div class="cut" style="left:75%;top:13px;transform:translateX(-50%);width:16px;height:16px;border-radius:50%"></div>' : "";
         extra = '<span class="sidebtn" style="background:'+c4+';right:-3px;top:110px;height:60px"></span><span class="sidebtn" style="background:'+c4+';top:-3px;right:120px;width:70px;height:4px"></span><div class="shell"></div>' +
           '<span style="position:absolute;left:50%;top:-3px;bottom:-3px;width:' + (d.silver ? 4 : 6) + 'px;transform:translateX(-50%);background:' + hg + ';border-radius:3px"></span>';
       }
