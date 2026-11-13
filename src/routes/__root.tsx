@@ -93,6 +93,12 @@ function AuthGate() {
   const [mounted, setMounted] = useState(false);
   const isLogin = location.pathname === "/login";
 
+  // only the four main tabs show the nav; every sub page hides it
+  const isSub = !["/", "/posture-monitor", "/workout", "/community"].includes(location.pathname);
+  useEffect(() => {
+    const el = document.documentElement;
+    if (isSub) el.dataset.sub = "1"; else delete el.dataset.sub;
+  }, [isSub]);
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => {
     if (mounted && !user && !isLogin) {

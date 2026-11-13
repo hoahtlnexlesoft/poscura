@@ -214,6 +214,6 @@ select:not([multiple]):not([size]) {
 }
 
 /* inner flows (exercise intro, guided session) hide the app navigation */
-html[data-immersive] [data-app-nav] { display: none !important; }
-html[data-immersive] [data-app-shell] { padding-left: 0 !important; padding-right: 0 !important; }
-html[data-immersive] [data-app-shell] > main { padding-bottom: 1.5rem !important; }
+html[data-immersive] [data-app-nav], html[data-sub] [data-app-nav] { display: none !important; }
+html[data-immersive] [data-app-shell], html[data-sub] [data-app-shell] { padding-left: 0 !important; padding-right: 0 !important; }
+html[data-immersive] [data-app-shell] > main, html[data-sub] [data-app-shell] > main { padding-bottom: 1.5rem !important; }

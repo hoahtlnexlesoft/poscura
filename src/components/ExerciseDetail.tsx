@@ -1,3 +1,4 @@
+import { useImmersive } from "@/hooks/useImmersive";
 import { ChevronLeft, ChevronDown, Play, Volume2, Maximize2, TrendingUp, Sparkles, AlertCircle, Target, Dumbbell, Share2, Facebook, Twitter, Linkedin, MessageCircle, Send, Users, X } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
@@ -63,6 +64,7 @@ function ShareToggle({ label, checked, onChange }: { label: string; checked: boo
 }
 
 export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext }: Props) {
+  useImmersive();
   const [phase, setPhase] = useState<Phase>("warm");
   const [chartOpen, setChartOpen] = useState(true);
   const [detailsOpen, setDetailsOpen] = useState(false);

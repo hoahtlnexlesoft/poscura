@@ -1,3 +1,4 @@
+import { useImmersive } from "@/hooks/useImmersive";
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, Play, Pause, Sparkles, Target, TrendingUp, Lightbulb, RotateCcw, Share2, Facebook, Twitter, Linkedin, MessageCircle, Send, Users, X } from "lucide-react";
 import { toast } from "sonner";
@@ -31,6 +32,7 @@ const improvements = [
 ];
 
 export function WorkoutAssessment({ workoutName, recordedVideoUrl, onClose }: Props) {
+  useImmersive();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [playing, setPlaying] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);

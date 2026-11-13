@@ -1,3 +1,4 @@
+import { useImmersive } from "@/hooks/useImmersive";
 import { ChevronLeft, ChevronRight, Play, Tag, Share2, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -60,6 +61,7 @@ function startOfWeek(d: Date): Date {
 }
 
 export function WorkoutProgramDetail({ onClose, onStartSession }: Props) {
+  useImmersive();
   const [tab, setTab] = useState<"today" | "all">("today");
   const [selectedExercise, setSelectedExercise] = useState<ExerciseListItem | null>(null);
   const [weekStart, setWeekStart] = useState<Date>(() => startOfWeek(new Date()));
