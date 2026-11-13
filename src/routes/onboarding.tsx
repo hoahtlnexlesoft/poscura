@@ -43,7 +43,7 @@ function OnboardingPage() {
   };
 
   return (
-    <div className="relative mx-auto w-full pb-24 fold:grid fold:max-w-[980px] fold:grid-cols-[minmax(240px,0.8fr)_1.4fr] land:grid-cols-2 fold:items-start fold:gap-8 land:gap-x-6 fold:pb-6">
+    <div className="relative mx-auto w-full pb-24 fold:grid fold:max-w-[980px] fold:grid-cols-[minmax(240px,0.8fr)_1.4fr] land:grid-cols-2 fold:items-start fold:gap-8 hinge-split land:gap-x-6 fold:pb-6">
       {/* ---------- side / header ---------- */}
       <aside className="fold:sticky fold:top-4 fold:glass-card fold:p-5">
         <div className="flex items-center justify-between">

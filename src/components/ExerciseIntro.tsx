@@ -35,7 +35,7 @@ export function ExerciseIntro({
         </button>
       </div>
 
-      <div className="mt-2 land:grid land:grid-cols-2 land:items-start land:gap-x-6">
+      <div className="mt-2 land:grid land:grid-cols-2 hinge-split land:items-start land:gap-x-6">
         {/* left: title, demo, numbers */}
         <div className="land:sticky land:top-[72px]">
           <div className="flex items-start justify-between gap-3">

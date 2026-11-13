@@ -95,7 +95,7 @@ export function WorkoutProgramDetail({ onClose, onStartSession }: Props) {
   }
 
   return (
-    <div className="space-y-4 land:grid land:grid-cols-2 land:items-start land:gap-x-6 land:gap-y-4 land:space-y-0">
+    <div className="space-y-4 land:grid land:grid-cols-2 hinge-split land:items-start land:gap-x-6 land:gap-y-4 land:space-y-0">
       <div className="flex items-center justify-between land:col-span-2">
         <button onClick={onClose} className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground">
           <ChevronLeft className="h-4 w-4" /> Workout

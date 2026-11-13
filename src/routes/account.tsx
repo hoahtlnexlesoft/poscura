@@ -267,9 +267,9 @@ function AccountPage() {
               ))}
             </TabsList>
           </div>
-          <TabsContent value="info" className="space-y-4 mt-4 fold:space-y-0 fold:columns-2 fold:gap-4 land:gap-6 fold:[&>*]:break-inside-avoid fold:[&>*]:mb-4"><AccountInfo /></TabsContent>
-          <TabsContent value="subscription" className="space-y-4 mt-4 fold:grid fold:grid-cols-2 fold:gap-4 land:gap-x-6 fold:space-y-0"><SubscriptionTab /></TabsContent>
-          <TabsContent value="invite" className="space-y-4 mt-4 fold:space-y-0 fold:columns-2 fold:gap-4 land:gap-6 fold:[&>*]:break-inside-avoid fold:[&>*]:mb-4"><InviteTab /></TabsContent>
+          <TabsContent value="info" className="space-y-4 mt-4 fold:space-y-0 fold:columns-2 fold:gap-4 land:gap-6 fold:[&>*]:break-inside-avoid fold:[&>*]:mb-4 hinge-split land:items-start land:gap-y-4"><AccountInfo /></TabsContent>
+          <TabsContent value="subscription" className="space-y-4 mt-4 fold:grid fold:grid-cols-2 fold:gap-4 land:gap-x-6 fold:space-y-0 hinge-split"><SubscriptionTab /></TabsContent>
+          <TabsContent value="invite" className="space-y-4 mt-4 fold:space-y-0 fold:columns-2 fold:gap-4 land:gap-6 fold:[&>*]:break-inside-avoid fold:[&>*]:mb-4 hinge-split land:items-start land:gap-y-4"><InviteTab /></TabsContent>
         </Tabs>
       </div>
     </div>

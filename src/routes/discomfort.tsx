@@ -36,7 +36,7 @@ function DiscomfortPage() {
   };
 
   return (
-    <div className="space-y-4 fold:grid fold:grid-cols-2 fold:gap-x-5 land:gap-x-6 fold:gap-y-4 fold:space-y-0 fold:items-start">
+    <div className="space-y-4 fold:grid fold:grid-cols-2 fold:gap-x-5 land:gap-x-6 hinge-split fold:gap-y-4 fold:space-y-0 fold:items-start">
       <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground fold:col-span-2 fold:justify-self-start">
         <ChevronLeft className="h-4 w-4" /> Back
       </Link>

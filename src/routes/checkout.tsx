@@ -17,7 +17,7 @@ function ChoosePlanPage() {
   const router = useRouter();
   const [cycle, setCycle] = useState<BillingCycle>("monthly");
   return (
-    <div className="pb-4 land:grid land:grid-cols-2 land:items-start land:gap-x-6">
+    <div className="pb-4 land:grid land:grid-cols-2 hinge-split land:items-start land:gap-x-6">
       {/* left pane on open foldables: title, billing and links */}
       <div className="land:sticky land:top-[72px]">
         <header className="relative flex h-11 items-center justify-center land:justify-start land:pl-10">

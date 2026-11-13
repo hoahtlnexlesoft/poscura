@@ -12,7 +12,7 @@ const progressTotal = TODAYS_WORKOUTS.reduce((a, w) => a + w.programTotal, 0);
 function Dashboard() {
   const navigate = useNavigate();
   return (
-    <div className="space-y-4 fold:grid fold:grid-cols-[1.25fr_1fr] land:grid-cols-2 fold:gap-4 land:gap-x-6 fold:space-y-0 fold:items-start">
+    <div className="space-y-4 fold:grid fold:grid-cols-[1.25fr_1fr] land:grid-cols-2 hinge-split fold:gap-4 land:gap-x-6 fold:space-y-0 fold:items-start">
       <div className="space-y-4">
       <section className="glass-card p-4">
         <h2 className="text-base font-semibold mb-3">Posture Insights</h2>
