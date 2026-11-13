@@ -136,7 +136,7 @@
     { id:"zflip",  name:"Galaxy Z Flip",     w:360, h:780, kind:"punch",  unit:"dp", color:"#5b6b8c", crease:"h" },
     { id:"duo-c",  name:"iPhone Duo · Folded",   w:420, h:600, kind:"duo", unit:"pt", color:"#8d8577", layout:"rail" },
     { id:"duo-o",  name:"iPhone Duo · Open", w:744, h:968, kind:"fold",   unit:"pt", color:"#8d8577", crease:"v", rotate:true },
-    { id:"zfold-c", name:"Galaxy Z Fold · Folded", w:412, h:600, kind:"punch", unit:"dp", color:"#3c3f45", tone:"#141619", radius:16, scr:8, layout:"rail", stack:true },
+    { id:"zfold-c", name:"Galaxy Z Fold · Folded", w:412, h:600, kind:"punch", unit:"dp", color:"#3c3f45", tone:"#141619", radius:10, scr:10, layout:"rail", stack:true },
     { id:"zfold",  name:"Galaxy Z Fold · Open",         w:707, h:823, kind:"fold",   unit:"dp", color:"#3c3f45", tone:"#141619", android:true, silver:true, crease:"v", rotate:true }
   ];
 
@@ -248,7 +248,7 @@
     if (d.stack) {
       // folded: the back half sits right behind the front one; its edge shows as a second metal band on the right and bottom, split by a seam
       var R = (typeof radius === "number" ? radius + "px" : radius);
-      back = '<div aria-hidden="true" style="position:absolute;left:0;top:2px;width:' + (ow + 10) + 'px;height:' + (oh + 4) + 'px;border-radius:' + R + ';background:linear-gradient(90deg,#1c1e22 0%,#3e424a 70%,#6a6f78 88%,#2a2d33 100%);box-shadow:0 40px 80px rgba(0,0,0,.6),inset -1px -1px 0 rgba(0,0,0,.25)"></div>' +
+      back = '<div aria-hidden="true" style="position:absolute;left:0;top:1px;width:' + (ow + 7) + 'px;height:' + (oh + 2) + 'px;border-radius:' + R + ';background:linear-gradient(90deg,#1c1e22 0%,#3e424a 70%,#6a6f78 88%,#2a2d33 100%);box-shadow:0 40px 80px rgba(0,0,0,.6),inset -1px -1px 0 rgba(0,0,0,.25)"></div>' +
         '<div aria-hidden="true" style="position:absolute;left:0;top:0;width:' + (ow + 1) + 'px;height:' + (oh + 1) + 'px;border-radius:' + R + ';box-shadow:1.5px 1.5px 0 rgba(0,0,0,.75)"></div>';
     }
     scaler.innerHTML = '<div style="position:relative">' + back + html + "</div>";
