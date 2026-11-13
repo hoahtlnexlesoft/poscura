@@ -229,3 +229,5 @@ html[data-side][data-sub] [data-app-shell], html[data-side][data-immersive] [dat
 /* sign-in and onboarding have no toolbar, but still leave the trailing column to the camera and status bar */
 html[data-side] [data-app-shell]:not([class*="pr-"]) { padding-right: 76px; }
 html[data-side] [data-app-nav] { top: auto !important; bottom: 12px !important; --tw-translate-y: 0px !important; translate: 0 0 !important; }
+/* guided session covers the app, so its top-right controls and camera preview step clear of the camera / status column */
+html[data-side] [data-ws-top], html[data-side] [data-ws-pip] { right: 76px !important; }

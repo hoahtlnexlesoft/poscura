@@ -133,7 +133,7 @@ export function WorkoutSession({ workoutName, videoSrc, session = 1, sessions = 
         )}
 
         {/* top controls */}
-        <div className="absolute inset-x-3 top-3 flex items-center gap-2">
+        <div data-ws-top className="absolute inset-x-3 top-3 flex items-center gap-2">
           <button onClick={onClose} aria-label="Back" className="flex h-9 w-9 items-center justify-center rounded-full bg-black/40 backdrop-blur transition hover:bg-black/55">
             <ArrowLeft className="h-5 w-5" />
           </button>
@@ -144,7 +144,7 @@ export function WorkoutSession({ workoutName, videoSrc, session = 1, sessions = 
         </div>
 
         {/* camera picture-in-picture */}
-        <div className="absolute right-3 top-14 aspect-[3/4] w-[24%] min-w-[96px] max-w-[150px] overflow-hidden rounded-xl border border-white/40 bg-[#1b2433] shadow-[0_8px_24px_rgba(0,0,0,0.35)] land:aspect-video land:w-[22%] land:max-w-[180px]">
+        <div data-ws-pip className="absolute right-3 top-14 aspect-[3/4] w-[24%] min-w-[96px] max-w-[150px] overflow-hidden rounded-xl border border-white/40 bg-[#1b2433] shadow-[0_8px_24px_rgba(0,0,0,0.35)] land:aspect-video land:w-[22%] land:max-w-[180px]">
           <video ref={camRef} className="h-full w-full object-cover [transform:scaleX(-1)]" playsInline muted />
           {!camReady && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 text-center text-white/60">
