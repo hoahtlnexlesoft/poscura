@@ -499,7 +499,7 @@ export function LivePostureView({ timeLeft, onEnd, onReading }: { timeLeft: stri
 
       {/* ---------- status bar ---------- */}
       <div ref={statusRef} className="@container border-t border-white/[0.06]">
-        <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 px-4 py-3 @max-[360px]:px-3 @max-[240px]:gap-1.5 @max-[240px]:px-2.5 @max-[240px]:py-2.5">
+        <div className="grid h-[76px] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 overflow-hidden px-4 @max-[360px]:px-3 @max-[240px]:gap-1.5 @max-[240px]:px-2.5">
           <div className="min-w-0">
             <div className="text-[9px] font-medium uppercase tracking-[0.1em] text-muted-foreground @max-[240px]:hidden!">Posture now</div>
             <div className={cn("mt-1.5 @max-[240px]:mt-0! @max-[240px]:text-[16px]! text-[20px] font-semibold leading-none tracking-tight transition-colors", LEVEL_TEXT[phase.level])}>{phase.status.word}</div>
@@ -517,7 +517,7 @@ export function LivePostureView({ timeLeft, onEnd, onReading }: { timeLeft: stri
           <div className="text-right leading-none">
             <div className="text-[9px] font-medium uppercase tracking-[0.1em] text-muted-foreground @max-[240px]:hidden!">Session</div>
             <div className="mt-1.5 text-[20px] font-semibold tabular-nums @max-[240px]:mt-0! @max-[240px]:text-[16px]!">{timeLeft}</div>
-            <div className="mt-1 text-[11px] text-muted-foreground @max-[240px]:hidden!">Session avg <b className="font-semibold text-foreground tabular-nums">{avg}</b></div>
+            <div className="mt-1 whitespace-nowrap text-[11px] text-muted-foreground @max-[240px]:hidden!">Session avg <b className="font-semibold text-foreground tabular-nums">{avg}</b></div>
           </div>
         </div>
       </div>
