@@ -224,6 +224,13 @@
         // landscape book fold: hinge stays vertical in the middle; Galaxy shows a punch-hole on the right panel,
         // iPhone Duo hides its inner camera under the display (Apple newsroom, Sep 2026)
         cut = d.android ? '<div class="cut" style="left:75%;top:13px;transform:translateX(-50%);width:16px;height:16px;border-radius:50%"></div>' : "";
+        if (!d.android) {
+          // iPhone Duo open: same corner status as the cover screen — clock and Wi-Fi stacked over the right-hand menu column
+          top = 0; sb = "";
+          cut = '<div style="position:absolute;right:48px;top:16px;transform:translateX(50%);z-index:2;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:5px;text-shadow:0 1px 2px rgba(0,0,0,.35)">' +
+            '<span style="color:#fff;font:600 13px/1 -apple-system,\'SF Pro Text\',system-ui,sans-serif;letter-spacing:-.2px;font-variant-numeric:tabular-nums">' + clock() + '</span>' +
+            '<span style="display:block;line-height:0;filter:drop-shadow(0 1px 1px rgba(0,0,0,.3))">' + I.wifi + '</span></div>';
+        }
         extra = '<span class="sidebtn" style="background:'+c4+';right:-3px;top:110px;height:60px"></span><span class="sidebtn" style="background:'+c4+';top:-3px;right:120px;width:70px;height:4px"></span><div class="shell"></div>' +
           '<span style="position:absolute;left:50%;top:-3px;bottom:-3px;width:' + (d.silver ? 4 : 6) + 'px;transform:translateX(-50%);background:' + hg + ';border-radius:3px"></span>';
       }
