@@ -37,10 +37,12 @@ import "../src/styles.css";
   }
 })();
 
-type Boot = { layout?: string; auth?: boolean };
+type Boot = { layout?: string; side?: boolean; auth?: boolean };
 let boot: Boot = {};
 try { boot = JSON.parse(window.name || "{}"); } catch {}
 if (boot.layout) document.documentElement.dataset.layout = boot.layout;
+// iPhone Duo: toolbar and tab bar live on the trailing edge (Apple HIG, "Designing for iPhone Duo")
+if (boot.side) document.documentElement.dataset.side = "1";
 
 const AUTH_KEY = "poscura.auth";
 const DEMO_USER = { email: "sam@poscura.app", firstName: "Sam", lastName: "Miller", initials: "SM", plan: "Freemium" };

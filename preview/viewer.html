@@ -132,8 +132,8 @@
   var DEVICES = [
     { id:"ip16pm", name:"iPhone 18 Pro Max", w:440, h:956, kind:"island", unit:"pt", color:"#8d8577" },
     { id:"ipse",   name:"iPhone SE",         w:375, h:667, kind:"home",   unit:"pt" },
-    { id:"duo-c",  name:"iPhone Duo · Folded",   w:466, h:678, kind:"duo", unit:"pt", color:"#8d8577", layout:"rail" },
-    { id:"duo-o",  name:"iPhone Duo · Open", w:626, h:890, kind:"fold",   unit:"pt", color:"#8d8577", crease:"v", rotate:true },
+    { id:"duo-c",  name:"iPhone Duo · Folded",   w:466, h:678, kind:"duo", unit:"pt", color:"#8d8577", layout:"rail", side:true },
+    { id:"duo-o",  name:"iPhone Duo · Open", w:626, h:890, kind:"fold",   unit:"pt", color:"#8d8577", crease:"v", rotate:true, side:true },
     { id:"zfold-c", name:"Galaxy Z Fold8 · Folded", w:467, h:737, kind:"punch", unit:"dp", color:"#3c3f45", tone:"#141619", radius:10, scr:10, layout:"rail", stack:true },
     { id:"zfold",  name:"Galaxy Z Fold8 · Open",         w:734, h:972, kind:"fold",   unit:"dp", color:"#3c3f45", tone:"#141619", android:true, silver:true, crease:"v", rotate:true }
   ];
@@ -314,7 +314,7 @@
     // a new frame, named before it loads, so the app reads its options on start-up
     var nf = document.createElement("iframe");
     nf.title = "Poscura"; nf.id = "app";
-    nf.name = JSON.stringify({ layout: view().layout || "", auth: auth });
+    nf.name = JSON.stringify({ layout: view().layout || "", side: !!view().side, auth: auth });
     nf.src = "app.html#" + path;
     frame.replaceWith(nf);
     frame = nf;

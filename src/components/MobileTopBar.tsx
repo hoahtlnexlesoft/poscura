@@ -1,5 +1,6 @@
 import { Bell, ClipboardList, Menu, LogOut, UserCircle, ChevronRight, User as UserIcon, CreditCard, Gift, Mail, Settings as SettingsIcon, HelpCircle, LifeBuoy, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate, Link } from "@tanstack/react-router";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -23,6 +24,8 @@ export function MobileTopBar() {
   const navigate = useNavigate();
   const user = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const go = (to: "/account" | "/settings" | "/support" | "/login" | "/checkout") => {
     setMenuOpen(false);
@@ -33,6 +36,7 @@ export function MobileTopBar() {
     <header className="h-14 border-b border-border flex items-center justify-between px-4 bg-background/80 backdrop-blur-xl sticky top-0 z-30">
       <div className="flex items-center gap-2">
         <button
+          data-tb-inline
           onClick={() => setMenuOpen(true)}
           aria-label="Open menu"
           className="h-9 w-9 rounded-full bg-card border border-border flex items-center justify-center"
@@ -159,7 +163,26 @@ export function MobileTopBar() {
         </SheetContent>
       </Sheet>
 
-      <div className="flex items-center gap-1.5">
+      {/* iPhone Duo: the same actions as a vertical toolbar on the trailing edge, under the status bar.
+          Portalled to <body> so the header's backdrop blur doesn't trap the fixed position. */}
+      {mounted && createPortal(<div data-side-toolbar className="fixed right-3 top-[84px] landscape:top-[60px] z-40 w-[72px] flex-col items-center gap-2 py-2.5 rounded-[28px] border border-sidebar-border bg-sidebar/85 backdrop-blur-xl shadow-[0_18px_40px_-12px_rgba(0,0,0,.6)]">
+        <button onClick={() => setMenuOpen(true)} aria-label="Open menu"
+          className="h-10 w-10 rounded-full flex items-center justify-center text-sidebar-foreground/80 hover:bg-white/5">
+          <Menu className="h-[18px] w-[18px]" />
+        </button>
+        <span aria-hidden className="h-px w-7 bg-sidebar-border" />
+        <button onClick={() => navigate({ to: "/discomfort" })} aria-label="Log discomfort"
+          className="h-10 w-10 rounded-full flex items-center justify-center text-sidebar-foreground/80 hover:bg-white/5">
+          <ClipboardList className="h-[18px] w-[18px]" />
+        </button>
+        <button onClick={() => navigate({ to: "/notifications" })} aria-label="Notifications"
+          className="relative h-10 w-10 rounded-full flex items-center justify-center text-sidebar-foreground/80 hover:bg-white/5">
+          <Bell className="h-[18px] w-[18px]" />
+          <span className="absolute top-0.5 right-0 text-[9px] px-1 rounded-full bg-destructive text-destructive-foreground font-semibold">9+</span>
+        </button>
+      </div>, document.body)}
+
+      <div data-tb-inline className="flex items-center gap-1.5">
         <button onClick={() => navigate({ to: "/discomfort" })} aria-label="Log discomfort"
           className="h-9 w-9 rounded-full bg-card border border-border flex items-center justify-center">
           <ClipboardList className="h-4 w-4" />
