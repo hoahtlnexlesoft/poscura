@@ -11,6 +11,7 @@ type SectionProps = {
   icon: LucideIcon;
   title: string;
   children: React.ReactNode;
+  className?: string;
 };
 
 type RowProps = {
@@ -40,9 +41,10 @@ function SettingsPage() {
         </button>
         <h1 className="text-base font-semibold">Settings</h1>
       </header>
-      <div className="p-4 space-y-4 fold:space-y-0 fold:columns-2 fold:gap-4 land:gap-6 fold:[&>*]:break-inside-avoid fold:[&>*]:mb-4 hinge-split land:items-start land:gap-y-4">
+      <div className="p-4 flex flex-col gap-4 fold:block fold:columns-2 fold:gap-4 fold:[&_section]:break-inside-avoid fold:[&_section]:mb-4 hinge-split land:items-start">
 
-      <Section icon={Languages} title="Language">
+      <div className="contents land:block land:space-y-4">
+      <Section className="order-1" icon={Languages} title="Language">
         <Row label="App language">
           <Select value={language} onValueChange={setLanguage}>
             <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
@@ -54,7 +56,20 @@ function SettingsPage() {
         </Row>
       </Section>
 
-      <Section icon={Clock} title="Monitoring">
+      <Section className="order-3" icon={Mic} title="Voice">
+        <Row label="Wake word"><span className="text-[15px] text-muted-foreground">Motion Future</span></Row>
+        <Row label="Voice activation" hint="Always listen for wake word">
+          <Switch checked={voice} onCheckedChange={setVoice} />
+        </Row>
+      </Section>
+
+      <Section className="order-5" icon={ShieldAlert} title="Legal Information">
+        <LinkRow label="Terms Of Service" />
+        <LinkRow label="Privacy Policy" />
+      </Section>
+      </div>
+      <div className="contents land:block land:space-y-4">
+      <Section className="order-2" icon={Clock} title="Monitoring">
         <Row label="Session length">
           <Select defaultValue="40">
             <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
@@ -68,34 +83,23 @@ function SettingsPage() {
         
       </Section>
 
-      <Section icon={Mic} title="Voice">
-        <Row label="Wake word"><span className="text-[15px] text-muted-foreground">Motion Future</span></Row>
-        <Row label="Voice activation" hint="Always listen for wake word">
-          <Switch checked={voice} onCheckedChange={setVoice} />
-        </Row>
-      </Section>
-
-      <Section icon={Bell} title="Notifications">
+      <Section className="order-4" icon={Bell} title="Notifications">
         <Row label="Allow notifications"><Switch checked={allowNotifications} onCheckedChange={setAllowNotifications} /></Row>
         <Row label="Posture alerts"><Switch checked={postureAlerts} onCheckedChange={setPostureAlerts} disabled={!allowNotifications} /></Row>
         <Row label="Workout reminders"><Switch checked={workoutReminders} onCheckedChange={setWorkoutReminders} disabled={!allowNotifications} /></Row>
         <Row label="Community notifications"><Switch checked={communityNotifications} onCheckedChange={setCommunityNotifications} disabled={!allowNotifications} /></Row>
       </Section>
-
-      <Section icon={ShieldAlert} title="Legal Information">
-        <LinkRow label="Terms Of Service" />
-        <LinkRow label="Privacy Policy" />
-      </Section>
+      </div>
       </div>
     </div>
   );
 }
 
 function Section(props: SectionProps) {
-  const { icon: Icon, title, children } = props;
+  const { icon: Icon, title, children, className } = props;
 
   return (
-    <section className="glass-card px-4 pt-4 pb-1">
+    <section className={`glass-card px-4 pt-4 pb-1 ${className ?? ""}`}>
       <div className="flex items-center gap-2 mb-1">
         <Icon className="h-[18px] w-[18px] text-primary" />
         <h2 className="text-[15px] font-semibold">{title}</h2>
