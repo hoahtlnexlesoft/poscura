@@ -41,7 +41,6 @@ export function ExerciseIntro({
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <h1 className="text-2xl font-bold leading-tight tracking-tight">{name}</h1>
-              <p className="mt-1 text-sm text-muted-foreground">{g.area} · {g.minutes}</p>
             </div>
             <span className="mt-1 shrink-0 rounded-full bg-muted/60 px-3 py-1 text-xs font-medium">Session {session} of {sessions}</span>
           </div>
@@ -52,7 +51,11 @@ export function ExerciseIntro({
           <p className="mt-2 text-xs text-muted-foreground">Preview loop · the full demo video is coming.</p>
 
           <div className="mt-3 grid grid-cols-3 gap-2">
-            {[["A day", g.perDay], ["Each session", g.reps], ["Hold", g.hold]].map(([l, v]) => (
+            {[
+              ["Every", plural(g.everyDays ?? 1, "day")],
+              ["Per day", plural(parseInt(g.perDay) || 1, "time")],
+              ["Repeat", `${g.repeatHours ?? 4} hr`],
+            ].map(([l, v]) => (
               <div key={l} className="rounded-xl bg-muted/40 px-3 py-2.5">
                 <div className="text-xs text-muted-foreground">{l}</div>
                 <div className="mt-0.5 text-[15px] font-semibold">{v}</div>
@@ -107,7 +110,6 @@ export function ExerciseIntro({
           >
             <Play className="h-4 w-4 fill-current" /> Start
           </button>
-          <p className="mt-2 text-center text-xs text-muted-foreground">Form tracking is simulated in this preview.</p>
         </div>
       </div>
     </div>
@@ -208,4 +210,8 @@ export function Figure({ motion, light = false }: { motion: Motion; light?: bool
       </>)}
     </>
   );
+}
+
+function plural(n: number, unit: string) {
+  return `${n} ${unit}${n === 1 ? "" : "s"}`;
 }

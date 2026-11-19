@@ -4,6 +4,9 @@ export type ExerciseGuide = {
   area: string;
   minutes: string;
   perDay: string;
+  /** schedule: every N days, `perDay` times that day, repeated every N hours */
+  everyDays?: number;
+  repeatHours?: number;
   reps: string;
   hold: string;
   goal: string;

@@ -221,13 +221,13 @@ function OnboardingPage() {
         )}
 
         {/* actions */}
-        <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border/60 bg-background/85 px-4 pb-4 pt-3 backdrop-blur-xl fold:static fold:mt-5 fold:border-0 fold:bg-transparent fold:p-0 fold:backdrop-blur-0">
-          <div className="flex gap-2 fold:justify-end">
+        <div data-ob-footer className="fixed inset-x-0 bottom-0 z-20 border-t border-border/60 bg-background/85 px-4 pb-4 pt-3 backdrop-blur-xl fold:static fold:mt-5 fold:border-0 fold:bg-transparent fold:p-0 fold:backdrop-blur-0">
+          <div className="flex justify-end gap-2">
             {step === 2 && (
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="flex h-12 items-center justify-center gap-1.5 rounded-xl border border-border px-4 text-sm font-medium text-muted-foreground transition hover:text-foreground"
+                className="mr-auto flex h-11 items-center justify-center gap-1.5 rounded-xl border border-border px-4 text-sm font-medium text-muted-foreground transition hover:text-foreground"
               >
                 <ArrowLeft className="h-4 w-4" /> Back
               </button>
@@ -235,7 +235,7 @@ function OnboardingPage() {
             <button
               type="button"
               onClick={next}
-              className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-secondary text-sm font-semibold text-white shadow-[0_10px_30px_-12px] shadow-primary transition hover:opacity-95 active:scale-[0.99] fold:max-w-[260px]"
+              className="flex h-11 min-w-[160px] items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-secondary px-6 text-sm font-semibold text-white shadow-[0_10px_30px_-12px] shadow-primary transition hover:opacity-95 active:scale-[0.99]"
             >
               {step === 1 ? "Continue" : "Start Posture Monitor"} <ArrowRight className="h-4 w-4" />
             </button>
