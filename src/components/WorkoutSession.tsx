@@ -21,7 +21,7 @@ interface Props {
 const fmt = (t: number) => `${String(Math.floor(t / 60)).padStart(2, "0")}:${String(Math.floor(t % 60)).padStart(2, "0")}`;
 
 /** Full-screen guided session, as in the live app: vertical guide video, camera picture-in-picture, Back / Start / Next. */
-export function WorkoutSession({ workoutName, videoSrc, session = 1, sessions = 1, duration = 10, // prototype: 10 s so the flow is quick to test
+export function WorkoutSession({ workoutName, videoSrc, session = 1, sessions = 1, duration = 3, // prototype: 3 s so the flow is quick to test
   onClose, onFinish, onNext }: Props) {
   const camRef = useRef<HTMLVideoElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
