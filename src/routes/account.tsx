@@ -267,7 +267,7 @@ function AccountPage() {
               ))}
             </TabsList>
           </div>
-          <TabsContent value="info" className="space-y-4 mt-4 fold:space-y-0 fold:columns-2 fold:gap-4 land:gap-6 fold:[&>*]:break-inside-avoid fold:[&>*]:mb-4 hinge-split land:items-start land:gap-y-4"><AccountInfo /></TabsContent>
+          <TabsContent value="info" className="flex flex-col gap-4 mt-4 fold:block fold:columns-2 fold:gap-4 land:gap-6 fold:[&>*>*]:break-inside-avoid fold:[&>*>*]:mb-4 hinge-split land:items-start land:gap-y-4"><AccountInfo /></TabsContent>
           <TabsContent value="subscription" className="space-y-4 mt-4 fold:grid fold:grid-cols-2 fold:gap-4 land:gap-x-6 fold:space-y-0 hinge-split"><SubscriptionTab /></TabsContent>
           <TabsContent value="invite" className="space-y-4 mt-4 fold:space-y-0 fold:columns-2 fold:gap-4 land:gap-6 fold:[&>*]:break-inside-avoid fold:[&>*]:mb-4 hinge-split land:items-start land:gap-y-4"><InviteTab /></TabsContent>
         </Tabs>
@@ -318,9 +318,12 @@ function AccountInfo() {
 
   return (
     <>
-      <AvatarSection />
-      <UnifiedAccountSection />
+      {/* open foldables: two independent stacks either side of the hinge, so a short card never leaves a hole under it.
+          Elsewhere the wrappers dissolve (display: contents) and `order` keeps the phone sequence. */}
+      <div className="contents land:block">
+      <div className="order-1"><AvatarSection /></div>
       <Section
+        className="order-3"
         title="Personal Information"
         action={
           <Button size="icon" variant="ghost" className="text-primary h-7 w-7" aria-label="Edit personal information" onClick={() => { setDraft(personal); setEditOpen(true); }}>
@@ -343,6 +346,10 @@ function AccountInfo() {
           <p className="mt-1 text-sm font-semibold">{personal.posturalStatus}</p>
         </div>
       </Section>
+      </div>
+
+      <div className="contents land:block">
+      <div className="order-2"><UnifiedAccountSection /></div>
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 gap-3">
@@ -382,9 +389,9 @@ function AccountInfo() {
       </Dialog>
 
 
-      <FamilyMembersSection />
+      <div className="order-4"><FamilyMembersSection /></div>
 
-      <section className="rounded-xl border-2 border-destructive/30 bg-destructive/5 p-4">
+      <section className="order-5 rounded-xl border-2 border-destructive/30 bg-destructive/5 p-4">
         <div className="flex items-center gap-2 mb-1">
           <AlertTriangle className="h-4 w-4 text-destructive" />
           <h2 className="text-sm font-semibold text-destructive">Danger Zone</h2>
@@ -398,6 +405,7 @@ function AccountInfo() {
           <Button variant="destructive" size="sm" className="w-full"><Trash2 className="h-3.5 w-3.5" /> Delete Account</Button>
         </div>
       </section>
+      </div>
     </>
   );
 }
