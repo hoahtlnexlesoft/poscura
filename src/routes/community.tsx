@@ -1,3 +1,4 @@
+import { ScoreRing } from "@/components/SessionResult";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -20,6 +21,8 @@ type Post = {
   verified?: boolean; pinned?: boolean; category: string; text: string;
   hashtags?: string[]; likes: number; comments: number; shares: number;
   liked?: boolean; thread?: Comment[];
+  /** a finished workout session shared from its result screen */
+  result?: { title: string; score: number };
 };
 
 const SEED_POSTS: Post[] = [
@@ -70,8 +73,9 @@ function CommunityPage() {
       const payload = JSON.parse(raw) as any;
       setPosts((ps) => [{
         id: `shared-${Date.now()}`, user: "You", handle: "@you", time: "now",
-        category: "Milestone", text: payload.text || "Shared from my session!",
+        category: "Milestone", text: payload.kind === "result" ? "Just finished a session!" : payload.text || "Shared from my session!",
         hashtags: ["#progress"], likes: 0, comments: 0, shares: 0, thread: [],
+        result: payload.kind === "result" ? { title: payload.title, score: payload.score } : undefined,
       }, ...ps]);
       toast.success("Shared to Community");
     } catch {}
@@ -238,6 +242,12 @@ function CommunityPage() {
           <p className="px-3 pb-3 text-sm leading-relaxed">
             {p.text} {p.hashtags && <span className="text-primary font-medium">{p.hashtags.join(" ")}</span>}
           </p>
+          {p.result && (
+            <div className="mx-3 mb-3 flex flex-col items-center gap-3 rounded-2xl border border-border bg-[radial-gradient(120%_90%_at_100%_0%,color-mix(in_oklab,var(--primary)_22%,transparent),transparent_60%)] bg-background/60 px-4 py-5">
+              <ScoreRing score={p.result.score} size={88} stroke={7} />
+              <div className="text-center text-[15px] font-semibold">{p.result.title}</div>
+            </div>
+          )}
           <footer className="flex items-center gap-1 px-2 py-1 border-t border-border/40">
             <button onClick={() => toggleLike(p.id)} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs ${p.liked ? "text-destructive" : "text-muted-foreground"}`}>
               <Heart className={`h-4 w-4 ${p.liked ? "fill-destructive" : ""}`} /> {p.likes}

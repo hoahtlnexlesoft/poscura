@@ -5,6 +5,7 @@ import { Play, Calendar, Dumbbell, Clock, CheckCircle2, XCircle, AlertTriangle, 
 import { WorkoutSession } from "@/components/WorkoutSession";
 import { ExerciseIntro } from "@/components/ExerciseIntro";
 import { WorkoutAssessment } from "@/components/WorkoutAssessment";
+import { SessionResult } from "@/components/SessionResult";
 import { WorkoutProgramDetail } from "@/components/WorkoutProgramDetail";
 import { ExerciseDetail } from "@/components/ExerciseDetail";
 import { NEXT_WORKOUT, TODAYS_WORKOUTS, TODAY_TIME } from "@/lib/todays-workouts";
@@ -32,7 +33,8 @@ type View =
   | { kind: "list" }
   | { kind: "intro"; name: string }
   | { kind: "session"; name: string }
-  | { kind: "assessment"; name: string; recordedUrl: string | null }
+  | { kind: "result"; name: string; score: number; recordedUrl: string | null }
+  | { kind: "assessment"; name: string; score: number; recordedUrl: string | null }
   | { kind: "exercise"; name: string }
   | { kind: "program" };
 
@@ -54,12 +56,30 @@ function WorkoutPage() {
         session={(w?.done ?? 0) + 1}
         sessions={w?.sessions ?? 1}
         onClose={() => setView({ kind: "list" })}
-        onFinish={(url) => setView({ kind: "assessment", name: view.name, recordedUrl: url })}
+        // form tracking is simulated in the prototype: a plausible accuracy score for the finished session
+        onFinish={(url) => setView({ kind: "result", name: view.name, score: 58 + Math.floor(Math.random() * 40), recordedUrl: url })}
         onNext={next ? () => setView({ kind: "intro", name: next.name }) : undefined}
       />
     );
   }
-  if (view.kind === "assessment") return <WorkoutAssessment workoutName={view.name} recordedVideoUrl={view.recordedUrl} onClose={() => setView({ kind: "list" })} />;
+  if (view.kind === "result") {
+    const idx = TODAYS_WORKOUTS.findIndex((x) => x.name === view.name);
+    const w = TODAYS_WORKOUTS[idx];
+    const nw = idx >= 0 ? TODAYS_WORKOUTS[idx + 1] : undefined;
+    return (
+      <SessionResult
+        workoutName={view.name}
+        session={(w?.done ?? 0) + 1}
+        sessions={w?.sessions ?? 1}
+        score={view.score}
+        next={nw ? { name: nw.name, session: nw.done + 1, sessions: nw.sessions } : undefined}
+        onEvaluation={() => setView({ kind: "assessment", name: view.name, score: view.score, recordedUrl: view.recordedUrl })}
+        onContinue={nw ? () => setView({ kind: "intro", name: nw.name }) : undefined}
+        onDone={() => setView({ kind: "list" })}
+      />
+    );
+  }
+  if (view.kind === "assessment") return <WorkoutAssessment workoutName={view.name} recordedVideoUrl={view.recordedUrl} onClose={() => setView({ kind: "result", name: view.name, score: view.score, recordedUrl: view.recordedUrl })} />;
   if (view.kind === "exercise") return <ExerciseDetail exerciseName={view.name} badge="Completed" onClose={() => setView({ kind: "list" })} />;
   if (view.kind === "program") return <WorkoutProgramDetail onClose={() => setView({ kind: "list" })} onStartSession={(name) => setView({ kind: "intro", name })} />;
 
