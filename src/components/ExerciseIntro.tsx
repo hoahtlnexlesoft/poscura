@@ -21,7 +21,7 @@ export function ExerciseIntro({
   const items = g[tab];
 
   return (
-    <div className="pb-4">
+    <div data-screen="Exercise intro" className="pb-4">
       <div className="flex items-center gap-2">
         <button onClick={onBack} aria-label="Back" className="flex h-9 w-9 -ml-1.5 items-center justify-center rounded-full hover:bg-muted">
           <ChevronLeft className="h-5 w-5" />

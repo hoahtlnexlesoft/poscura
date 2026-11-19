@@ -458,7 +458,7 @@ export function LivePostureView({ timeLeft, onEnd, onReading }: { timeLeft: stri
   );
 
   return (
-    <div>
+    <div data-screen="Live monitoring">
       {/* ---------- live view ---------- */}
       {/* 9:16 camera frame, sized by the screen height so the status bar stays in view */}
       <div ref={wrapRef} className="relative isolate flex justify-center overflow-hidden bg-[#04070d]">

@@ -108,7 +108,7 @@ export function WorkoutSession({ workoutName, videoSrc, session = 1, sessions = 
   const pct = Math.min(100, (elapsed / duration) * 100);
 
   return (
-    <div className="fixed inset-0 z-[60] flex flex-col bg-black text-white">
+    <div data-screen="Guided session" className="fixed inset-0 z-[60] flex flex-col bg-black text-white">
       {/* stage */}
       <div className="relative min-h-0 flex-1">
         {/* vertical guide video */}
