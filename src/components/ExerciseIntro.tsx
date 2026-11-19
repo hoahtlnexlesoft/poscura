@@ -1,6 +1,6 @@
 import { useImmersive } from "@/hooks/useImmersive";
 import { useState } from "react";
-import { Armchair, ChevronLeft, Play, ShieldCheck, SkipForward, Target } from "lucide-react";
+import { Armchair, ChevronLeft, Lightbulb, Play, ShieldCheck, SkipForward, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { guideFor, type Motion } from "@/lib/exercise-guides";
 
@@ -70,14 +70,15 @@ export function ExerciseIntro({
 
         {/* right: how to, safety, start */}
         <div className="mt-4 land:mt-0">
-          <div className="flex gap-2">
+          {/* one segmented track instead of three loose pills */}
+          <div className="grid grid-cols-3 rounded-full border border-white/[0.06] bg-white/[0.03] p-1">
             {TABS.map((t) => (
               <button
                 key={t.id}
                 onClick={() => setTab(t.id)}
                 className={cn(
-                  "h-9 rounded-full border px-4 text-sm font-medium transition",
-                  tab === t.id ? "border-primary/50 bg-primary/15 text-primary" : "border-border text-muted-foreground hover:text-foreground",
+                  "h-8 rounded-full text-[13px] font-medium transition",
+                  tab === t.id ? "bg-white/[0.09] text-foreground shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]" : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 {t.label}
@@ -85,31 +86,38 @@ export function ExerciseIntro({
             ))}
           </div>
 
-          <ol className="mt-4 space-y-0">
+          <ol key={tab} className="mt-3 overflow-hidden rounded-[18px] border border-white/[0.06] bg-card animate-in fade-in duration-300">
             {items.map((s, i) => (
-              <li key={s.title} className="relative flex gap-3.5 pb-4 last:pb-0">
-                {i < items.length - 1 && <span aria-hidden className="absolute left-[15px] top-8 bottom-0 w-px bg-border" />}
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-white">{i + 1}</span>
-                <div className="pt-0.5">
-                  <div className="text-[15px] font-semibold">{s.title}</div>
-                  <div className="mt-0.5 text-sm leading-relaxed text-muted-foreground">{s.text}</div>
+              <li key={s.title} className="relative flex gap-3.5 px-4 py-3.5 [&+&]:border-t [&+&]:border-white/[0.05]">
+                <span className="mt-px flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/12 text-[12.5px] font-semibold tabular-nums text-primary ring-1 ring-inset ring-primary/25">{i + 1}</span>
+                <div className="min-w-0">
+                  <div className="text-[14.5px] font-semibold leading-snug">{s.title}</div>
+                  <div className="mt-1 text-[13px] leading-relaxed text-muted-foreground">{s.text}</div>
                 </div>
               </li>
             ))}
+            {tab === "steps" && g.tip && (
+              <li className="flex items-start gap-2.5 border-t border-white/[0.05] bg-white/[0.02] px-4 py-3 text-[12.5px] leading-relaxed text-muted-foreground">
+                <Lightbulb className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warning" />
+                <span>{g.tip}</span>
+              </li>
+            )}
           </ol>
-          {tab === "steps" && <p className="mt-3 text-xs text-muted-foreground">{g.tip}</p>}
 
-          <div className="mt-4 flex gap-2.5 rounded-xl bg-muted/40 p-3 text-xs leading-relaxed text-muted-foreground">
+          <div className="mt-3 flex gap-2.5 rounded-[14px] border border-white/[0.06] px-3.5 py-3 text-[12px] leading-relaxed text-muted-foreground">
             <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
             Move slowly and only within a comfortable range. Stop if you feel pain, numbness or dizziness.
           </div>
 
-          <button
-            onClick={onStart}
-            className="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-secondary text-[15px] font-semibold text-white shadow-[0_10px_30px_-12px] shadow-primary transition hover:opacity-95 active:scale-[0.99]"
-          >
-            <Play className="h-4 w-4 fill-current" /> Start
-          </button>
+          {/* pinned to the bottom of the screen so Start is always in reach, with the content fading out behind it */}
+          <div className="sticky bottom-0 z-10 -mx-4 mt-4 bg-gradient-to-t from-background from-60% to-transparent px-4 pb-4 pt-6">
+            <button
+              onClick={onStart}
+              className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-secondary text-[15px] font-semibold text-white shadow-[0_10px_30px_-12px] shadow-primary transition hover:opacity-95 active:scale-[0.99]"
+            >
+              <Play className="h-4 w-4 fill-current" /> Start
+            </button>
+          </div>
         </div>
       </div>
     </div>
