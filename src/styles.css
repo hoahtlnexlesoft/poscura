@@ -24,6 +24,7 @@
 @media (min-width: 800px) and (min-height: 600px) and (orientation: landscape) {
   .hinge-split { display: grid !important; grid-template-columns: calc(50vw - 28px) minmax(0, 1fr) !important; column-gap: 24px !important; }
   .hinge-split > * { margin-bottom: 0 !important; }
+  .hinge-split > [data-pd-bar] { margin-bottom: -24px !important; } /* comment bar runs to the screen edge */
 }
 
 @theme inline {

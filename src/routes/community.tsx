@@ -384,7 +384,7 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
   const reply = (c: Comment) => { setReplyTo(c); inputRef.current?.focus(); };
 
   return (
-    <div data-screen="Post details" className="hinge-split flex min-h-[calc(100dvh-var(--pd-off,104px))] flex-col">
+    <div data-screen="Post details" className="hinge-split flex min-h-[calc(100dvh-var(--pd-off,104px))] flex-col land:grid-rows-[1fr_auto]">
       {/* ---------- post ---------- */}
       <section className="land:self-start">
         <div className="mb-3 flex items-center gap-2">
@@ -487,31 +487,32 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
           ))}
         </div>
 
-        {/* composer stays in reach at the bottom */}
-        <div className="sticky bottom-0 z-10 -mx-4 -mb-6 mt-auto border-t border-white/[0.06] bg-background px-4 pb-3 pt-3 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-10 after:bg-background">
-          {replyTo && (
-            <div className="mb-2 flex items-center gap-2 text-[12px] text-muted-foreground">
-              <span>Replying to <b className="font-medium text-foreground">{replyTo.user}</b></span>
-              <button onClick={() => setReplyTo(null)} aria-label="Cancel reply" className="ml-auto rounded-full p-1 hover:bg-white/[0.05]"><X className="h-3.5 w-3.5" /></button>
-            </div>
-          )}
-          <div className="flex items-center gap-2 rounded-full border border-white/[0.08] bg-card py-1.5 pl-1.5 pr-1.5 focus-within:border-primary/40">
-            <Avatar name="You" size={30} />
-            <input
-              ref={inputRef}
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
-              placeholder={replyTo ? `Reply to ${replyTo.user}` : "Write a comment…"}
-              className="min-w-0 flex-1 bg-transparent px-1 text-[13.5px] outline-none placeholder:text-muted-foreground"
-            />
-            <button onClick={submit} disabled={!text.trim()} aria-label="Send"
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-primary to-secondary text-white transition disabled:opacity-30">
-              <Send className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        </div>
       </section>
+
+      {/* composer: a child of the page (not the comment column) so it stays pinned even when the post is taller than the screen */}
+      <div data-pd-bar className="sticky bottom-0 z-10 -mx-4 -mb-6 mt-auto land:col-start-2 land:row-start-2 land:mt-0 border-t border-white/[0.06] bg-background px-4 pb-3 pt-3 shadow-[0_40px_0_0_var(--background)]">
+        {replyTo && (
+          <div className="mb-2 flex items-center gap-2 text-[12px] text-muted-foreground">
+            <span>Replying to <b className="font-medium text-foreground">{replyTo.user}</b></span>
+            <button onClick={() => setReplyTo(null)} aria-label="Cancel reply" className="ml-auto rounded-full p-1 hover:bg-white/[0.05]"><X className="h-3.5 w-3.5" /></button>
+          </div>
+        )}
+        <div className="flex items-center gap-2 rounded-full border border-white/[0.08] bg-card py-1.5 pl-1.5 pr-1.5 focus-within:border-primary/40">
+          <Avatar name="You" size={30} />
+          <input
+            ref={inputRef}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
+            placeholder={replyTo ? `Reply to ${replyTo.user}` : "Write a comment…"}
+            className="min-w-0 flex-1 bg-transparent px-1 text-[13.5px] outline-none placeholder:text-muted-foreground"
+          />
+          <button onClick={submit} disabled={!text.trim()} aria-label="Send"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-primary to-secondary text-white transition disabled:opacity-30">
+            <Send className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </div>
 
       {zoom && <Lightbox list={zoom.list} start={zoom.i} onClose={() => setZoom(null)} />}
     </div>
