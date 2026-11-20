@@ -237,3 +237,4 @@ html { scrollbar-gutter: stable; }
 /* onboarding's pinned footer stays clear of the Duo camera / status column too */
 html[data-side] [data-ob-footer] { padding-right: 108px; } /* shell 92px (sub page) + main 16px, so the button lines up with the content above */
 html[data-side] [data-lightbox-close] { right: 84px !important; }
+html[data-side] [data-lightbox-next] { right: 84px !important; }

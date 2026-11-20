@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9fd3f2"/><stop offset="1" stop-color="#e8f4f6"/></linearGradient>
+    <linearGradient id="hill1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fcf8a"/><stop offset="1" stop-color="#5fae7d"/></linearGradient>
+    <linearGradient id="hill2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6dbb7e"/><stop offset="1" stop-color="#3f8f63"/></linearGradient>
+    <linearGradient id="path" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9d9bd"/><stop offset="1" stop-color="#d6bf98"/></linearGradient>
+  </defs>
+  <rect width="800" height="800" fill="url(#sky)"/>
+  <circle cx="620" cy="170" r="70" fill="#fff3c4"/><circle cx="620" cy="170" r="110" fill="#fff3c4" opacity=".35"/>
+  <path d="M120 150 q30-24 60 0 q24-18 48 4 q-60 14 -108 -4z" fill="#fff" opacity=".9"/>
+  <path d="M420 110 q26-20 52 0 q20-14 40 4 q-50 12 -92 -4z" fill="#fff" opacity=".8"/>
+  <path d="M0 470 Q200 360 420 430 T800 400 V800 H0z" fill="url(#hill1)"/>
+  <path d="M0 560 Q240 470 480 540 T800 520 V800 H0z" fill="url(#hill2)"/>
+  <path d="M330 800 C 380 690 450 620 520 560 C 560 528 600 520 640 516 L 660 520 C 610 540 560 580 520 640 C 480 700 470 760 480 800z" fill="url(#path)"/>
+  <!-- trees -->
+  <g><rect x="140" y="420" width="14" height="80" fill="#6b4b33"/><circle cx="147" cy="400" r="54" fill="#4f9d6d"/><circle cx="120" cy="420" r="36" fill="#5fae7d"/><circle cx="176" cy="424" r="34" fill="#3f8f63"/></g>
+  <g><rect x="690" y="430" width="12" height="70" fill="#6b4b33"/><circle cx="696" cy="412" r="44" fill="#3f8f63"/><circle cx="720" cy="430" r="28" fill="#5fae7d"/></g>
+  <!-- walker -->
+  <g transform="translate(540 470)">
+    <circle cx="0" cy="-70" r="16" fill="#e7b48f"/>
+    <path d="M-16 -78 q16-20 32 0 q-2-12 -16 -14 q-14 2 -16 14z" fill="#3e2a1e"/>
+    <path d="M-14 -52 h28 l6 52 h-40z" fill="#3b82f6"/>
+    <path d="M-10 0 l-14 54" stroke="#1d2433" stroke-width="10" stroke-linecap="round"/>
+    <path d="M10 0 l18 50" stroke="#1d2433" stroke-width="10" stroke-linecap="round"/>
+    <path d="M-14 -46 l-18 34" stroke="#e7b48f" stroke-width="8" stroke-linecap="round"/>
+    <path d="M14 -46 l18 30" stroke="#e7b48f" stroke-width="8" stroke-linecap="round"/>
+    <path d="M-30 56 h14 M24 52 h14" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
+  </g>
+  <!-- step badge -->
+  <g transform="translate(70 640)">
+    <rect width="230" height="96" rx="22" fill="#0f1a31" opacity=".88"/>
+    <text x="24" y="40" font-family="Helvetica, Arial, sans-serif" font-size="16" letter-spacing="2" fill="#8ea0bf">MORNING WALK</text>
+    <text x="24" y="76" font-family="Helvetica, Arial, sans-serif" font-size="30" font-weight="700" fill="#fff">6,240 steps</text>
+  </g>
+</svg>
