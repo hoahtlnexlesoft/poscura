@@ -2,6 +2,8 @@ import { ScoreRing } from "@/components/SessionResult";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useImmersive } from "@/hooks/useImmersive";
+import deskSetupImg from "@/assets/demo-desk-setup.svg";
+import stretchBreakImg from "@/assets/demo-stretch-break.svg";
 import { cn } from "@/lib/utils";
 import {
   Heart, MessageCircle, Share2, BadgeCheck, Send, X, ChevronLeft,
@@ -16,12 +18,14 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/community")({ component: CommunityPage });
 
-type Comment = { id: string; user: string; time: string; text: string; likes?: number; liked?: boolean; replies?: Comment[] };
+type Comment = { id: string; user: string; time: string; text: string; likes?: number; liked?: boolean; replies?: Comment[]; image?: string };
 type Post = {
   id: string; user: string; handle: string; time: string;
   verified?: boolean; pinned?: boolean; category: string; text: string;
   hashtags?: string[]; likes: number; comments: number; shares: number;
   liked?: boolean; thread?: Comment[];
+  /** photo attached to the post */
+  image?: string;
   /** a finished workout session shared from its result screen */
   result?: { title: string; score: number };
 };
@@ -34,6 +38,14 @@ const SEED_POSTS: Post[] = [
         { id: "c01r1", user: "Poscura Team", time: "32m", text: "Love to hear it. You can tune how sensitive they are in Settings → Alerts.", likes: 5 },
       ] },
       { id: "c02", user: "Ben Hughes", time: "25m", text: "Is this coming to the free plan later?", likes: 3 },
+    ] },
+  { id: "p4", user: "Linh Pham", handle: "@linhp", time: "1h", category: "Milestone",
+    text: "Finally sorted my desk after the ergonomics webinar: monitor on an arm at eye level, laptop on a stand, lamp off to the side. Neck feels so much better by 5pm.",
+    hashtags: ["#desksetup", "#progress"], image: deskSetupImg, likes: 204, comments: 3, shares: 12, thread: [
+      { id: "c41", user: "Ruby Nguyen", time: "52m", text: "That light is gorgeous. Here's my afternoon reset kit 👇", image: stretchBreakImg, likes: 18, replies: [
+        { id: "c41r1", user: "Linh Pham", time: "40m", text: "Stealing the checklist idea!", likes: 4 },
+      ] },
+      { id: "c42", user: "Dr. Naomi Park", time: "35m", text: "Textbook setup. Top of the screen at eye level is exactly right.", likes: 11 },
     ] },
   { id: "p1", user: "Alex Kovacs", handle: "@alexk", time: "2h", category: "Milestone",
     text: "Hit a 90 posture score for the first time today after 3 weeks of the neck plan!",
@@ -286,6 +298,11 @@ function CommunityPage() {
           <p onClick={() => setDetailId(p.id)} className="cursor-pointer px-3 pb-3 text-sm leading-relaxed">
             {p.text} {p.hashtags && <span className="text-primary font-medium">{p.hashtags.join(" ")}</span>}
           </p>
+          {p.image && (
+            <button onClick={() => setDetailId(p.id)} className="mx-3 mb-3 block overflow-hidden rounded-2xl border border-white/[0.06]" style={{ width: "calc(100% - 1.5rem)" }}>
+              <img src={p.image} alt="" className="aspect-[3/2] w-full object-cover transition duration-500 hover:scale-[1.02]" />
+            </button>
+          )}
           {p.result && (
             <div className="mx-3 mb-3 flex flex-col items-center gap-3 rounded-2xl border border-border bg-[radial-gradient(120%_90%_at_100%_0%,color-mix(in_oklab,var(--primary)_22%,transparent),transparent_60%)] bg-background/60 px-4 py-5">
               <ScoreRing score={p.result.score} size={88} stroke={7} />
@@ -329,6 +346,7 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
   useImmersive();
   const [text, setText] = useState("");
   const [replyTo, setReplyTo] = useState<Comment | null>(null);
+  const [zoom, setZoom] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const thread = post.thread || [];
   const total = thread.reduce((n, c) => n + 1 + (c.replies?.length || 0), 0);
@@ -341,9 +359,9 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
   const reply = (c: Comment) => { setReplyTo(c); inputRef.current?.focus(); };
 
   return (
-    <div data-screen="Post details" className="hinge-split land:items-start">
+    <div data-screen="Post details" className="hinge-split flex min-h-[calc(100dvh-var(--pd-off,96px))] flex-col">
       {/* ---------- post ---------- */}
-      <section className="land:sticky land:top-4">
+      <section className="land:self-start">
         <div className="mb-3 flex items-center gap-2">
           <button onClick={onBack} aria-label="Back" className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.08] text-foreground/80 transition hover:border-primary/40 hover:text-foreground">
             <ChevronLeft className="h-[18px] w-[18px]" />
@@ -370,6 +388,11 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
             {post.text} {post.hashtags && <span className="font-medium text-primary">{post.hashtags.join(" ")}</span>}
           </p>
 
+          {post.image && (
+            <button onClick={() => setZoom(post.image!)} className="mx-4 mb-4 block overflow-hidden rounded-2xl border border-white/[0.06]" style={{ width: "calc(100% - 2rem)" }}>
+              <img src={post.image} alt="" className="aspect-[3/2] w-full object-cover land:aspect-[16/9]" />
+            </button>
+          )}
           {post.result && (
             <div className="mx-4 mb-4 flex flex-col items-center gap-3 rounded-2xl border border-white/[0.06] bg-background/50 px-4 py-6">
               <ScoreRing score={post.result.score} size={96} stroke={7} />
@@ -397,7 +420,8 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
       </section>
 
       {/* ---------- conversation ---------- */}
-      <section className="mt-5 land:mt-0 land:flex land:min-h-[calc(100dvh-140px)] land:flex-col">
+      {/* fills the rest of the screen so the composer always sits at the bottom, however short the thread */}
+      <section className="mt-5 flex flex-1 flex-col land:mt-0">
         <div className="mb-3 flex items-baseline gap-2 land:pt-[38px]">
           <h2 className="text-[14px] font-semibold">Comments & replies</h2>
           <span className="text-[12px] text-muted-foreground">{total}</span>
@@ -412,10 +436,10 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
           )}
           {thread.map((c) => (
             <div key={c.id}>
-              <CommentRow c={c} onLike={() => onLikeComment(c.id)} onReply={() => reply(c)} />
+              <CommentRow c={c} onLike={() => onLikeComment(c.id)} onReply={() => reply(c)} onZoom={setZoom} />
               {!!c.replies?.length && (
                 <div className="ml-[18px] mt-3 space-y-3 border-l border-white/[0.07] pl-[22px]">
-                  {c.replies.map((r) => <CommentRow key={r.id} c={r} small onLike={() => onLikeComment(r.id)} onReply={() => reply(c)} />)}
+                  {c.replies.map((r) => <CommentRow key={r.id} c={r} small onLike={() => onLikeComment(r.id)} onReply={() => reply(c)} onZoom={setZoom} />)}
                 </div>
               )}
             </div>
@@ -423,7 +447,7 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
         </div>
 
         {/* composer stays in reach at the bottom */}
-        <div className="sticky bottom-0 z-10 -mx-4 bg-gradient-to-t from-background from-70% to-transparent px-4 pb-4 pt-5">
+        <div className="sticky bottom-0 z-10 -mx-4 mt-auto bg-gradient-to-t from-background from-70% to-transparent px-4 pb-4 pt-5">
           {replyTo && (
             <div className="mb-2 flex items-center gap-2 text-[12px] text-muted-foreground">
               <span>Replying to <b className="font-medium text-foreground">{replyTo.user}</b></span>
@@ -447,11 +471,18 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
           </div>
         </div>
       </section>
+
+      {zoom && (
+        <div onClick={() => setZoom(null)} className="fixed inset-0 z-[70] flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+          <img src={zoom} alt="" className="max-h-full max-w-full rounded-2xl object-contain shadow-2xl" />
+          <button data-lightbox-close aria-label="Close" className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white"><X className="h-4 w-4" /></button>
+        </div>
+      )}
     </div>
   );
 }
 
-function CommentRow({ c, small, onLike, onReply }: { c: Comment; small?: boolean; onLike: () => void; onReply: () => void }) {
+function CommentRow({ c, small, onLike, onReply, onZoom }: { c: Comment; small?: boolean; onLike: () => void; onReply: () => void; onZoom: (src: string) => void }) {
   return (
     <div className="flex gap-2.5">
       <Avatar name={c.user} size={small ? 28 : 34} />
@@ -463,6 +494,11 @@ function CommentRow({ c, small, onLike, onReply }: { c: Comment; small?: boolean
           </div>
           <p className="mt-0.5 text-[13.5px] leading-relaxed text-foreground/90">{c.text}</p>
         </div>
+        {c.image && (
+          <button onClick={() => onZoom(c.image!)} className="mt-1.5 block w-full max-w-[240px] overflow-hidden rounded-[14px] border border-white/[0.06]">
+            <img src={c.image} alt="" className="aspect-square w-full object-cover transition duration-500 hover:scale-[1.03]" />
+          </button>
+        )}
         <div className="mt-1 flex items-center gap-4 pl-3.5 text-[11.5px] font-medium text-muted-foreground">
           <button onClick={onLike} className={cn("inline-flex items-center gap-1 transition hover:text-foreground", c.liked && "text-destructive hover:text-destructive")}>
             <Heart className={cn("h-3 w-3", c.liked && "fill-destructive")} />{c.likes ? c.likes : "Like"}
