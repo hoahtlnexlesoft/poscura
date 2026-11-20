@@ -237,5 +237,7 @@ html[data-side] [data-ws-top], html[data-side] [data-ws-pip] { right: 76px !impo
 html { scrollbar-gutter: stable; }
 /* onboarding's pinned footer stays clear of the Duo camera / status column too */
 html[data-side] [data-ob-footer] { padding-right: 108px; } /* shell 92px (sub page) + main 16px, so the button lines up with the content above */
-html[data-side] [data-lightbox-close] { right: 84px !important; }
-html[data-side] [data-lightbox-next] { right: 84px !important; }
+html[data-side] [data-lightbox-close] { right: 20px !important; top: 84px !important; }
+/* Duo: the photo keeps clear of the camera / status column, the close button sits in it */
+html[data-side] [data-lightbox] { padding-right: 84px; }
+html[data-side] [data-lightbox] img { max-width: 100%; }

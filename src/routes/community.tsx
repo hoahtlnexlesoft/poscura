@@ -2,6 +2,7 @@ import { ScoreRing } from "@/components/SessionResult";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useImmersive } from "@/hooks/useImmersive";
+import { useAuth } from "@/lib/auth-store";
 import deskSetupImg from "@/assets/demo-desk-setup.svg";
 import stretchBreakImg from "@/assets/demo-stretch-break.svg";
 import parkWalkImg from "@/assets/demo-park-walk.svg";
@@ -92,11 +93,21 @@ const SEED_POSTS: Post[] = [
 
 const initials = (name: string) => name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
 
+/** Each person gets their own soft tone (stable per name); "You" shows your own initials on a neutral chip,
+ *  so avatars never read as buttons. */
+const AVATAR_TONES = [
+  ["oklch(0.42 0.08 250)", "oklch(0.85 0.06 250)"], ["oklch(0.42 0.08 165)", "oklch(0.86 0.07 165)"],
+  ["oklch(0.44 0.09 30)", "oklch(0.87 0.06 40)"], ["oklch(0.42 0.08 300)", "oklch(0.86 0.06 300)"],
+  ["oklch(0.45 0.08 85)", "oklch(0.9 0.07 90)"], ["oklch(0.42 0.07 200)", "oklch(0.87 0.06 200)"],
+];
 function Avatar({ name, size = 36 }: { name: string; size?: number }) {
+  const me = useAuth();
+  const isYou = name === "You";
+  const [bg, fg] = AVATAR_TONES[[...name].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) >>> 0, 7) % AVATAR_TONES.length];
   return (
-    <div className="rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center font-bold text-white shrink-0"
-      style={{ width: size, height: size, fontSize: size * 0.36 }}>
-      {initials(name)}
+    <div className="flex shrink-0 items-center justify-center rounded-full font-semibold ring-1 ring-inset ring-white/10"
+      style={{ width: size, height: size, fontSize: size * 0.36, background: isYou ? "rgba(255,255,255,0.08)" : bg, color: isYou ? "var(--foreground)" : fg }}>
+      {isYou ? me?.initials || "Y" : initials(name)}
     </div>
   );
 }
@@ -376,8 +387,27 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
   const thread = post.thread || [];
   const total = thread.reduce((n, c) => n + 1 + (c.replies?.length || 0), 0);
 
+  // after sending, jump to the new comment and flash it so the user sees where it landed
+  const [flash, setFlash] = useState<string | null>(null);
+  const known = useRef<Set<string>>(new Set());
+  const awaiting = useRef(false);
+  useEffect(() => {
+    const ids = thread.flatMap((c) => [c.id, ...(c.replies || []).map((r) => r.id)]);
+    const fresh = ids.find((id) => !known.current.has(id));
+    known.current = new Set(ids);
+    if (!awaiting.current || !fresh) return;
+    awaiting.current = false;
+    const parent = thread.find((c) => c.replies?.some((r) => r.id === fresh));
+    if (parent) setExpanded((e) => ({ ...e, [parent.id]: true }));
+    setFlash(fresh);
+    // wait a frame for collapsed replies to expand before scrolling
+    window.setTimeout(() => document.querySelector(`[data-cid="${fresh}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" }), 60);
+    window.setTimeout(() => setFlash(null), 1800);
+  }, [thread]);
+
   const submit = () => {
     if (!text.trim()) return;
+    awaiting.current = true;
     onComment(text.trim(), replyTo?.id);
     setText(""); setReplyTo(null);
   };
@@ -472,10 +502,10 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
           )}
           {thread.map((c) => (
             <div key={c.id}>
-              <CommentRow c={c} onLike={() => onLikeComment(c.id)} onReply={() => reply(c)} onZoom={(src) => setZoom({ list: [src], i: 0 })} />
+              <CommentRow c={c} onLike={() => onLikeComment(c.id)} onReply={() => reply(c)} onZoom={(src) => setZoom({ list: [src], i: 0 })} flash={flash} />
               {!!c.replies?.length && (
                 <div className="ml-[18px] mt-3 space-y-3 border-l border-white/[0.07] pl-[22px]">
-                  {(expanded[c.id] ? c.replies : c.replies.slice(0, 2)).map((r) => <CommentRow key={r.id} c={r} small onLike={() => onLikeComment(r.id)} onReply={() => reply(c)} onZoom={(src) => setZoom({ list: [src], i: 0 })} />)}
+                  {(expanded[c.id] ? c.replies : c.replies.slice(0, 2)).map((r) => <CommentRow key={r.id} c={r} small onLike={() => onLikeComment(r.id)} onReply={() => reply(c)} onZoom={(src) => setZoom({ list: [src], i: 0 })} flash={flash} />)}
                   {c.replies.length > 2 && !expanded[c.id] && (
                     <button onClick={() => setExpanded((e) => ({ ...e, [c.id]: true }))} className="inline-flex items-center gap-2 text-[12px] font-medium text-muted-foreground transition hover:text-foreground">
                       <span className="h-px w-5 bg-white/15" />View {c.replies.length - 2} more {c.replies.length - 2 === 1 ? "reply" : "replies"}
@@ -508,7 +538,7 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
             className="min-w-0 flex-1 bg-transparent px-1 text-[13.5px] outline-none placeholder:text-muted-foreground"
           />
           <button onClick={submit} disabled={!text.trim()} aria-label="Send"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-primary to-secondary text-white transition disabled:opacity-30">
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-white transition-all disabled:bg-transparent disabled:text-muted-foreground/60">
             <Send className="h-3.5 w-3.5" />
           </button>
         </div>
@@ -519,12 +549,13 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
   );
 }
 
-function CommentRow({ c, small, onLike, onReply, onZoom }: { c: Comment; small?: boolean; onLike: () => void; onReply: () => void; onZoom: (src: string) => void }) {
+function CommentRow({ c, small, onLike, onReply, onZoom, flash }: { c: Comment; small?: boolean; onLike: () => void; onReply: () => void; onZoom: (src: string) => void; flash?: string | null }) {
   return (
-    <div className="flex gap-2.5">
+    <div data-cid={c.id} className="flex scroll-mb-24 gap-2.5">
       <Avatar name={c.user} size={small ? 28 : 34} />
       <div className="min-w-0 flex-1">
-        <div className="rounded-[16px] rounded-tl-[6px] bg-white/[0.04] px-3.5 py-2.5">
+        <div className={cn("rounded-[16px] rounded-tl-[6px] bg-white/[0.04] px-3.5 py-2.5 transition-[background-color,box-shadow] duration-700",
+          flash === c.id && "bg-primary/15 shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--primary)_45%,transparent)]")}>
           <div className="flex items-baseline gap-2">
             <span className="truncate text-[13px] font-semibold">{c.user}</span>
             <span className="shrink-0 text-[11px] text-muted-foreground">{c.time}</span>
@@ -806,17 +837,21 @@ function PostMedia({ post, large, onOpen }: { post: Post; large?: boolean; onOpe
 function Lightbox({ list, start, onClose }: { list: string[]; start: number; onClose: () => void }) {
   const [i, setI] = useState(start);
   const go = (d: number) => setI((x) => (x + d + list.length) % list.length);
+  const arrow = "absolute top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white outline-none backdrop-blur-md transition hover:bg-black/60 focus-visible:ring-2 focus-visible:ring-white/60";
   return (
-    <div onClick={onClose} className="fixed inset-0 z-[70] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm animate-in fade-in duration-200">
-      <img key={i} src={list[i]} alt="" onClick={(e) => e.stopPropagation()} className="max-h-full max-w-full rounded-2xl object-contain shadow-2xl animate-in fade-in zoom-in-95 duration-200" />
-      <button data-lightbox-close aria-label="Close" className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white"><X className="h-4 w-4" /></button>
-      {list.length > 1 && (
-        <>
-          <button onClick={(e) => { e.stopPropagation(); go(-1); }} aria-label="Previous" className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-md hover:bg-white/20"><ChevronLeft className="h-5 w-5" /></button>
-          <button data-lightbox-next onClick={(e) => { e.stopPropagation(); go(1); }} aria-label="Next" className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-md hover:bg-white/20"><ChevronRight className="h-5 w-5" /></button>
-          <span className="absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-white/10 px-3 py-1 text-[12px] font-medium tabular-nums text-white">{i + 1} / {list.length}</span>
-        </>
-      )}
+    <div data-lightbox onClick={onClose} className="fixed inset-0 z-[70] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+      {/* arrows sit inside the photo, mirrored, so they line up on every screen */}
+      <div onClick={(e) => e.stopPropagation()} className="relative max-h-full max-w-full">
+        <img key={i} src={list[i]} alt="" className="block max-h-[calc(100dvh-2rem)] max-w-full rounded-2xl object-contain shadow-2xl animate-in fade-in zoom-in-95 duration-200" />
+        {list.length > 1 && (
+          <>
+            <button onClick={() => go(-1)} aria-label="Previous" className={cn(arrow, "left-3")}><ChevronLeft className="h-5 w-5" /></button>
+            <button onClick={() => go(1)} aria-label="Next" className={cn(arrow, "right-3")}><ChevronRight className="h-5 w-5" /></button>
+            <span className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/45 px-3 py-1 text-[12px] font-medium tabular-nums text-white backdrop-blur-md">{i + 1} / {list.length}</span>
+          </>
+        )}
+      </div>
+      <button data-lightbox-close aria-label="Close" className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white outline-none"><X className="h-4 w-4" /></button>
     </div>
   );
 }
