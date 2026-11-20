@@ -417,7 +417,7 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
     <div data-screen="Post details" className="hinge-split flex min-h-[calc(100dvh-var(--pd-off,104px))] flex-col land:grid-rows-[1fr_auto]">
       {/* ---------- post ---------- */}
       {/* open foldables: the post stays put while the conversation scrolls; a tall post scrolls inside its own pane */}
-      <section className="land:sticky land:top-[72px] land:row-span-2 land:flex land:h-[calc(100dvh-84px)] land:flex-col land:self-start">
+      <section className="land:sticky land:top-[72px] land:row-span-2 land:flex land:max-h-[calc(100dvh-84px)] land:flex-col land:self-start">
         <div className="mb-3 flex items-center gap-2">
           <button onClick={onBack} aria-label="Back" className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.08] text-foreground/80 transition hover:border-primary/40 hover:text-foreground">
             <ChevronLeft className="h-[18px] w-[18px]" />
@@ -425,7 +425,7 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
           <h1 className="text-[17px] font-semibold tracking-tight">Post</h1>
         </div>
 
-        <article className={cn("overflow-hidden rounded-[22px] border bg-card land:flex land:min-h-0 land:flex-1 land:flex-col",
+        <article className={cn("overflow-hidden rounded-[22px] border bg-card land:flex land:min-h-0 land:flex-col",
           post.pinned ? "border-primary/25 bg-[radial-gradient(120%_80%_at_100%_0%,color-mix(in_oklab,var(--primary)_14%,transparent),transparent_60%)]" : "border-white/[0.06]")}>
           {/* body scrolls on its own; the action bar below stays put */}
           <div className="land:min-h-0 land:flex-1 land:overflow-y-auto land:overscroll-contain land:[scrollbar-width:thin]">
