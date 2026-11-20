@@ -297,7 +297,7 @@ function CommunityPage() {
         <input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter" && draft.trim()) submitPost(); }}
+          onKeyDown={(e) => { if (e.key === "Enter" && !e.nativeEvent.isComposing && e.keyCode !== 229 && draft.trim()) submitPost(); }}
           placeholder="Share your progress today…"
           className="flex-1 min-w-0 bg-transparent outline-none text-sm placeholder:text-muted-foreground"
         />
@@ -409,8 +409,11 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
     window.setTimeout(() => setFlash(null), 1800);
   }, [thread]);
 
+  const sending = useRef(false);
   const submit = () => {
-    if (!text.trim()) return;
+    if (!text.trim() || sending.current) return;
+    sending.current = true;
+    window.setTimeout(() => { sending.current = false; }, 300);
     awaiting.current = true;
     onComment(text.trim(), replyTo?.id);
     setText(""); setReplyTo(null);
@@ -432,7 +435,7 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
         <article className={cn("overflow-hidden rounded-[22px] border bg-card land:flex land:min-h-0 land:flex-col",
           post.pinned ? "border-primary/25 bg-[radial-gradient(120%_80%_at_100%_0%,color-mix(in_oklab,var(--primary)_14%,transparent),transparent_60%)]" : "border-white/[0.06]")}>
           {/* body scrolls on its own; the action bar below stays put */}
-          <div className="land:min-h-0 land:flex-1 land:overflow-y-auto land:overscroll-contain land:[scrollbar-width:thin]">
+          <div className="mac-scroll land:min-h-0 land:flex-1 land:overflow-y-auto land:overscroll-contain">
           <header className="flex items-center gap-3 px-4 pt-4">
             <Avatar name={post.user} size={40} />
             <div className="min-w-0 flex-1">
@@ -545,7 +548,11 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
             ref={inputRef}
             value={text}
             onChange={(e) => setText(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
+            onKeyDown={(e) => {
+              // Vietnamese/Japanese IMEs send Enter to commit the word first: ignore that one, or the comment posts twice
+              if (e.key !== "Enter" || e.nativeEvent.isComposing || e.keyCode === 229) return;
+              e.preventDefault(); submit();
+            }}
             placeholder={replyTo ? `Reply to ${replyTo.user}` : "Write a comment…"}
             className="min-w-0 flex-1 bg-transparent px-1 text-[13.5px] outline-none placeholder:text-muted-foreground"
           />
