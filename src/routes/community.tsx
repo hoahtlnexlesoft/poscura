@@ -48,7 +48,7 @@ const SEED_POSTS: Post[] = [
       { id: "c02", user: "Ben Hughes", time: "25m", text: "Is this coming to the free plan later?", likes: 3 },
     ] },
   { id: "p4", user: "Linh Pham", handle: "@linhp", time: "1h", category: "Milestone",
-    text: "Finally sorted my desk after the ergonomics webinar: monitor on an arm at eye level, laptop on a stand, lamp off to the side. Neck feels so much better by 5pm.",
+    text: "Finally sorted my desk after the ergonomics webinar: monitor on an arm at eye level, laptop on a stand, lamp off to the side. Neck feels so much better by 5pm.\n\nWhat changed: the top of the screen now sits right at eye level, so I stopped craning forward. The laptop went up on a stand with a separate keyboard, elbows at about 90°. I also swapped the overhead light for a lamp off to the side, which killed the glare that had me squinting and leaning in.\n\nSmall thing that helped most: a 3pm reminder to stand, roll the shoulders and do 10 chin tucks. Poscura's alerts dropped from ~20 a day to 4 this week.",
     hashtags: ["#desksetup", "#progress"], images: [deskSetupImg], views: 1840, likes: 204, comments: 3, shares: 12, thread: [
       { id: "c41", user: "Ruby Nguyen", time: "52m", text: "That light is gorgeous. Here's my afternoon reset kit 👇", image: stretchBreakImg, likes: 18, replies: [
         { id: "c41r1", user: "Linh Pham", time: "40m", text: "Stealing the checklist idea!", likes: 4 },
@@ -331,7 +331,7 @@ function CommunityPage() {
               <div className="text-[11px] text-muted-foreground">{p.time} · {p.category}</div>
             </div>
           </header>
-          <p onClick={() => setDetailId(p.id)} className="cursor-pointer px-3 pb-3 text-sm leading-relaxed">
+          <p onClick={() => setDetailId(p.id)} className="cursor-pointer px-3 pb-3 text-sm leading-relaxed line-clamp-4 whitespace-pre-line">
             {p.text} {p.hashtags && <span className="text-primary font-medium">{p.hashtags.join(" ")}</span>}
           </p>
           {(p.images?.length || p.video) && (
@@ -417,7 +417,7 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
     <div data-screen="Post details" className="hinge-split flex min-h-[calc(100dvh-var(--pd-off,104px))] flex-col land:grid-rows-[1fr_auto]">
       {/* ---------- post ---------- */}
       {/* open foldables: the post stays put while the conversation scrolls; a tall post scrolls inside its own pane */}
-      <section className="land:sticky land:top-[72px] land:row-span-2 land:max-h-[calc(100dvh-88px)] land:self-start land:overflow-y-auto land:overscroll-contain land:[scrollbar-width:none] land:[&::-webkit-scrollbar]:hidden">
+      <section className="land:sticky land:top-[72px] land:row-span-2 land:flex land:h-[calc(100dvh-84px)] land:flex-col land:self-start">
         <div className="mb-3 flex items-center gap-2">
           <button onClick={onBack} aria-label="Back" className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.08] text-foreground/80 transition hover:border-primary/40 hover:text-foreground">
             <ChevronLeft className="h-[18px] w-[18px]" />
@@ -425,8 +425,10 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
           <h1 className="text-[17px] font-semibold tracking-tight">Post</h1>
         </div>
 
-        <article className={cn("overflow-hidden rounded-[22px] border bg-card",
+        <article className={cn("overflow-hidden rounded-[22px] border bg-card land:flex land:min-h-0 land:flex-1 land:flex-col",
           post.pinned ? "border-primary/25 bg-[radial-gradient(120%_80%_at_100%_0%,color-mix(in_oklab,var(--primary)_14%,transparent),transparent_60%)]" : "border-white/[0.06]")}>
+          {/* body scrolls on its own; the action bar below stays put */}
+          <div className="land:min-h-0 land:flex-1 land:overflow-y-auto land:overscroll-contain land:[scrollbar-width:thin]">
           <header className="flex items-center gap-3 px-4 pt-4">
             <Avatar name={post.user} size={40} />
             <div className="min-w-0 flex-1">
@@ -440,7 +442,7 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
             <span className="rounded-full border border-white/[0.08] px-2.5 py-1 text-[11px] text-muted-foreground">{post.category}</span>
           </header>
 
-          <p className="px-4 pb-4 pt-3 text-[15px] leading-relaxed">
+          <p className="whitespace-pre-line px-4 pb-4 pt-3 text-[15px] leading-relaxed">
             {post.text} {post.hashtags && <span className="font-medium text-primary">{post.hashtags.join(" ")}</span>}
           </p>
 
@@ -454,22 +456,27 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
             </div>
           )}
 
-          <div className="flex items-center gap-4 border-t border-white/[0.05] px-4 py-2.5 text-[12px] text-muted-foreground">
-            <span><b className="font-semibold text-foreground">{post.likes}</b> likes</span>
-            <span><b className="font-semibold text-foreground">{total}</b> comments</span>
-            <span><b className="font-semibold text-foreground">{post.shares}</b> shares</span>
-            {post.views != null && <span className="ml-auto inline-flex items-center gap-1"><Eye className="h-3.5 w-3.5" />{fmtCount(post.views)}</span>}
           </div>
-          <div className="grid grid-cols-3 border-t border-white/[0.05]">
-            <button onClick={onLike} className={cn("flex h-11 items-center justify-center gap-2 text-[13px] font-medium transition hover:bg-white/[0.03]", post.liked ? "text-destructive" : "text-foreground/80")}>
-              <Heart className={cn("h-4 w-4", post.liked && "fill-destructive")} /> Like
+
+          <div className="flex shrink-0 items-center gap-1.5 border-t border-white/[0.06] px-3 py-2.5">
+            <button onClick={onLike} aria-label="Like"
+              className={cn("inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium tabular-nums transition",
+                post.liked ? "bg-destructive/12 text-destructive" : "text-foreground/80 hover:bg-white/[0.05]")}>
+              <Heart className={cn("h-[17px] w-[17px] transition-transform", post.liked && "scale-110 fill-destructive")} />{fmtCount(post.likes)}
             </button>
-            <button onClick={() => inputRef.current?.focus()} className="flex h-11 items-center justify-center gap-2 text-[13px] font-medium text-foreground/80 transition hover:bg-white/[0.03]">
-              <MessageCircle className="h-4 w-4" /> Comment
+            <button onClick={() => inputRef.current?.focus()} aria-label="Comment"
+              className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium tabular-nums text-foreground/80 transition hover:bg-white/[0.05]">
+              <MessageCircle className="h-[17px] w-[17px]" />{total}
             </button>
-            <button onClick={onShare} className="flex h-11 items-center justify-center gap-2 text-[13px] font-medium text-foreground/80 transition hover:bg-white/[0.03]">
-              <Share2 className="h-4 w-4" /> Share
+            <button onClick={onShare} aria-label="Share"
+              className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium tabular-nums text-foreground/80 transition hover:bg-white/[0.05]">
+              <Share2 className="h-[17px] w-[17px]" />{post.shares}
             </button>
+            {post.views != null && (
+              <span className="ml-auto inline-flex items-center gap-1.5 pr-1.5 text-[12px] tabular-nums text-muted-foreground" title="Views">
+                <Eye className="h-4 w-4" />{fmtCount(post.views)}
+              </span>
+            )}
           </div>
         </article>
       </section>
