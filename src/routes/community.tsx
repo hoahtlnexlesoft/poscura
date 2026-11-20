@@ -331,9 +331,13 @@ function CommunityPage() {
               <div className="text-[11px] text-muted-foreground">{p.time} · {p.category}</div>
             </div>
           </header>
-          <p onClick={() => setDetailId(p.id)} className="cursor-pointer px-3 pb-3 text-sm leading-relaxed line-clamp-4 whitespace-pre-line">
-            {p.text} {p.hashtags && <span className="text-primary font-medium">{p.hashtags.join(" ")}</span>}
-          </p>
+          {/* feed shows the first paragraph only; the full post opens in Post details */}
+          <div onClick={() => setDetailId(p.id)} className="cursor-pointer px-3 pb-3 text-sm leading-relaxed">
+            <p className="line-clamp-4">
+              {p.text.split("\n\n")[0]} {!p.text.includes("\n\n") && p.hashtags && <span className="text-primary font-medium">{p.hashtags.join(" ")}</span>}
+            </p>
+            {p.text.includes("\n\n") && <span className="mt-1 inline-block text-[13px] font-medium text-muted-foreground hover:text-foreground">See more</span>}
+          </div>
           {(p.images?.length || p.video) && (
             <div className="px-3 pb-3"><PostMedia post={p} onOpen={() => setDetailId(p.id)} /></div>
           )}
