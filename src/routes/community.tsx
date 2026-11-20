@@ -416,7 +416,8 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
   return (
     <div data-screen="Post details" className="hinge-split flex min-h-[calc(100dvh-var(--pd-off,104px))] flex-col land:grid-rows-[1fr_auto]">
       {/* ---------- post ---------- */}
-      <section className="land:self-start">
+      {/* open foldables: the post stays put while the conversation scrolls; a tall post scrolls inside its own pane */}
+      <section className="land:sticky land:top-[72px] land:row-span-2 land:max-h-[calc(100dvh-88px)] land:self-start land:overflow-y-auto land:overscroll-contain land:[scrollbar-width:none] land:[&::-webkit-scrollbar]:hidden">
         <div className="mb-3 flex items-center gap-2">
           <button onClick={onBack} aria-label="Back" className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.08] text-foreground/80 transition hover:border-primary/40 hover:text-foreground">
             <ChevronLeft className="h-[18px] w-[18px]" />
