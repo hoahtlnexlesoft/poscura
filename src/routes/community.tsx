@@ -488,7 +488,7 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
         </div>
 
         {/* composer stays in reach at the bottom */}
-        <div className="sticky bottom-0 z-10 -mx-4 -mb-6 mt-auto border-t border-white/[0.06] bg-background/90 px-4 pb-3 pt-3 backdrop-blur-xl land:-mr-0">
+        <div className="sticky bottom-0 z-10 -mx-4 -mb-6 mt-auto border-t border-white/[0.06] bg-background/90 px-4 pb-3 pt-3 backdrop-blur-xl">
           {replyTo && (
             <div className="mb-2 flex items-center gap-2 text-[12px] text-muted-foreground">
               <span>Replying to <b className="font-medium text-foreground">{replyTo.user}</b></span>
