@@ -1,9 +1,10 @@
 import { ScoreRing } from "@/components/SessionResult";
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useImmersive } from "@/hooks/useImmersive";
 import { cn } from "@/lib/utils";
 import {
-  Heart, MessageCircle, Share2, BadgeCheck, Send, X,
+  Heart, MessageCircle, Share2, BadgeCheck, Send, X, ChevronLeft,
   Facebook, Twitter, Linkedin, MessageSquare, Link2, ImageIcon, Smile,
   Search, SlidersHorizontal, Check, Hash, Flame, Clock3, Layers,
 } from "lucide-react";
@@ -15,7 +16,7 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/community")({ component: CommunityPage });
 
-type Comment = { id: string; user: string; time: string; text: string };
+type Comment = { id: string; user: string; time: string; text: string; likes?: number; liked?: boolean; replies?: Comment[] };
 type Post = {
   id: string; user: string; handle: string; time: string;
   verified?: boolean; pinned?: boolean; category: string; text: string;
@@ -28,15 +29,25 @@ type Post = {
 const SEED_POSTS: Post[] = [
   { id: "p0", user: "Poscura Team", handle: "@poscura", time: "1h", verified: true, pinned: true, category: "Expert Advice",
     text: "New feature: Real-time shoulder protraction alerts are now live for Pro members.", hashtags: ["#poscura"],
-    likes: 312, comments: 48, shares: 22, thread: [] },
+    likes: 312, comments: 48, shares: 22, thread: [
+      { id: "c01", user: "Uyen Tran", time: "40m", text: "Finally! The shoulder alerts caught me twice this morning.", likes: 12, replies: [
+        { id: "c01r1", user: "Poscura Team", time: "32m", text: "Love to hear it. You can tune how sensitive they are in Settings → Alerts.", likes: 5 },
+      ] },
+      { id: "c02", user: "Ben Hughes", time: "25m", text: "Is this coming to the free plan later?", likes: 3 },
+    ] },
   { id: "p1", user: "Alex Kovacs", handle: "@alexk", time: "2h", category: "Milestone",
     text: "Hit a 90 posture score for the first time today after 3 weeks of the neck plan!",
     hashtags: ["#progress"], likes: 142, comments: 18, shares: 6, thread: [
-      { id: "c1", user: "Maria S.", time: "1h", text: "Insane progress! What program?" },
+      { id: "c1", user: "Maria S.", time: "1h", text: "Insane progress! What program?", likes: 4, replies: [
+        { id: "c1r1", user: "Alex Kovacs", time: "48m", text: "The 4-week neck plan, 2 sessions a day. Chin tucks were the game changer.", likes: 6 },
+      ] },
+      { id: "c2", user: "Dr. Naomi Park", time: "30m", text: "Great consistency. Keep the sessions short and you'll hold that score.", likes: 9 },
     ] },
   { id: "p2", user: "Maria Santos", handle: "@marias", time: "5h", category: "Question",
     text: "Wall angels at lunch break really help reset shoulders. Anyone else?",
-    hashtags: ["#desklife"], likes: 89, comments: 24, shares: 4, thread: [] },
+    hashtags: ["#desklife"], likes: 89, comments: 24, shares: 4, thread: [
+      { id: "c3", user: "Ken Ito", time: "3h", text: "Every day at 12:30. My upper back thanks me.", likes: 2 },
+    ] },
   { id: "p3", user: "Dr. Naomi Park", handle: "@drpark", time: "8h", verified: true, category: "Expert Advice",
     text: "Pair monitoring sessions with a standing desk for an average +18 point posture jump.",
     hashtags: ["#wellness"], likes: 296, comments: 42, shares: 31, thread: [] },
@@ -56,7 +67,7 @@ function Avatar({ name, size = 36 }: { name: string; size?: number }) {
 function CommunityPage() {
   const [posts, setPosts] = useState<Post[]>(SEED_POSTS);
   const [draft, setDraft] = useState("");
-  const [commentPost, setCommentPost] = useState<Post | null>(null);
+  const [detailId, setDetailId] = useState<string | null>(null);
   const [sharePost, setSharePost] = useState<Post | null>(null);
   const [searchQ, setSearchQ] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -99,11 +110,44 @@ function CommunityPage() {
     toast.success("Posted!");
   };
 
-  const addComment = (postId: string, text: string) => {
+  const addComment = (postId: string, text: string, replyTo?: string) => {
     const p = posts.find((x) => x.id === postId); if (!p) return;
-    const newC: Comment = { id: `c${Date.now()}`, user: "You", time: "now", text };
-    update(postId, { thread: [...(p.thread || []), newC], comments: p.comments + 1 });
+    const newC: Comment = { id: `c${Date.now()}`, user: "You", time: "now", text, likes: 0 };
+    const thread = replyTo
+      ? (p.thread || []).map((c) => (c.id === replyTo ? { ...c, replies: [...(c.replies || []), newC] } : c))
+      : [...(p.thread || []), newC];
+    update(postId, { thread, comments: p.comments + 1 });
   };
+
+  const toggleCommentLike = (postId: string, commentId: string) => {
+    const p = posts.find((x) => x.id === postId); if (!p) return;
+    const flip = (c: Comment): Comment =>
+      c.id === commentId ? { ...c, liked: !c.liked, likes: (c.likes || 0) + (c.liked ? -1 : 1) } : { ...c, replies: c.replies?.map(flip) };
+    update(postId, { thread: (p.thread || []).map(flip) });
+  };
+
+  const detail = detailId ? posts.find((p) => p.id === detailId) : undefined;
+  if (detail) {
+    return (
+      <>
+        <PostDetail
+          post={detail}
+          onBack={() => setDetailId(null)}
+          onLike={() => toggleLike(detail.id)}
+          onShare={() => setSharePost(detail)}
+          onComment={(text, replyTo) => addComment(detail.id, text, replyTo)}
+          onLikeComment={(cid) => toggleCommentLike(detail.id, cid)}
+        />
+        {sharePost && (
+          <ShareDialog
+            post={sharePost}
+            onClose={() => setSharePost(null)}
+            onShared={(channel) => { update(sharePost.id, { shares: sharePost.shares + 1 }); toast.success(`Shared to ${channel}`); }}
+          />
+        )}
+      </>
+    );
+  }
 
   const activeFilterCount =
     (category !== "All Feeds" ? 1 : 0) + (sortBy !== "recent" ? 1 : 0) + selectedTags.length;
@@ -228,7 +272,7 @@ function CommunityPage() {
       <div className="space-y-3">
       {filtered.map((p) => (
         <article key={p.id} className={`glass-card overflow-hidden ${p.pinned ? "border-primary/40 bg-gradient-to-br from-primary/10 to-secondary/5" : ""}`}>
-          <header className="flex items-center gap-3 p-3">
+          <header onClick={() => setDetailId(p.id)} className="flex cursor-pointer items-center gap-3 p-3">
             <Avatar name={p.user} />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1">
@@ -239,7 +283,7 @@ function CommunityPage() {
               <div className="text-[11px] text-muted-foreground">{p.time} · {p.category}</div>
             </div>
           </header>
-          <p className="px-3 pb-3 text-sm leading-relaxed">
+          <p onClick={() => setDetailId(p.id)} className="cursor-pointer px-3 pb-3 text-sm leading-relaxed">
             {p.text} {p.hashtags && <span className="text-primary font-medium">{p.hashtags.join(" ")}</span>}
           </p>
           {p.result && (
@@ -252,7 +296,7 @@ function CommunityPage() {
             <button onClick={() => toggleLike(p.id)} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs ${p.liked ? "text-destructive" : "text-muted-foreground"}`}>
               <Heart className={`h-4 w-4 ${p.liked ? "fill-destructive" : ""}`} /> {p.likes}
             </button>
-            <button onClick={() => setCommentPost(p)} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs text-muted-foreground">
+            <button onClick={() => setDetailId(p.id)} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs text-muted-foreground">
               <MessageCircle className="h-4 w-4" /> {p.comments}
             </button>
             <button onClick={() => setSharePost(p)} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs text-muted-foreground ml-auto">
@@ -264,13 +308,6 @@ function CommunityPage() {
       </div>
       </div>
 
-      {commentPost && (
-        <CommentSheet
-          post={posts.find((p) => p.id === commentPost.id)!}
-          onClose={() => setCommentPost(null)}
-          onAdd={(text) => addComment(commentPost.id, text)}
-        />
-      )}
 
       {sharePost && (
         <ShareDialog
@@ -283,55 +320,154 @@ function CommunityPage() {
   );
 }
 
-function CommentSheet({ post, onClose, onAdd }: { post: Post; onClose: () => void; onAdd: (text: string) => void }) {
+/** Post details: the post on its own, the full comment thread with one level of replies, and a pinned composer.
+ *  Open foldables split it at the hinge: post on the left, conversation on the right. */
+function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }: {
+  post: Post; onBack: () => void; onLike: () => void; onShare: () => void;
+  onComment: (text: string, replyTo?: string) => void; onLikeComment: (commentId: string) => void;
+}) {
+  useImmersive();
   const [text, setText] = useState("");
+  const [replyTo, setReplyTo] = useState<Comment | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const thread = post.thread || [];
+  const total = thread.reduce((n, c) => n + 1 + (c.replies?.length || 0), 0);
+
   const submit = () => {
     if (!text.trim()) return;
-    onAdd(text.trim());
-    setText("");
+    onComment(text.trim(), replyTo?.id);
+    setText(""); setReplyTo(null);
   };
+  const reply = (c: Comment) => { setReplyTo(c); inputRef.current?.focus(); };
+
   return (
-    <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-end" onClick={onClose}>
-      <div className="w-full bg-card rounded-t-2xl max-h-[85vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between p-4 border-b border-border/50">
-          <h3 className="font-semibold">Comments ({post.comments})</h3>
-          <button onClick={onClose} aria-label="Close"><X className="h-5 w-5" /></button>
+    <div data-screen="Post details" className="hinge-split land:items-start">
+      {/* ---------- post ---------- */}
+      <section className="land:sticky land:top-4">
+        <div className="mb-3 flex items-center gap-2">
+          <button onClick={onBack} aria-label="Back" className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.08] text-foreground/80 transition hover:border-primary/40 hover:text-foreground">
+            <ChevronLeft className="h-[18px] w-[18px]" />
+          </button>
+          <h1 className="text-[17px] font-semibold tracking-tight">Post</h1>
         </div>
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
-          {(post.thread || []).length === 0 && (
-            <p className="text-sm text-muted-foreground text-center py-8">No comments yet. Be the first!</p>
-          )}
-          {(post.thread || []).map((c) => (
-            <div key={c.id} className="flex gap-2">
-              <Avatar name={c.user} size={30} />
-              <div className="flex-1 bg-muted/40 rounded-2xl px-3 py-2">
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-xs">{c.user}</span>
-                  <span className="text-[10px] text-muted-foreground">{c.time}</span>
-                </div>
-                <p className="text-sm mt-0.5">{c.text}</p>
+
+        <article className={cn("overflow-hidden rounded-[22px] border bg-card",
+          post.pinned ? "border-primary/25 bg-[radial-gradient(120%_80%_at_100%_0%,color-mix(in_oklab,var(--primary)_14%,transparent),transparent_60%)]" : "border-white/[0.06]")}>
+          <header className="flex items-center gap-3 px-4 pt-4">
+            <Avatar name={post.user} size={40} />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5">
+                <span className="truncate text-[14.5px] font-semibold">{post.user}</span>
+                {post.verified && <BadgeCheck className="h-4 w-4 shrink-0 text-primary" />}
+                {post.pinned && <span className="rounded-full bg-primary/15 px-1.5 py-px text-[9.5px] font-semibold uppercase tracking-wider text-primary">Pinned</span>}
               </div>
+              <div className="text-[12px] text-muted-foreground">{post.handle} · {post.time}</div>
+            </div>
+            <span className="rounded-full border border-white/[0.08] px-2.5 py-1 text-[11px] text-muted-foreground">{post.category}</span>
+          </header>
+
+          <p className="px-4 pb-4 pt-3 text-[15px] leading-relaxed">
+            {post.text} {post.hashtags && <span className="font-medium text-primary">{post.hashtags.join(" ")}</span>}
+          </p>
+
+          {post.result && (
+            <div className="mx-4 mb-4 flex flex-col items-center gap-3 rounded-2xl border border-white/[0.06] bg-background/50 px-4 py-6">
+              <ScoreRing score={post.result.score} size={96} stroke={7} />
+              <div className="text-center text-[15px] font-semibold">{post.result.title}</div>
+            </div>
+          )}
+
+          <div className="flex items-center gap-4 border-t border-white/[0.05] px-4 py-2.5 text-[12px] text-muted-foreground">
+            <span><b className="font-semibold text-foreground">{post.likes}</b> likes</span>
+            <span><b className="font-semibold text-foreground">{total}</b> comments</span>
+            <span><b className="font-semibold text-foreground">{post.shares}</b> shares</span>
+          </div>
+          <div className="grid grid-cols-3 border-t border-white/[0.05]">
+            <button onClick={onLike} className={cn("flex h-11 items-center justify-center gap-2 text-[13px] font-medium transition hover:bg-white/[0.03]", post.liked ? "text-destructive" : "text-foreground/80")}>
+              <Heart className={cn("h-4 w-4", post.liked && "fill-destructive")} /> Like
+            </button>
+            <button onClick={() => inputRef.current?.focus()} className="flex h-11 items-center justify-center gap-2 text-[13px] font-medium text-foreground/80 transition hover:bg-white/[0.03]">
+              <MessageCircle className="h-4 w-4" /> Comment
+            </button>
+            <button onClick={onShare} className="flex h-11 items-center justify-center gap-2 text-[13px] font-medium text-foreground/80 transition hover:bg-white/[0.03]">
+              <Share2 className="h-4 w-4" /> Share
+            </button>
+          </div>
+        </article>
+      </section>
+
+      {/* ---------- conversation ---------- */}
+      <section className="mt-5 land:mt-0 land:flex land:min-h-[calc(100dvh-140px)] land:flex-col">
+        <div className="mb-3 flex items-baseline gap-2 land:pt-[38px]">
+          <h2 className="text-[14px] font-semibold">Comments & replies</h2>
+          <span className="text-[12px] text-muted-foreground">{total}</span>
+        </div>
+
+        <div className="flex-1 space-y-4 pb-4">
+          {thread.length === 0 && (
+            <div className="rounded-[18px] border border-dashed border-white/[0.08] px-4 py-8 text-center">
+              <MessageCircle className="mx-auto h-5 w-5 text-muted-foreground" />
+              <p className="mt-2 text-[13px] text-muted-foreground">No comments yet. Start the conversation.</p>
+            </div>
+          )}
+          {thread.map((c) => (
+            <div key={c.id}>
+              <CommentRow c={c} onLike={() => onLikeComment(c.id)} onReply={() => reply(c)} />
+              {!!c.replies?.length && (
+                <div className="ml-[18px] mt-3 space-y-3 border-l border-white/[0.07] pl-[22px]">
+                  {c.replies.map((r) => <CommentRow key={r.id} c={r} small onLike={() => onLikeComment(r.id)} onReply={() => reply(c)} />)}
+                </div>
+              )}
             </div>
           ))}
         </div>
-        <div className="flex items-center gap-2 p-3 border-t border-border/50">
-          <Avatar name="You" size={30} />
-          <input
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
-            placeholder="Write a comment…"
-            autoFocus
-            className="flex-1 bg-muted/40 rounded-full px-4 py-2 text-sm outline-none"
-          />
-          <button
-            onClick={submit}
-            disabled={!text.trim()}
-            className="h-9 w-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-40"
-            aria-label="Send"
-          >
-            <Send className="h-4 w-4" />
+
+        {/* composer stays in reach at the bottom */}
+        <div className="sticky bottom-0 z-10 -mx-4 bg-gradient-to-t from-background from-70% to-transparent px-4 pb-4 pt-5">
+          {replyTo && (
+            <div className="mb-2 flex items-center gap-2 text-[12px] text-muted-foreground">
+              <span>Replying to <b className="font-medium text-foreground">{replyTo.user}</b></span>
+              <button onClick={() => setReplyTo(null)} aria-label="Cancel reply" className="ml-auto rounded-full p-1 hover:bg-white/[0.05]"><X className="h-3.5 w-3.5" /></button>
+            </div>
+          )}
+          <div className="flex items-center gap-2 rounded-full border border-white/[0.08] bg-card py-1.5 pl-1.5 pr-1.5 focus-within:border-primary/40">
+            <Avatar name="You" size={30} />
+            <input
+              ref={inputRef}
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
+              placeholder={replyTo ? `Reply to ${replyTo.user}` : "Write a comment…"}
+              className="min-w-0 flex-1 bg-transparent px-1 text-[13.5px] outline-none placeholder:text-muted-foreground"
+            />
+            <button onClick={submit} disabled={!text.trim()} aria-label="Send"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-primary to-secondary text-white transition disabled:opacity-30">
+              <Send className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function CommentRow({ c, small, onLike, onReply }: { c: Comment; small?: boolean; onLike: () => void; onReply: () => void }) {
+  return (
+    <div className="flex gap-2.5">
+      <Avatar name={c.user} size={small ? 28 : 34} />
+      <div className="min-w-0 flex-1">
+        <div className="rounded-[16px] rounded-tl-[6px] bg-white/[0.04] px-3.5 py-2.5">
+          <div className="flex items-baseline gap-2">
+            <span className="truncate text-[13px] font-semibold">{c.user}</span>
+            <span className="shrink-0 text-[11px] text-muted-foreground">{c.time}</span>
+          </div>
+          <p className="mt-0.5 text-[13.5px] leading-relaxed text-foreground/90">{c.text}</p>
+        </div>
+        <div className="mt-1 flex items-center gap-4 pl-3.5 text-[11.5px] font-medium text-muted-foreground">
+          <button onClick={onLike} className={cn("inline-flex items-center gap-1 transition hover:text-foreground", c.liked && "text-destructive hover:text-destructive")}>
+            <Heart className={cn("h-3 w-3", c.liked && "fill-destructive")} />{c.likes ? c.likes : "Like"}
           </button>
+          <button onClick={onReply} className="transition hover:text-foreground">Reply</button>
         </div>
       </div>
     </div>
