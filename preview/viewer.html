@@ -86,6 +86,17 @@
     body { padding-right:44px; }
     .right { padding-right:16px; }
   }
+  /* ---------- desktop: the app fills the whole window like a real browser tab ---------- */
+  body.full { display:block; }
+  .full .left, .full .right { display:none; }
+  .full .center { position:fixed; top:0; left:0; bottom:0; right:54px; padding:0 !important; min-height:0; }
+  .full .holder, .full .scaler { position:absolute; inset:0; width:100% !important; height:100% !important; transform:none !important; }
+  .deskwrap { position:absolute; inset:0; background:var(--app); }
+  .deskwrap iframe { display:block; width:100%; height:100%; border:0; background:var(--app); }
+  .exitdesk { display:none; position:fixed; right:70px; bottom:16px; z-index:50; align-items:center; gap:8px; font:600 13px/1 Quicksand,system-ui,sans-serif; color:#eef2fa; background:rgba(22,29,43,.86); backdrop-filter:blur(14px); border:1px solid rgba(255,255,255,.1); border-radius:999px; padding:10px 14px 10px 12px; cursor:pointer; box-shadow:0 12px 30px -12px rgba(0,0,0,.6); transition:background .15s, border-color .15s; }
+  .exitdesk:hover { background:rgba(31,139,255,.22); border-color:rgba(31,139,255,.55); }
+  .exitdesk:focus-visible { outline:2px solid #1f8bff; outline-offset:2px; }
+  .full .exitdesk { display:inline-flex; }
 </style>
 </head>
 <body>
@@ -95,6 +106,7 @@
   <ul class="screens" id="screens"></ul>
 </section>
 
+<button type="button" class="exitdesk" id="exitdesk" title="Back to phone and foldable previews"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>Mobile devices</button>
 <section class="center" id="center">
   <div class="holder" id="holder"><div class="scaler" id="scaler"></div></div>
 </section>
@@ -171,6 +183,15 @@
   var frame, size = { w:0, h:0 };
 
   function buildPhone() {
+    if (view().kind === "desktop") {
+      // desktop web app: no device frame, the page gets the real window size
+      document.body.classList.add("full");
+      scaler.innerHTML = '<div class="deskwrap"><iframe title="Poscura" id="app"></iframe></div>';
+      frame = document.getElementById("app");
+      size = null;
+      return;
+    }
+    document.body.classList.remove("full");
     var d = view(), k = d.kind, html = "", ow, oh, sl, st, radius, scr, top, bot, sb = "", hb = "", cut = "", extra = "", bg;
     if (k === "island") {
       ow = d.w + 36; oh = d.h + 36; sl = st = 18; radius = 74; scr = 58; top = 59; bot = 34;
@@ -235,13 +256,6 @@
         extra = '<span class="sidebtn" style="background:'+c4+';right:-3px;top:110px;height:60px"></span><span class="sidebtn" style="background:'+c4+';top:-3px;right:120px;width:70px;height:4px"></span><div class="shell"></div>' +
           '<span style="position:absolute;left:50%;top:-3px;bottom:-3px;width:' + (d.silver ? 4 : 6) + 'px;transform:translateX(-50%);background:' + hg + ';border-radius:3px"></span>';
       }
-    } else if (k === "desktop") {
-      // browser window: traffic lights + address bar above the page
-      ow = d.w; oh = d.h + 44; sl = 0; st = 44; radius = 12; scr = "0 0 12px 12px"; top = 0; bot = 0;
-      bg = "#1b1d22";
-      extra = '<div style="position:absolute;left:0;right:0;top:0;height:44px;display:flex;align-items:center;gap:8px;padding:0 16px;border-bottom:1px solid #2a2d34">' +
-        '<i style="width:12px;height:12px;border-radius:50%;background:#ff5f57"></i><i style="width:12px;height:12px;border-radius:50%;background:#febc2e"></i><i style="width:12px;height:12px;border-radius:50%;background:#28c840"></i>' +
-        '<div style="margin:0 auto;width:420px;height:28px;border-radius:8px;background:#26292f;color:#9aa1ad;font:500 13px/28px system-ui,sans-serif;text-align:center">app.poscura.com</div><span style="width:60px"></span></div>';
     } else {
       ow = d.w + 28; oh = d.h + 30; sl = 14; st = 15; radius = d.radius || 52; scr = d.scr || 40; top = 40; bot = 24;
       bg = "linear-gradient(145deg," + d.color + "," + (d.tone || "#24272c") + ")";
@@ -293,6 +307,7 @@
   }
 
   function layout() {
+    if (!size) { scaler.style.transform = ""; holder.style.width = ""; holder.style.height = ""; return; }
     var c = document.getElementById("center");
     var narrow = window.innerWidth <= 980;
     var availW = c.clientWidth - 24, availH = narrow ? window.innerHeight * 0.85 : c.clientHeight - 32;
@@ -329,7 +344,7 @@
   }
   window.poscuraGo = function (path) { go(path); };
   // which simulated device the reviewer is looking at (read by the comment kit)
-  window.poscuraDevice = function () { var d = view(); return { name: d.name, size: d.w + "×" + d.h + " " + d.unit }; };
+  window.poscuraDevice = function () { var d = view(); if (d.kind === "desktop" && frame) return { name: "Desktop browser", size: frame.clientWidth + "×" + frame.clientHeight + " px" }; return { name: d.name, size: d.w + "×" + d.h + " " + d.unit }; };
   function markActive(path) {
     document.querySelectorAll("#screens button").forEach(function (b) { b.classList.toggle("on", b.dataset.path === path); });
   }
@@ -361,7 +376,12 @@
   }
   document.getElementById("devices").addEventListener("click", function (e) {
     var b = e.target.closest("button"); if (!b || b.dataset.id === state.dev) return;
+    if (b.dataset.id !== "desk") state.lastPhone = b.dataset.id;
     state.dev = b.dataset.id; save(); renderDevices(); buildPhone(); go(state.path, true);
+  });
+  document.getElementById("exitdesk").addEventListener("click", function () {
+    state.dev = state.lastPhone && state.lastPhone !== "desk" ? state.lastPhone : "ip16pm";
+    save(); renderDevices(); buildPhone(); go(state.path, true);
   });
   document.getElementById("orient").addEventListener("click", function (e) {
     var b = e.target.closest("button"); if (!b || b.dataset.o === (state.orient || "portrait")) return;
