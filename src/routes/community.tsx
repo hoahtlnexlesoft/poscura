@@ -338,11 +338,11 @@ function CommunityPage() {
           />
           <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={(e) => pickImages(e.target.files)} />
           <button onClick={() => fileRef.current?.click()} aria-label="Add photos"
-            className={cn("h-8 w-8 shrink-0 rounded-full flex items-center justify-center transition hover:bg-muted/60", attach.length ? "text-primary" : "text-muted-foreground")}>
+            className={cn("h-8 w-8 shrink-0 rounded-full flex items-center justify-center transition hover:bg-primary/15 hover:text-primary active:scale-90", attach.length ? "text-primary" : "text-muted-foreground")}>
             <ImageIcon className="h-4 w-4" />
           </button>
           <button onClick={() => setEmojiOpen((o) => !o)} aria-label="Emoji" aria-expanded={emojiOpen}
-            className={cn("h-8 w-8 shrink-0 rounded-full hidden min-[380px]:flex items-center justify-center transition hover:bg-muted/60", emojiOpen ? "bg-muted/60 text-foreground" : "text-muted-foreground")}>
+            className={cn("h-8 w-8 shrink-0 rounded-full hidden min-[380px]:flex items-center justify-center transition hover:bg-amber-400/15 hover:text-amber-300 active:scale-90", emojiOpen ? "bg-amber-400/15 text-amber-300" : "text-muted-foreground")}>
             <Smile className="h-4 w-4" />
           </button>
           <button
