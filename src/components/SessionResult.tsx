@@ -12,7 +12,7 @@ export function scoreBand(score: number) {
 }
 
 /** Accuracy ring: band-coloured gradient arc that sweeps in while the number counts up. */
-export function ScoreRing({ score, size = 132, stroke = 8, animate = true }: { score: number; size?: number; stroke?: number; animate?: boolean }) {
+export function ScoreRing({ score, size = 132, stroke = 8, animate = true, label = "Accuracy" }: { score: number; size?: number; stroke?: number; animate?: boolean; label?: string }) {
   const id = useId().replace(/:/g, "");
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
@@ -45,7 +45,7 @@ export function ScoreRing({ score, size = 132, stroke = 8, animate = true }: { s
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span className="font-semibold leading-none tracking-tight tabular-nums" style={{ fontSize: size * 0.3 }}>{shown}</span>
-        {size >= 110 && <span className="mt-1.5 text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">Accuracy</span>}
+        {size >= 110 && <span className="mt-1.5 text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">{label}</span>}
       </div>
     </div>
   );

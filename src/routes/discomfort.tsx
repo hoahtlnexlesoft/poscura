@@ -113,7 +113,7 @@ function DiscomfortPage() {
       </div>
 
       {/* pinned to the bottom so Skip / Submit are always visible, content fades out behind them */}
-      <div className="sticky bottom-0 z-20 -mx-4 bg-gradient-to-t from-background from-60% to-transparent px-4 pb-4 pt-6 fold:col-start-2 fold:row-start-3 fold:self-end fold:mx-0 fold:px-0 fold:pb-0">
+      <div className="sticky bottom-0 z-20 -mx-4 -mb-6 fold:mb-0 bg-gradient-to-t from-background from-60% to-transparent px-4 pb-4 pt-6 fold:col-start-2 fold:row-start-3 fold:self-end fold:mx-0 fold:px-0 fold:pb-0">
         <div className="flex gap-3">
           <button onClick={() => navigate({ to: "/" })} className="h-12 flex-[0_0_34%] rounded-full border border-white/10 bg-white/[0.03] text-[15px] font-medium text-muted-foreground transition hover:border-white/20 hover:bg-white/[0.07] hover:text-foreground active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
             Skip

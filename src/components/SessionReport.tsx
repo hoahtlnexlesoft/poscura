@@ -1,6 +1,7 @@
-import { ChevronLeft, Share2, TrendingUp, AlertTriangle, CheckCircle2, Facebook, Twitter, Linkedin, MessageCircle, Send, Users, X, Sparkles, AlertOctagon } from "lucide-react";
+import { ChevronLeft, Share2, TrendingUp, AlertTriangle, CheckCircle2, Facebook, Twitter, Linkedin, MessageCircle, Send, Users, X, Sparkles, AlertOctagon, Clock3, CalendarClock, type LucideIcon } from "lucide-react";
 import { BodyMap } from "@/components/BodyMap";
-import { ScoreGauge } from "@/components/ScoreGauge";
+import { ScoreRing, scoreBand } from "@/components/SessionResult";
+import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -33,6 +34,37 @@ const sessionShare = {
   recommendation: { name: "Shoulder & Neck Relief", tag: "Postural strength & endurance", sessions: 10, exercises: 4 },
 };
 
+const SCORE = 74;
+const ALIGN = [
+  { label: "Balanced", pct: 65, bar: "bg-success" },
+  { label: "Slight", pct: 15, bar: "bg-[#3b82f6]" },
+  { label: "Moderate", pct: 10, bar: "bg-warning" },
+  { label: "Significant", pct: 10, bar: "bg-destructive" },
+];
+
+function Stat({ value, unit, label, tone }: { value: string; unit: string; label: string; tone?: string }) {
+  return (
+    <div className="px-3 py-3 text-center">
+      <div className={cn("text-[20px] font-semibold leading-none tabular-nums tracking-tight", tone)}>
+        {value}{unit && <span className="ml-0.5 text-[11px] font-medium text-muted-foreground">{unit}</span>}
+      </div>
+      <div className="mt-1.5 text-[11px] text-muted-foreground">{label}</div>
+    </div>
+  );
+}
+
+function Insight({ icon: Icon, tone, title, text }: { icon: LucideIcon; tone: string; title: string; text: string }) {
+  return (
+    <div className="flex gap-3 py-3 first:pt-0 last:pb-0">
+      <span className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-xl", tone)}><Icon className="h-4 w-4" /></span>
+      <div className="min-w-0">
+        <div className="text-[13.5px] font-semibold">{title}</div>
+        <p className="mt-0.5 text-[12.5px] leading-relaxed text-muted-foreground">{text}</p>
+      </div>
+    </div>
+  );
+}
+
 function ShareToggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
     <label className="flex items-center justify-between text-xs cursor-pointer">
@@ -60,6 +92,7 @@ export function SessionReport({ onClose }: Props) {
   const [incGuidance, setIncGuidance] = useState(true);
   const [incRecommendation, setIncRecommendation] = useState(true);
   const navigate = useNavigate();
+  const band = scoreBand(SCORE);
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
 
   const publishToCommunity = () => {
@@ -84,18 +117,18 @@ export function SessionReport({ onClose }: Props) {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <button onClick={onClose} aria-label="Back" className="h-9 w-9 rounded-lg border border-border bg-card flex items-center justify-center transition hover:border-primary/40 hover:bg-white/[0.04] hover:text-foreground">
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <div>
-            <h1 className="text-sm font-semibold">Aug 13, 2025</h1>
-            <p className="text-[11px] text-muted-foreground">10:30 AM · 20 min</p>
-          </div>
+    <div className="space-y-4 land:grid land:grid-cols-2 hinge-split land:items-start land:gap-x-6 land:gap-y-4 land:space-y-0">
+      {/* ---------- header ---------- */}
+      <div className="flex items-center gap-3 land:col-span-2">
+        <button onClick={onClose} aria-label="Back" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/[0.08] text-foreground/80 transition hover:border-primary/40 hover:text-foreground active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+          <ChevronLeft className="h-[18px] w-[18px]" />
+        </button>
+        <div className="min-w-0 flex-1">
+          <div className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Session report</div>
+          <h1 className="truncate text-[19px] font-semibold leading-tight tracking-tight">Aug 13, 2025</h1>
         </div>
-        <button onClick={() => setShareOpen(true)} aria-label="Share" className="h-9 w-9 rounded-lg border border-border bg-card flex items-center justify-center">
+        <span className="hidden shrink-0 items-center gap-1.5 text-[12px] text-muted-foreground min-[380px]:flex"><Clock3 className="h-3.5 w-3.5" /> 10:30 AM · 20 min</span>
+        <button onClick={() => setShareOpen(true)} aria-label="Share" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/[0.08] text-foreground/80 transition hover:border-primary/40 hover:text-primary active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
           <Share2 className="h-4 w-4" />
         </button>
       </div>
@@ -199,107 +232,105 @@ export function SessionReport({ onClose }: Props) {
         </div>
       )}
 
-      <section className="glass-card p-5">
-        <h2 className="text-sm font-semibold mb-3">Posture Score</h2>
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <div className="text-xs text-muted-foreground mb-1">Average score</div>
-            <ScoreGauge value={74} size={130} />
-            <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-success/10 text-success text-[11px] font-semibold">
-              <TrendingUp className="h-3 w-3" /> 15%
-              <span className="text-foreground/70 font-normal ml-1">from last session</span>
+      {/* ---------- left: score + alignment ---------- */}
+      <div className="space-y-4 land:col-start-1 land:row-start-2 land:sticky land:top-[72px]">
+        <section className="relative overflow-hidden rounded-[22px] border border-white/[0.07] bg-gradient-to-b from-primary/[0.08] to-transparent p-5">
+          <div className="flex items-center gap-5">
+            <ScoreRing score={SCORE} size={124} label="Score" />
+            <div className="min-w-0">
+              <div className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Posture score</div>
+              <div className="mt-1 text-[20px] font-semibold leading-tight tracking-tight">{band.label}</div>
+              <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-success/12 px-2 py-0.5 text-[11.5px] font-semibold text-success ring-1 ring-inset ring-success/20">
+                <TrendingUp className="h-3 w-3" /> +15% <span className="font-normal text-foreground/60">vs last session</span>
+              </div>
             </div>
           </div>
-          <div className="text-right">
-            <div className="text-xs text-muted-foreground">Duration</div>
-            <div className="text-3xl font-bold leading-none mt-1">20</div>
-            <div className="text-xs text-muted-foreground mt-1">minutes</div>
+          <div className="mt-5 grid grid-cols-3 divide-x divide-white/[0.06] rounded-2xl border border-white/[0.06] bg-white/[0.02]">
+            <Stat value="20" unit="min" label="Duration" />
+            <Stat value="13" unit="min" label="Balanced" tone="text-success" />
+            <Stat value="2" unit="" label="Alerts" tone="text-warning" />
           </div>
-        </div>
+        </section>
 
-        <div className="mt-5">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-semibold">Alignment Level</h3>
-            <span className="text-[11px] px-2 py-0.5 rounded-full bg-success/15 text-success font-medium">Balanced</span>
+        <section className="rounded-[22px] border border-white/[0.07] p-5">
+          <div className="flex items-center justify-between">
+            <h2 className="text-[15px] font-semibold tracking-tight">Alignment</h2>
+            <span className="rounded-full bg-success/12 px-2.5 py-0.5 text-[11px] font-semibold text-success ring-1 ring-inset ring-success/20">Mostly balanced</span>
           </div>
-          <div className="flex h-2.5 w-full overflow-hidden rounded-full">
-            <div className="bg-success" style={{ width: "65%" }} />
-            <div className="bg-[#3b82f6]" style={{ width: "15%" }} />
-            <div className="bg-warning" style={{ width: "10%" }} />
-            <div className="bg-destructive" style={{ width: "10%" }} />
+          <div className="mt-4 flex h-2 w-full gap-1">
+            {ALIGN.map((a) => <div key={a.label} className={cn("rounded-full", a.bar)} style={{ width: `${a.pct}%` }} />)}
           </div>
-          <div className="mt-2 grid grid-cols-2 gap-y-1 text-[11px]">
-            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-success" />Balanced (65%)</span>
-            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#3b82f6]" />Slight (15%)</span>
-            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-warning" />Moderate (10%)</span>
-            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-destructive" />Significant (10%)</span>
-          </div>
-        </div>
-      </section>
+          <ul className="mt-4 divide-y divide-white/[0.05]">
+            {ALIGN.map((a) => (
+              <li key={a.label} className="flex items-center gap-3 py-1.5 text-[13px]">
+                <span className={cn("h-2 w-2 shrink-0 rounded-full", a.bar)} />
+                <span className="flex-1 text-foreground/85">{a.label}</span>
+                <span className="tabular-nums text-muted-foreground">{Math.round((a.pct / 100) * 20)} min</span>
+                <span className="w-10 text-right font-semibold tabular-nums">{a.pct}%</span>
+              </li>
+            ))}
+          </ul>
+        </section>
 
-      <section className="glass-card p-5">
-        <div className="mb-4 flex items-end justify-between gap-2">
-          <div>
-            <h2 className="text-sm font-semibold">Posture analysis</h2>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Tap a region for detail</p>
+      </div>
+
+      {/* ---------- right: insights + next step ---------- */}
+      <div className="space-y-4 land:col-start-2 land:row-start-2">
+        <section className="rounded-[22px] border border-white/[0.07] p-5">
+          <h2 className="text-[15px] font-semibold tracking-tight">Highlights</h2>
+          <div className="mt-3 divide-y divide-white/[0.05]">
+            <Insight icon={TrendingUp} tone="bg-success/12 text-success" title="Biggest improvement" text={sessionShare.improvementText} />
+            <Insight icon={AlertTriangle} tone="bg-destructive/12 text-destructive" title="New risk · Head & neck" text="Extended forward head tilt can strain neck muscles." />
           </div>
-          <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
-            <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-destructive" />Serious</span>
-            <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-warning" />Risky</span>
+        </section>
+
+        <section className="rounded-[22px] border border-white/[0.07] p-5">
+          <div className="mb-3 flex items-end justify-between gap-2">
+            <div>
+              <h2 className="text-[15px] font-semibold tracking-tight">Posture analysis</h2>
+              <p className="mt-0.5 text-[12px] text-muted-foreground">Tap a region for detail</p>
+            </div>
+            <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+              <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-destructive" />Serious</span>
+              <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-warning" />Risky</span>
+            </div>
           </div>
-        </div>
-        <div className="flex justify-center">
-          <BodyMap head="serious" shoulders="serious" spine="risky" pelvis="risky" className="!max-w-[180px]"
+          <BodyMap head="serious" shoulders="serious" spine="risky" pelvis="risky" className="!max-w-[170px]"
             onPartClick={(p) => navigate({ to: "/body-part/$part", params: { part: p }, search: { from: "session" } })} />
-        </div>
-      </section>
-
-      <section className="glass-card p-5 border-success/30 bg-success/5">
-        <div className="flex items-center gap-2 mb-2">
-          <TrendingUp className="h-5 w-5 text-success" />
-          <h3 className="font-semibold text-sm">Biggest Improvement</h3>
-        </div>
-        <p className="text-xs text-foreground/80">{sessionShare.improvementText}</p>
-      </section>
-
-      <section className="glass-card p-5 border-destructive/30 bg-destructive/5">
-        <div className="flex items-center gap-2 mb-2">
-          <AlertOctagon className="h-5 w-5 text-destructive" />
-          <h3 className="font-semibold text-sm text-destructive">New Risk</h3>
-        </div>
-        <p className="text-xs text-foreground/80">
-          <span className="font-semibold text-foreground">Head & Neck</span> — Extended forward head tilt can strain neck muscles.
-        </p>
-      </section>
-
-      <section className="glass-card p-5">
-        <div className="flex items-center gap-2 mb-3">
-          <Sparkles className="h-5 w-5 text-primary" />
-          <h2 className="font-semibold text-sm">Smart Guidance</h2>
-        </div>
-        <ul className="space-y-1.5 text-xs text-foreground/85 list-disc pl-5 marker:text-primary">
-          {sessionShare.guidance.map((g) => <li key={g}>{g}</li>)}
-        </ul>
-      </section>
-
-      <section className="glass-card p-5">
-        <div className="flex items-center gap-2 mb-3">
-          <CheckCircle2 className="h-5 w-5 text-primary" />
-          <h2 className="font-semibold text-sm">Recommended Workout</h2>
-        </div>
-        <div className="rounded-xl border border-border p-4">
-          <h3 className="font-semibold text-sm">{sessionShare.recommendation.name}</h3>
-          <span className="inline-block text-[11px] px-2 py-0.5 rounded-full bg-primary/15 text-primary mt-1">{sessionShare.recommendation.tag}</span>
-          <div className="flex gap-2 mt-2 text-[11px]">
-            <span className="px-2 py-0.5 rounded-md bg-card border border-border">{sessionShare.recommendation.sessions} sessions</span>
-            <span className="px-2 py-0.5 rounded-md bg-card border border-border">{sessionShare.recommendation.exercises} exercises</span>
+        </section>
+        <section className="rounded-[22px] border border-white/[0.07] p-5">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-primary" />
+            <h2 className="text-[15px] font-semibold tracking-tight">Smart guidance</h2>
           </div>
-          <button onClick={() => setScheduleOpen(true)}
-            className="mt-4 w-full py-2.5 rounded-lg bg-gradient-to-r from-primary to-secondary text-primary-foreground font-semibold text-sm hover:opacity-90">
-            Set Schedule
-          </button>
-        </div>
-      </section>
+          <ol className="mt-3 space-y-2.5">
+            {sessionShare.guidance.map((g, i) => (
+              <li key={g} className="flex gap-3 text-[13px] leading-relaxed text-foreground/85">
+                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/12 text-[11px] font-semibold text-primary">{i + 1}</span>
+                {g}
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section className="overflow-hidden rounded-[22px] border border-white/[0.07]">
+          <div className="relative bg-gradient-to-br from-primary/25 via-primary/[0.08] to-secondary/15 p-5">
+            <div className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-primary">Recommended for you</div>
+            <h3 className="mt-1 text-[17px] font-semibold tracking-tight">{sessionShare.recommendation.name}</h3>
+            <p className="mt-0.5 text-[12.5px] text-muted-foreground">{sessionShare.recommendation.tag}</p>
+            <div className="mt-3 flex gap-2 text-[11.5px]">
+              <span className="rounded-full bg-white/[0.06] px-2.5 py-1 text-foreground/80">{sessionShare.recommendation.sessions} sessions</span>
+              <span className="rounded-full bg-white/[0.06] px-2.5 py-1 text-foreground/80">{sessionShare.recommendation.exercises} exercises</span>
+            </div>
+          </div>
+          <div className="p-4">
+            <button onClick={() => setScheduleOpen(true)}
+              className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-secondary text-[15px] font-semibold text-white shadow-[0_10px_30px_-12px] shadow-primary transition hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+              <CalendarClock className="h-4 w-4" /> Set schedule
+            </button>
+          </div>
+        </section>
+      </div>
 
       {scheduleOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setScheduleOpen(false)}>

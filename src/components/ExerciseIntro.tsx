@@ -69,7 +69,7 @@ export function ExerciseIntro({
         </div>
 
         {/* right: how to, safety, start */}
-        <div className="mt-4 land:mt-0">
+        <div className="mt-4 land:mt-0 land:flex land:flex-col land:self-stretch">
           {/* one segmented track instead of three loose pills */}
           <div className="grid grid-cols-3 rounded-full border border-white/[0.06] bg-white/[0.03] p-1">
             {TABS.map((t) => (
@@ -110,7 +110,7 @@ export function ExerciseIntro({
           </div>
 
           {/* pinned to the bottom of the screen so Start is always in reach, with the content fading out behind it */}
-          <div className="sticky bottom-0 z-10 -mx-4 mt-4 bg-gradient-to-t from-background from-60% to-transparent px-4 pb-4 pt-6">
+          <div className="sticky bottom-0 z-10 -mx-4 -mb-10 mt-4 hidden land:mx-0 land:mt-auto land:block land:px-0 bg-gradient-to-t from-background from-60% to-transparent px-4 pb-4 pt-6">
             <button
               onClick={onStart}
               className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-secondary text-[15px] font-semibold text-white shadow-[0_10px_30px_-12px] shadow-primary transition hover:opacity-95 active:scale-[0.99]"
@@ -119,6 +119,16 @@ export function ExerciseIntro({
             </button>
           </div>
         </div>
+      </div>
+
+      {/* single column: the bar lives at page level so it sticks from the very top of the scroll (inside the right column it only stuck once that column scrolled into view) */}
+      <div className="sticky bottom-0 z-10 -mx-4 -mb-10 mt-0 land:hidden bg-gradient-to-t from-background from-60% to-transparent px-4 pb-4 pt-6">
+        <button
+          onClick={onStart}
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-secondary text-[15px] font-semibold text-white shadow-[0_10px_30px_-12px] shadow-primary transition hover:opacity-95 active:scale-[0.99]"
+        >
+          <Play className="h-4 w-4 fill-current" /> Start
+        </button>
       </div>
     </div>
   );
