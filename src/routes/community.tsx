@@ -11,7 +11,7 @@ import { Figure } from "@/components/ExerciseIntro";
 import type { Motion } from "@/lib/exercise-guides";
 import { cn } from "@/lib/utils";
 import {
-  Heart, MessageCircle, Share2, BadgeCheck, Send, X, ChevronLeft, ChevronRight, Eye, Play, Pause, MessagesSquare, Sparkles, PenLine,
+  Heart, MessageCircle, Share2, BadgeCheck, Send, X, ChevronLeft, ChevronRight, Eye, Play, Pause, MessagesSquare, Sparkles, PenLine, SearchX, RotateCcw,
   Facebook, Twitter, Linkedin, MessageSquare, Link2, ImageIcon, Smile,
   Search, SlidersHorizontal, Check, Hash, Flame, Clock3, Layers,
 } from "lucide-react";
@@ -148,13 +148,46 @@ function CommunityPage() {
     update(id, { liked: !p.liked, likes: p.likes + (p.liked ? -1 : 1) });
   };
 
+  const [attach, setAttach] = useState<string[]>([]);
+  const [emojiOpen, setEmojiOpen] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const draftRef = useRef<HTMLInputElement>(null);
+  const emojiRef = useRef<HTMLDivElement>(null);
+  // close the emoji panel on any tap outside it (or Escape), without a backdrop that would block the composer
+  useEffect(() => {
+    if (!emojiOpen) return;
+    const down = (e: PointerEvent) => {
+      const t = e.target as Element;
+      if (!emojiRef.current?.contains(t) && !t.closest?.('[aria-label="Emoji"]')) setEmojiOpen(false);
+    };
+    const key = (e: KeyboardEvent) => { if (e.key === "Escape") setEmojiOpen(false); };
+    document.addEventListener("pointerdown", down); document.addEventListener("keydown", key);
+    return () => { document.removeEventListener("pointerdown", down); document.removeEventListener("keydown", key); };
+  }, [emojiOpen]);
+  const canPost = !!draft.trim() || attach.length > 0;
+
+  const pickImages = (files: FileList | null) => {
+    if (!files) return;
+    const urls = [...files].filter((f) => f.type.startsWith("image/")).slice(0, 10 - attach.length).map((f) => URL.createObjectURL(f));
+    setAttach((a) => [...a, ...urls]);
+    if (fileRef.current) fileRef.current.value = "";
+  };
+  const insertEmoji = (em: string) => {
+    const el = draftRef.current;
+    const at = el?.selectionStart ?? draft.length;
+    const next = draft.slice(0, at) + em + draft.slice(el?.selectionEnd ?? at);
+    setDraft(next);
+    requestAnimationFrame(() => { el?.focus(); el?.setSelectionRange(at + em.length, at + em.length); });
+  };
+
   const submitPost = () => {
-    if (!draft.trim()) return;
+    if (!canPost) return;
     setPosts((ps) => [{
       id: `u${Date.now()}`, user: "You", handle: "@you", time: "now",
-      category: "Posture Tip", text: draft.trim(), likes: 0, comments: 0, shares: 0, thread: [],
+      category: "Posture Tip", text: draft.trim(), images: attach.length ? attach : undefined,
+      likes: 0, comments: 0, shares: 0, thread: [],
     }, ...ps]);
-    setDraft("");
+    setDraft(""); setAttach([]); setEmojiOpen(false);
     toast.success("Posted!");
   };
 
@@ -291,30 +324,92 @@ function CommunityPage() {
         )}
       </div>
 
-      {/* Inline composer — one row */}
-      <div className="glass-card flex items-center gap-2.5 py-2 pl-2.5 pr-2">
-        <Avatar name="You" size={32} />
-        <input
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter" && !e.nativeEvent.isComposing && e.keyCode !== 229 && draft.trim()) submitPost(); }}
-          placeholder="Share your progress today…"
-          className="flex-1 min-w-0 bg-transparent outline-none text-sm placeholder:text-muted-foreground"
-        />
-        <button aria-label="Add image" className="h-8 w-8 shrink-0 rounded-full flex items-center justify-center text-muted-foreground hover:bg-muted/60"><ImageIcon className="h-4 w-4" /></button>
-        <button aria-label="Emoji" className="h-8 w-8 shrink-0 rounded-full hidden min-[380px]:flex items-center justify-center text-muted-foreground hover:bg-muted/60"><Smile className="h-4 w-4" /></button>
-        <button
-          onClick={submitPost}
-          disabled={!draft.trim()}
-          className="h-8 px-4 shrink-0 rounded-full bg-gradient-to-r from-primary to-secondary text-white text-sm font-semibold disabled:opacity-40"
-        >
-          Post
-        </button>
+      {/* Inline composer: text, photos, emoji */}
+      <div className={cn("glass-card relative py-2 pl-2.5 pr-2", emojiOpen && "z-40")}>
+        <div className="flex items-center gap-2.5">
+          <Avatar name="You" size={32} />
+          <input
+            ref={draftRef}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter" && !e.nativeEvent.isComposing && e.keyCode !== 229 && canPost) submitPost(); }}
+            placeholder="Share your progress today…"
+            className="flex-1 min-w-0 bg-transparent outline-none text-sm placeholder:text-muted-foreground"
+          />
+          <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={(e) => pickImages(e.target.files)} />
+          <button onClick={() => fileRef.current?.click()} aria-label="Add photos"
+            className={cn("h-8 w-8 shrink-0 rounded-full flex items-center justify-center transition hover:bg-muted/60", attach.length ? "text-primary" : "text-muted-foreground")}>
+            <ImageIcon className="h-4 w-4" />
+          </button>
+          <button onClick={() => setEmojiOpen((o) => !o)} aria-label="Emoji" aria-expanded={emojiOpen}
+            className={cn("h-8 w-8 shrink-0 rounded-full hidden min-[380px]:flex items-center justify-center transition hover:bg-muted/60", emojiOpen ? "bg-muted/60 text-foreground" : "text-muted-foreground")}>
+            <Smile className="h-4 w-4" />
+          </button>
+          <button
+            onClick={submitPost}
+            disabled={!canPost}
+            className="h-8 px-4 shrink-0 rounded-full bg-gradient-to-r from-primary to-secondary text-white text-sm font-semibold disabled:opacity-40"
+          >
+            Post
+          </button>
+        </div>
+
+        {attach.length > 0 && (
+          <div className="mt-2 flex gap-2 overflow-x-auto pb-0.5 pl-[42px] mac-scroll">
+            {attach.map((src, i) => (
+              <div key={src} className="group relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-white/[0.08]">
+                <img src={src} alt="" className="h-full w-full object-cover" />
+                <button onClick={() => { URL.revokeObjectURL(src); setAttach((a) => a.filter((_, k) => k !== i)); }} aria-label="Remove photo"
+                  className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/65 text-white backdrop-blur-sm">
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            ))}
+            {attach.length < 10 && (
+              <button onClick={() => fileRef.current?.click()} aria-label="Add more photos"
+                className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-dashed border-white/15 text-muted-foreground transition hover:border-primary/50 hover:text-primary">
+                <ImageIcon className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+        )}
+
+        {emojiOpen && (
+          <>
+            <div ref={emojiRef} className="absolute right-2 top-[calc(100%+6px)] z-40 w-[264px] rounded-2xl border border-white/[0.08] bg-popover/95 p-2 shadow-[0_20px_50px_-20px_rgba(0,0,0,.8)] backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150">
+              <div className="px-1.5 pb-1.5 pt-0.5 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Quick reactions</div>
+              <div className="grid grid-cols-8 gap-0.5">
+                {EMOJIS.map((em) => (
+                  <button key={em} onClick={() => insertEmoji(em)} className="flex h-8 w-8 items-center justify-center rounded-lg text-[18px] transition hover:bg-white/[0.08] active:scale-90">{em}</button>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {filtered.length === 0 && (
-        <div className="text-center py-12 text-sm text-muted-foreground">
-          No posts match your filters.
+        <div className="flex flex-col items-center px-6 py-14 text-center">
+          <div className="relative">
+            <div aria-hidden className="absolute -inset-7 rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--primary)_26%,transparent),transparent)]" />
+            <div className="relative flex h-16 w-16 items-center justify-center rounded-[20px] border border-white/[0.08] bg-gradient-to-br from-primary/25 to-secondary/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+              <SearchX className="h-7 w-7 text-primary" strokeWidth={1.6} />
+            </div>
+          </div>
+          <h3 className="mt-5 text-[15.5px] font-semibold">{searchQ ? `Nothing for “${searchQ}”` : "No posts here yet"}</h3>
+          <p className="mt-1 max-w-[280px] text-[13px] leading-relaxed text-muted-foreground">
+            {searchQ ? "Try a different word, or clear the search to see every post." : `Nobody has posted in ${category} yet. Be the first, or browse all feeds.`}
+          </p>
+          <div className="mt-5 flex gap-2">
+            <button onClick={() => { setSearchQ(""); setCategory("All Feeds"); setSortBy("recent"); setSelectedTags([]); }}
+              className="inline-flex h-9 items-center gap-1.5 rounded-full border border-white/10 px-4 text-[13px] font-medium transition hover:border-primary/50 hover:text-primary">
+              <RotateCcw className="h-3.5 w-3.5" /> Clear filters
+            </button>
+            <button onClick={() => draftRef.current?.focus()}
+              className="inline-flex h-9 items-center gap-1.5 rounded-full bg-primary/15 px-4 text-[13px] font-medium text-primary transition hover:bg-primary/25">
+              <PenLine className="h-3.5 w-3.5" /> Write a post
+            </button>
+          </div>
         </div>
       )}
       <div className="space-y-3">
@@ -874,3 +969,5 @@ function Lightbox({ list, start, onClose }: { list: string[]; start: number; onC
     </div>
   );
 }
+
+const EMOJIS = ["😀","😄","😅","😂","🥲","😍","🤩","😎","🤔","😴","😮‍💨","💪","🙌","👏","👍","🙏","🔥","✨","🎉","💯","❤️","💙","💚","✅","🧘","🏃","🚶","🪑","💻","☕","💧","🌿"];
