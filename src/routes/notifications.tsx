@@ -35,7 +35,7 @@ function NotificationsPage() {
         <div className="mt-3 hidden land:block">{markAllBtn}</div>
       </div>
 
-      <div className="mt-4 land:mt-0">
+      <div className="mt-4 rounded-[20px] border border-white/[0.06] bg-white/[0.015] px-1.5 py-3 land:mt-0">
         <NotiList tab={tab} />
       </div>
     </div>

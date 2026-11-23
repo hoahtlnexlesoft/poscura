@@ -21,7 +21,7 @@ export type Noti = {
 
 export const KIND: Record<NotiKind, { label: string; icon: LucideIcon; tone: string }> = {
   posture: { label: "How's your posture?", icon: Activity, tone: "bg-primary/12 text-primary ring-primary/25" },
-  invite: { label: "New business invitation", icon: Briefcase, tone: "bg-[#a78bfa]/12 text-[#b9a3ff] ring-[#a78bfa]/25" },
+  invite: { label: "Team invitation", icon: Briefcase, tone: "bg-[#a78bfa]/12 text-[#b9a3ff] ring-[#a78bfa]/25" },
   workout: { label: "Upcoming workout", icon: Dumbbell, tone: "bg-secondary/12 text-secondary ring-secondary/25" },
   report: { label: "Report ready", icon: FileText, tone: "bg-primary/12 text-primary ring-primary/25" },
   community: { label: "Community", icon: Users, tone: "bg-success/12 text-success ring-success/25" },

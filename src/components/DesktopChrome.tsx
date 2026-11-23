@@ -118,25 +118,22 @@ function NotificationBell() {
         )}
       </PopoverTrigger>
       <PopoverContent align="end" sideOffset={10}
-        className="flex w-[420px] flex-col overflow-hidden rounded-[22px] border-white/[0.08] bg-[oklch(0.2_0.03_260/0.96)] p-0 shadow-[0_30px_80px_-20px_rgba(0,0,0,.75)] backdrop-blur-2xl">
-        <div className="border-b border-white/[0.06] px-5 pb-4 pt-5">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h2 className="text-[17px] font-semibold tracking-tight">Notifications</h2>
-              <p className="mt-0.5 text-[12.5px] text-muted-foreground">Updates on workouts, plan and subscription</p>
-            </div>
+        className="flex w-[400px] flex-col overflow-hidden rounded-2xl border border-white/[0.1] bg-[#121a2a] p-0 shadow-[0_24px_64px_-12px_rgba(0,0,0,.8),0_0_0_1px_rgba(0,0,0,.4)]">
+        <div className="border-b border-white/[0.06] px-4 pb-3 pt-4">
+          <div className="flex items-center justify-between gap-3 pl-1">
+            <h2 className="text-[16px] font-semibold tracking-tight">Notifications</h2>
             <button onClick={markAll} disabled={!unread}
               className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3 text-[12.5px] font-medium text-primary transition enabled:hover:bg-primary/10 disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
               <CheckCheck className="h-4 w-4" /> Mark all as read
             </button>
           </div>
-          <NotiFilter tab={tab} onTab={setTab} className="mt-4" />
+          <NotiFilter tab={tab} onTab={setTab} className="mt-3" />
         </div>
-        <div className="mac-scroll max-h-[min(520px,calc(100vh-220px))] overflow-y-auto p-3">
+        <div className="mac-scroll max-h-[min(520px,calc(100vh-200px))] overflow-y-auto px-1.5 py-3">
           <NotiList tab={tab} compact onOpen={() => setOpen(false)} />
         </div>
         <Link to="/notifications" onClick={() => setOpen(false)}
-          className="flex h-12 items-center justify-center gap-1.5 border-t border-white/[0.06] text-[13px] font-semibold text-foreground/80 transition hover:bg-white/[0.04] hover:text-foreground">
+          className="flex h-11 items-center justify-center gap-1.5 border-t border-white/[0.06] text-[13px] font-semibold text-primary transition hover:bg-primary/[0.06]">
           View all notifications <ArrowRight className="h-4 w-4" />
         </Link>
       </PopoverContent>
