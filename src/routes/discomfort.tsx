@@ -47,9 +47,9 @@ function DiscomfortPage() {
       </div>
 
       <div className="glass-card p-4 flex flex-col items-center fold:col-start-1 fold:row-start-3 fold:sticky fold:top-[72px]">
-        {/* on foldables the figure is sized by height so the whole body fits on screen without scrolling */}
-        <div className="relative w-full max-w-[280px] fold:w-auto fold:max-w-none">
-          <img src={bodyImg} alt="Body" className="w-full h-auto pointer-events-none select-none fold:w-auto fold:h-[calc(100dvh-260px)] fold:min-h-[300px]" draggable={false} />
+        {/* the figure is sized by screen height so the whole body fits above the pinned Skip / Submit bar */}
+        <div className="relative w-auto">
+          <img src={bodyImg} alt="Body" className="w-auto h-[calc(100dvh-340px)] min-h-[260px] pointer-events-none select-none fold:h-[calc(100dvh-260px)] fold:min-h-[300px]" draggable={false} />
           {([
             { p: "head", style: { top: "2%", left: "38%", width: "24%", height: "12%", borderRadius: "50%" } },
             { p: "neck", style: { top: "13%", left: "42%", width: "16%", height: "5%" } },
