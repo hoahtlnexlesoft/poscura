@@ -109,14 +109,18 @@ function DiscomfortPage() {
         )}
       </div>
 
-      <div className="flex gap-3">
-        <button onClick={() => navigate({ to: "/" })} className="flex-1 py-2.5 rounded-lg border border-primary/40 text-primary text-sm font-medium">
-          Skip
-        </button>
-        <button onClick={() => navigate({ to: "/" })} className="flex-1 py-2.5 rounded-lg bg-gradient-to-r from-primary to-secondary text-primary-foreground text-sm font-medium shadow-lg">
-          Submit
-        </button>
       </div>
+
+      {/* pinned to the bottom so Skip / Submit are always visible, content fades out behind them */}
+      <div className="sticky bottom-0 z-20 -mx-4 bg-gradient-to-t from-background from-60% to-transparent px-4 pb-4 pt-6 fold:col-start-2 fold:mx-0 fold:px-0">
+        <div className="flex gap-3">
+          <button onClick={() => navigate({ to: "/" })} className="h-12 flex-[0_0_34%] rounded-full border border-white/10 bg-white/[0.03] text-[15px] font-medium text-muted-foreground transition hover:border-white/20 hover:bg-white/[0.07] hover:text-foreground active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+            Skip
+          </button>
+          <button onClick={() => navigate({ to: "/" })} className="h-12 flex-1 rounded-full bg-gradient-to-r from-primary to-secondary text-[15px] font-semibold text-white shadow-[0_10px_30px_-12px] shadow-primary transition hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+            Submit{selected.size > 0 ? ` · ${selected.size} area${selected.size > 1 ? "s" : ""}` : ""}
+          </button>
+        </div>
       </div>
     </div>
   );
