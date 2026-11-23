@@ -17,6 +17,11 @@
   @media (min-width: 800px) and (min-height: 600px) and (orientation: landscape) { @slot; }
 }
 
+/* Desktop web app (≥1200px): sidebar + top bar instead of the phone chrome */
+@custom-variant desk {
+  @media (min-width: 1200px) { @slot; }
+}
+
 @custom-variant dark (&:is(.dark *));
 
 /* Open foldables in landscape: the left column ends exactly at the hinge, the right one takes the rest
@@ -25,6 +30,10 @@
   .hinge-split { display: grid !important; grid-template-columns: calc(50vw - 28px) minmax(0, 1fr) !important; column-gap: 24px !important; }
   .hinge-split > * { margin-bottom: 0 !important; }
   .hinge-split > [data-pd-bar] { margin-bottom: -24px !important; } /* comment bar runs to the screen edge */
+}
+/* desktop: no hinge, the content area sits beside the sidebar, so split it evenly */
+@media (min-width: 1200px) {
+  .hinge-split { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; column-gap: 28px !important; }
 }
 
 @theme inline {
@@ -268,4 +277,9 @@ html[data-side] [data-lightbox] img { max-width: 100%; }
     [data-app-nav] :is(a, button):not([class*="hover:"]):hover { color: var(--color-foreground); }
     [data-app-nav] :is(a, button).active:hover, [data-app-nav] :is(a, button)[aria-current="page"]:hover { color: var(--color-primary); }
   }
+}
+
+/* desktop web app: the shell always clears the fixed sidebar, on main tabs and sub pages alike */
+@media (min-width: 1200px) {
+  html [data-app-shell]:has([data-desk-sidebar]) { padding-left: 264px !important; padding-right: 0 !important; }
 }

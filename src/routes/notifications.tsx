@@ -1,177 +1,42 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { ChevronLeft, Bell, Activity, Dumbbell, Users, AlertTriangle, FileText, CheckCheck, BellOff } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ChevronLeft, CheckCheck } from "lucide-react";
+import { useNotifications } from "@/lib/notifications";
+import { NotiFilter, NotiList, type NotiTab } from "@/components/NotificationList";
 
 export const Route = createFileRoute("/notifications")({ component: NotificationsPage });
 
-type Category = "posture" | "workout" | "report" | "community" | "system";
-
-type Item = {
-  id: string; category: Category; title: string; body: string; detail: string;
-  time: string; ago: string; unread?: boolean;
-  action: { label: string; to: "/posture-monitor" | "/workout" | "/community"; search?: Record<string, string> };
-};
-
-const SEED: Item[] = [
-  { id: "1", category: "posture", title: "Posture alert", body: "Slouching for 15 minutes. Reset!", time: "2m", ago: "2 minutes ago", unread: true,
-    detail: "You've been leaning forward for the last 15 minutes. Sit back, let your shoulders drop and bring your ears over your shoulders.",
-    action: { label: "Open Posture Monitor", to: "/posture-monitor" } },
-  { id: "2", category: "workout", title: "Workout reminder", body: "Mobility session in 5 min.", time: "20m", ago: "20 minutes ago", unread: true,
-    detail: "Your neck mobility session starts in 5 minutes. It takes about 8 minutes and needs no equipment.",
-    action: { label: "Go to Workout", to: "/workout" } },
-  { id: "3", category: "report", title: "Report ready", body: "Morning report available.", time: "1h", ago: "1 hour ago", unread: true,
-    detail: "Your morning session report is ready, with your average score, time in good posture and the areas to work on.",
-    action: { label: "View report", to: "/posture-monitor", search: { report: "1" } } },
-  { id: "4", category: "community", title: "New reply", body: "Maria replied to your post.", time: "3h", ago: "3 hours ago",
-    detail: "Maria Santos replied to your post in Community.",
-    action: { label: "Open Community", to: "/community" } },
-  { id: "5", category: "system", title: "Camera disconnected", body: "Reconnect to resume.", time: "1d", ago: "Yesterday",
-    detail: "The camera disconnected during your last session, so monitoring paused. Reconnect it to resume.",
-    action: { label: "Reconnect camera", to: "/posture-monitor" } },
-];
-
-const META: Record<Category, { icon: typeof Bell; tone: string; label: string }> = {
-  posture: { icon: Activity, tone: "text-primary bg-primary/10 border-primary/30", label: "Posture" },
-  workout: { icon: Dumbbell, tone: "text-secondary bg-secondary/10 border-secondary/30", label: "Workout" },
-  report: { icon: FileText, tone: "text-primary bg-primary/10 border-primary/30", label: "Report" },
-  community: { icon: Users, tone: "text-success bg-success/10 border-success/30", label: "Community" },
-  system: { icon: AlertTriangle, tone: "text-warning bg-warning/10 border-warning/30", label: "System" },
-};
-
 function NotificationsPage() {
-  const navigate = useNavigate();
-  const [items, setItems] = useState(SEED);
-  const [tab, setTab] = useState<"all" | "unread">("all");
-  const unread = items.filter((n) => n.unread).length;
-  const list = tab === "unread" ? items.filter((n) => n.unread) : items;
+  const { unread, markAll } = useNotifications();
+  const [tab, setTab] = useState<NotiTab>("all");
 
-  const markRead = (id: string) => setItems((xs) => xs.map((x) => (x.id === id ? { ...x, unread: false } : x)));
-
-  const open = (n: Item) => {
-    markRead(n.id);
-    navigate({ to: n.action.to, search: n.action.search as never });
-  };
-
-  const markAll = () => setItems((xs) => xs.map((x) => ({ ...x, unread: false })));
-  const TABS = [
-    { id: "all" as const, label: "All", count: items.length },
-    { id: "unread" as const, label: "Unread", count: unread },
-  ];
+  const markAllBtn = (
+    <button onClick={markAll} disabled={!unread}
+      className="inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-white/10 px-3.5 text-[12.5px] font-medium text-primary transition enabled:hover:border-primary/40 enabled:hover:bg-primary/10 enabled:active:scale-[0.97] disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+      <CheckCheck className="h-4 w-4" /> Mark all read
+    </button>
+  );
 
   return (
-    <div className="fold:max-w-[640px] land:max-w-none hinge-split land:items-start">
-      {/* open foldables: the left pane holds the page header and filters, the list sits on the right of the hinge */}
-      <aside className="hidden land:flex land:sticky land:top-4 flex-col">
-        <Link to="/" className="inline-flex w-fit items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+    <div data-screen="Notifications" className="fold:mx-auto fold:max-w-[640px] land:max-w-none hinge-split land:items-start">
+      {/* header (on open foldables it becomes the left pane, with the list across the hinge) */}
+      <div className="land:sticky land:top-[72px]">
+        <Link to="/" className="inline-flex w-fit items-center gap-1 text-sm text-muted-foreground transition hover:text-foreground">
           <ChevronLeft className="h-4 w-4" /> Back
         </Link>
-        <h1 className="mt-3 text-[26px] font-bold tracking-tight">Notifications</h1>
-        <p className="mt-0.5 text-sm text-muted-foreground">Stay on top of your posture journey.</p>
-
-        <div className="glass-card mt-5 p-1.5">
-          {TABS.map((t) => (
-            <button key={t.id} onClick={() => setTab(t.id)}
-              className={cn("flex w-full items-center justify-between rounded-xl px-3.5 py-3 text-sm font-medium transition",
-                tab === t.id ? "bg-primary/12 text-foreground" : "text-muted-foreground hover:bg-white/[0.07] hover:text-foreground")}>
-              <span className="flex items-center gap-2.5">
-                <span className={cn("h-1.5 w-1.5 rounded-full", tab === t.id ? "bg-primary" : "bg-transparent")} />
-                {t.label}
-              </span>
-              <span className={cn("min-w-6 rounded-full px-2 text-center text-[11px] leading-5 tabular-nums",
-                tab === t.id ? "bg-primary text-primary-foreground" : "bg-muted/60 text-muted-foreground")}>{t.count}</span>
-            </button>
-          ))}
+        <div className="mt-3 flex items-end justify-between gap-3 land:block">
+          <div>
+            <h1 className="text-[22px] font-bold tracking-tight land:text-[26px]">Notifications</h1>
+            <p className="mt-0.5 text-[12.5px] text-muted-foreground">Updates on workouts, your plan and subscription.</p>
+          </div>
+          <div className="land:hidden">{markAllBtn}</div>
         </div>
-
-        <button onClick={markAll} disabled={!unread}
-          className="mt-3 inline-flex h-10 items-center justify-center gap-1.5 rounded-xl border border-border text-sm font-medium text-primary transition hover:bg-primary/10 disabled:opacity-40">
-          <CheckCheck className="h-4 w-4" /> Mark all read
-        </button>
-      </aside>
-
-      <div className="land:hidden">
-      <div className="flex items-center justify-between">
-        <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-          <ChevronLeft className="h-4 w-4" /> Back
-        </Link>
-      </div>
-
-      <div className="mt-3 flex items-end justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-tight">Notifications</h1>
-          <p className="text-xs text-muted-foreground">Stay on top of your posture journey.</p>
-        </div>
-        <button
-          onClick={markAll}
-          disabled={!unread}
-          className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-primary transition hover:bg-primary/10 disabled:opacity-40"
-        >
-          <CheckCheck className="h-3.5 w-3.5" /> Mark all read
-        </button>
-      </div>
+        <NotiFilter tab={tab} onTab={setTab} className="mt-4 land:mt-5" />
+        <div className="mt-3 hidden land:block">{markAllBtn}</div>
       </div>
 
       <div className="mt-4 land:mt-0">
-        {/* list */}
-        <section>
-          <div className="mb-3 inline-flex rounded-xl bg-muted/40 p-1 land:hidden">
-            {(["all", "unread"] as const).map((t) => (
-              <button
-                key={t}
-                onClick={() => setTab(t)}
-                className={cn(
-                  "flex h-8 items-center gap-1.5 rounded-lg px-3.5 text-xs font-semibold transition",
-                  tab === t ? "bg-background text-foreground shadow" : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {t === "all" ? "All" : "Unread"}
-                {t === "unread" && unread > 0 && (
-                  <span className="rounded-full bg-primary px-1.5 text-[10px] leading-4 text-primary-foreground">{unread}</span>
-                )}
-              </button>
-            ))}
-          </div>
-
-          <div className="mb-3 hidden items-baseline justify-between land:flex">
-            <h2 className="text-sm font-semibold">{tab === "all" ? "All notifications" : "Unread"}</h2>
-            <span className="text-xs text-muted-foreground">{list.length} {list.length === 1 ? "item" : "items"}</span>
-          </div>
-          {list.length === 0 ? (
-            <div className="glass-card flex flex-col items-center gap-2 py-12 text-center">
-              <BellOff className="h-6 w-6 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">You're all caught up.</p>
-            </div>
-          ) : (
-            <div className="glass-card overflow-hidden p-1.5">
-              {list.map((n) => {
-                const m = META[n.category]; const Icon = m.icon;
-                return (
-                  <button
-                    key={n.id}
-                    onClick={() => open(n)}
-                    className="relative flex w-full items-start gap-3 rounded-xl p-3 text-left transition hover:bg-white/[0.07] hover:text-foreground"
-                  >
-                    <span className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-full border", m.tone)}>
-                      <Icon className="h-4 w-4" />
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="flex items-center gap-2">
-                        <span className={cn("truncate text-sm", n.unread ? "font-semibold" : "font-medium text-foreground/85")}>{n.title}</span>
-                        <span className="ml-auto shrink-0 text-[10.5px] text-muted-foreground">{n.time}</span>
-                      </span>
-                      <span className="mt-0.5 flex items-center gap-2">
-                        <span className="truncate text-xs text-muted-foreground">{n.body}</span>
-                        {n.unread && <span className="ml-auto h-2 w-2 shrink-0 rounded-full bg-primary" />}
-                      </span>
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </section>
-
+        <NotiList tab={tab} />
       </div>
     </div>
   );

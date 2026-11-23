@@ -135,7 +135,8 @@
     { id:"duo-c",  name:"iPhone Duo · Folded",   w:466, h:678, kind:"duo", unit:"pt", color:"#8d8577", layout:"rail", side:true },
     { id:"duo-o",  name:"iPhone Duo · Open", w:626, h:890, kind:"fold",   unit:"pt", color:"#8d8577", crease:"v", rotate:true, side:true },
     { id:"zfold-c", name:"Galaxy Z Fold8 · Folded", w:467, h:737, kind:"punch", unit:"dp", color:"#3c3f45", tone:"#141619", radius:10, scr:10, layout:"rail", stack:true },
-    { id:"zfold",  name:"Galaxy Z Fold8 · Open",         w:734, h:972, kind:"fold",   unit:"dp", color:"#3c3f45", tone:"#141619", android:true, silver:true, crease:"v", rotate:true }
+    { id:"zfold",  name:"Galaxy Z Fold8 · Open",         w:734, h:972, kind:"fold",   unit:"dp", color:"#3c3f45", tone:"#141619", android:true, silver:true, crease:"v", rotate:true },
+    { id:"desk",   name:"Desktop · Web app",    w:1440, h:900, kind:"desktop", unit:"px" }
   ];
 
   var store = {
@@ -234,6 +235,13 @@
         extra = '<span class="sidebtn" style="background:'+c4+';right:-3px;top:110px;height:60px"></span><span class="sidebtn" style="background:'+c4+';top:-3px;right:120px;width:70px;height:4px"></span><div class="shell"></div>' +
           '<span style="position:absolute;left:50%;top:-3px;bottom:-3px;width:' + (d.silver ? 4 : 6) + 'px;transform:translateX(-50%);background:' + hg + ';border-radius:3px"></span>';
       }
+    } else if (k === "desktop") {
+      // browser window: traffic lights + address bar above the page
+      ow = d.w; oh = d.h + 44; sl = 0; st = 44; radius = 12; scr = "0 0 12px 12px"; top = 0; bot = 0;
+      bg = "#1b1d22";
+      extra = '<div style="position:absolute;left:0;right:0;top:0;height:44px;display:flex;align-items:center;gap:8px;padding:0 16px;border-bottom:1px solid #2a2d34">' +
+        '<i style="width:12px;height:12px;border-radius:50%;background:#ff5f57"></i><i style="width:12px;height:12px;border-radius:50%;background:#febc2e"></i><i style="width:12px;height:12px;border-radius:50%;background:#28c840"></i>' +
+        '<div style="margin:0 auto;width:420px;height:28px;border-radius:8px;background:#26292f;color:#9aa1ad;font:500 13px/28px system-ui,sans-serif;text-align:center">app.poscura.com</div><span style="width:60px"></span></div>';
     } else {
       ow = d.w + 28; oh = d.h + 30; sl = 14; st = 15; radius = d.radius || 52; scr = d.scr || 40; top = 40; bot = 24;
       bg = "linear-gradient(145deg," + d.color + "," + (d.tone || "#24272c") + ")";

@@ -9,6 +9,7 @@ import {
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useAuth, signOut } from "@/lib/auth-store";
 import logo from "@/assets/poscura-logo.png";
+import { useNotifications, badge } from "@/lib/notifications";
 
 const PRIMARY_ITEMS = [
   { label: "My Account", icon: UserIcon, to: "/account" as const },
@@ -24,6 +25,7 @@ export function MobileTopBar() {
   const navigate = useNavigate();
   const user = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { unread } = useNotifications();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -33,7 +35,7 @@ export function MobileTopBar() {
   };
 
   return (
-    <header className="h-14 border-b border-border flex items-center justify-between px-4 bg-background/80 backdrop-blur-xl sticky top-0 z-30">
+    <header className="desk:hidden h-14 border-b border-border flex items-center justify-between px-4 bg-background/80 backdrop-blur-xl sticky top-0 z-30">
       <div className="flex items-center gap-2">
         <button
           data-tb-inline
@@ -178,7 +180,7 @@ export function MobileTopBar() {
         <button onClick={() => navigate({ to: "/notifications" })} aria-label="Notifications"
           className="relative h-10 w-10 rounded-full flex items-center justify-center text-sidebar-foreground/80 hover:bg-white/[0.08] hover:text-foreground">
           <Bell className="h-[18px] w-[18px]" />
-          <span className="absolute top-0.5 right-0 text-[9px] px-1 rounded-full bg-destructive text-destructive-foreground font-semibold">9+</span>
+          {unread > 0 && <span className="absolute top-0.5 right-0 text-[9px] px-1 rounded-full bg-destructive text-destructive-foreground font-semibold">{badge(unread)}</span>}
         </button>
       </div>, document.body)}
 
@@ -190,7 +192,7 @@ export function MobileTopBar() {
         <button onClick={() => navigate({ to: "/notifications" })} aria-label="Notifications"
           className="relative h-9 w-9 rounded-full bg-card border border-border flex items-center justify-center">
           <Bell className="h-4 w-4" />
-          <span className="absolute -top-1 -right-1 text-[9px] px-1 rounded-full bg-destructive text-destructive-foreground font-semibold">9+</span>
+          {unread > 0 && <span className="absolute -top-1 -right-1 text-[9px] px-1 rounded-full bg-destructive text-destructive-foreground font-semibold">{badge(unread)}</span>}
         </button>
         {!user && (
           <Link to="/login" className="h-9 px-3 rounded-full bg-card border border-border flex items-center text-xs font-medium">

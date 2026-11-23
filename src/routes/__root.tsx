@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { MobileTopBar } from "@/components/MobileTopBar";
 import { BottomNav } from "@/components/BottomNav";
+import { DesktopSidebar, DesktopTopBar } from "@/components/DesktopChrome";
 import { useAuth } from "@/lib/auth-store";
 
 import appCss from "../styles.css?url";
@@ -124,10 +125,12 @@ function AuthGate() {
   const isOnboarding = location.pathname === "/onboarding";
   const hideTopBar = isOnboarding || location.pathname === "/account" || location.pathname === "/settings" || location.pathname === "/support";
   return (
-    <div data-app-shell className={`flex flex-col min-h-screen w-full bg-background text-foreground ${isOnboarding ? "" : "rail:pr-[92px]"}`}>
+    <div data-app-shell className={`flex flex-col min-h-screen w-full bg-background text-foreground ${isOnboarding ? "" : "rail:pr-[92px] desk:pr-0 desk:pl-[264px]"}`}>
+      {!isOnboarding && <DesktopSidebar />}
+      {!isOnboarding && <DesktopTopBar />}
       {!hideTopBar && <MobileTopBar />}
-      <main className={`flex-1 p-4 ${isOnboarding ? "pb-6" : "pb-24 rail:pb-6"}`}>
-        <div className="fold:max-w-[1040px] fold:mx-auto">
+      <main className={`flex-1 p-4 ${isOnboarding ? "pb-6" : "pb-24 rail:pb-6 desk:px-8 desk:pt-7 desk:pb-10"}`}>
+        <div className="fold:max-w-[1040px] fold:mx-auto desk:max-w-[1180px]">
           <Outlet />
         </div>
       </main>
