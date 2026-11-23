@@ -1,5 +1,6 @@
 import { useImmersive } from "@/hooks/useImmersive";
-import { ChevronLeft, ChevronRight, Play, Tag, Share2, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, Tag, Share2, X, CalendarClock, Check, Clock3 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { ExerciseDetail } from "@/components/ExerciseDetail";
@@ -19,10 +20,10 @@ const todaySessions = [
 ];
 
 const exerciseList: ExerciseListItem[] = [
-  { name: "Squeeze Blades", description: "Strengthens muscles between your shoulder blades", badge: "Warm Up", sessions: "5 sessions", thumbnailGradient: "from-amber-200 to-orange-300" },
-  { name: "Neck Rotation", description: "Improves cervical mobility", badge: "Mobility", sessions: "3 sessions", thumbnailGradient: "from-sky-200 to-blue-300" },
-  { name: "Cat Cow", description: "Mobilizes the spine and relieves back tension", badge: "Flexibility", sessions: "4 sessions", thumbnailGradient: "from-emerald-200 to-teal-300" },
-  { name: "Chest Stretch", description: "Opens the chest, counteracts forward posture", badge: "Cool Down", sessions: "2 sessions", thumbnailGradient: "from-rose-200 to-pink-300" },
+  { name: "Squeeze Blades", description: "Strengthens muscles between your shoulder blades", badge: "Warm Up", sessions: "5 sessions", thumbnailGradient: "from-amber-400/35 to-orange-500/25" },
+  { name: "Neck Rotation", description: "Improves cervical mobility", badge: "Mobility", sessions: "3 sessions", thumbnailGradient: "from-sky-400/35 to-blue-500/25" },
+  { name: "Cat Cow", description: "Mobilizes the spine and relieves back tension", badge: "Flexibility", sessions: "4 sessions", thumbnailGradient: "from-emerald-400/35 to-teal-500/25" },
+  { name: "Chest Stretch", description: "Opens the chest, counteracts forward posture", badge: "Cool Down", sessions: "2 sessions", thumbnailGradient: "from-rose-400/35 to-pink-500/25" },
 ];
 
 interface Props {
@@ -47,9 +48,9 @@ const WEEK_SCHEDULE: Record<number, Slot[]> = {
 };
 
 const SLOT_STYLES: Record<SlotStatus, string> = {
-  done: "border-success/40 bg-success/10 text-success",
-  missed: "border-destructive/40 bg-destructive/10 text-destructive",
-  upcoming: "border-border bg-card text-foreground/80",
+  done: "bg-success/12 text-success ring-1 ring-inset ring-success/25",
+  missed: "bg-destructive/10 text-destructive ring-1 ring-inset ring-destructive/25",
+  upcoming: "bg-white/[0.04] text-foreground/75 ring-1 ring-inset ring-white/[0.07]",
 };
 
 function startOfWeek(d: Date): Date {
@@ -96,157 +97,172 @@ export function WorkoutProgramDetail({ onClose, onStartSession }: Props) {
     return <ExerciseDetail exerciseName={selectedExercise.name} badge={selectedExercise.badge} onClose={() => setSelectedExercise(null)} />;
   }
 
+  const next = todaySessions[0];
   return (
     <div className="space-y-4 land:grid land:grid-cols-2 hinge-split land:items-start land:gap-x-6 land:gap-y-4 land:space-y-0">
-      <div className="flex items-center justify-between land:col-span-2">
-        <button onClick={onClose} className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground transition hover:text-foreground">
-          <ChevronLeft className="h-4 w-4" /> Workout
+      {/* ---------- header ---------- */}
+      <div className="flex items-center gap-3 land:col-span-2">
+        <button onClick={onClose} aria-label="Back" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/[0.08] text-foreground/80 transition hover:border-primary/40 hover:text-foreground">
+          <ChevronLeft className="h-[18px] w-[18px]" />
         </button>
-        <div className="flex items-center gap-2">
-          <button onClick={onClose} className="px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium transition hover:border-primary/40 hover:bg-white/[0.04] hover:text-foreground">
-            Cancel
-          </button>
-          <button onClick={() => setRescheduleOpen(true)} className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium">
-            Reschedule
-          </button>
-        </div>
+        <span className="flex-1 text-[15px] font-semibold">Program</span>
+        <button onClick={() => setRescheduleOpen(true)} className="inline-flex h-9 items-center gap-1.5 rounded-full border border-white/[0.08] px-3.5 text-[12.5px] font-medium text-foreground/85 transition hover:border-primary/40 hover:text-foreground">
+          <CalendarClock className="h-4 w-4" /> Reschedule
+        </button>
+        <button onClick={() => toast.success("Share menu")} aria-label="Share" className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.08] text-foreground/80 transition hover:border-primary/40 hover:text-primary">
+          <Share2 className="h-4 w-4" />
+        </button>
       </div>
 
-      <section className="glass-card p-4 space-y-4 land:sticky land:top-[72px]">
-        <div className="space-y-2">
-          <div className="flex items-start justify-between gap-2">
-            <h1 className="text-lg font-bold">Shoulder &amp; Neck Relief</h1>
-            <button onClick={() => toast.success("Share menu")} className="h-8 w-8 rounded-lg border border-border flex items-center justify-center">
-              <Share2 className="h-3.5 w-3.5" />
-            </button>
-          </div>
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted text-[11px] text-foreground/80">
+      {/* ---------- left: program hero ---------- */}
+      <section className="relative overflow-hidden rounded-[22px] border border-white/[0.06] bg-card land:sticky land:top-[72px]">
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[radial-gradient(90%_100%_at_0%_0%,color-mix(in_oklab,var(--primary)_22%,transparent),transparent_70%),radial-gradient(70%_90%_at_100%_0%,color-mix(in_oklab,var(--secondary)_16%,transparent),transparent_70%)]" />
+        <div className="relative p-5">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.06] px-2.5 py-1 text-[11px] font-medium text-foreground/80 ring-1 ring-inset ring-white/[0.08]">
             <Tag className="h-3 w-3" /> Postural strength
           </span>
-          <p className="text-xs text-foreground/80">A program to relieve tension and improve mobility in the shoulders and neck.</p>
+          <h1 className="mt-3 text-[22px] font-semibold leading-tight tracking-tight">Shoulder &amp; Neck Relief</h1>
+          <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground">A program to relieve tension and improve mobility in the shoulders and neck.</p>
+
+          <div className="mt-5 grid grid-cols-3 divide-x divide-white/[0.06] rounded-[16px] border border-white/[0.06] bg-background/40">
+            {[["39", "sessions"], ["4", "exercises"], ["4", "weeks"]].map(([v, l]) => (
+              <div key={l} className="px-3 py-3 text-center">
+                <div className="text-[20px] font-semibold leading-none tabular-nums">{v}</div>
+                <div className="mt-1 text-[11px] text-muted-foreground">{l}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-5">
+            <div className="flex items-baseline justify-between text-[12px]">
+              <span className="text-muted-foreground">Progress</span>
+              <span className="tabular-nums"><b className="font-semibold">0</b><span className="text-muted-foreground"> of 40 sessions · 0%</span></span>
+            </div>
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
+              <div className="h-full w-[2%] rounded-full bg-gradient-to-r from-primary to-secondary" />
+            </div>
+          </div>
         </div>
 
-        <div>
-          <div className="flex items-center justify-between mb-1 text-xs">
-            <span className="font-semibold">Progress</span>
-            <span className="text-muted-foreground">0/40 sessions</span>
+        {/* the one primary action: start the next session */}
+        <div className="relative flex items-center gap-3 border-t border-white/[0.06] bg-white/[0.02] px-5 py-4">
+          <div className="min-w-0 flex-1">
+            <div className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Up next</div>
+            <div className="mt-0.5 truncate text-[14.5px] font-semibold">{next.name} <span className="font-normal text-muted-foreground">· {next.scheduledAt}</span></div>
           </div>
-          <div className="h-2 rounded-full bg-muted overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-primary to-secondary" style={{ width: "0%" }} />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-3 gap-2">
-          <div className="rounded-xl border border-border bg-card p-2">
-            <div className="text-[10px] text-muted-foreground">Total</div>
-            <div><span className="text-lg font-bold">39</span><span className="text-[10px] text-muted-foreground"> sessions</span></div>
-          </div>
-          <div className="rounded-xl border border-border bg-card p-2">
-            <div className="text-[10px] text-muted-foreground">Exercises</div>
-            <div><span className="text-lg font-bold">4</span></div>
-          </div>
-          <div className="rounded-xl border border-border bg-card p-2">
-            <div className="text-[10px] text-muted-foreground">Duration</div>
-            <div><span className="text-lg font-bold">4</span><span className="text-[10px] text-muted-foreground"> wks</span></div>
-          </div>
+          <button onClick={() => onStartSession(next.name)} className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-r from-primary to-secondary px-4 text-[13px] font-semibold text-white shadow-[0_10px_26px_-14px] shadow-primary transition hover:brightness-110 active:scale-[0.98]">
+            <Play className="h-3.5 w-3.5 fill-current" /> Start
+          </button>
         </div>
       </section>
 
       <div className="space-y-4">
-      <section className="glass-card p-4 space-y-3">
-        <div className="flex items-center gap-2">
-          <button onClick={() => setTab("today")}
-            className={`px-4 py-1.5 rounded-full border text-xs font-medium ${tab === "today" ? "border-primary text-primary bg-primary/5" : "border-border"}`}>Today's Sessions</button>
-          <button onClick={() => setTab("all")}
-            className={`px-4 py-1.5 rounded-full border text-xs font-medium ${tab === "all" ? "border-primary text-primary bg-primary/5" : "border-border"}`}>All Sessions</button>
-        </div>
-
-        {tab === "today" ? (
-          <div className="space-y-2">
-            {todaySessions.map((s) => (
-              <div key={s.name} className="rounded-xl border border-border bg-card p-3 flex items-center justify-between gap-2">
-                <div className="min-w-0">
-                  <h3 className="font-semibold text-sm">{s.name}</h3>
-                  <span className="inline-block text-[10px] px-1.5 py-0.5 rounded-md bg-destructive/15 text-destructive font-medium mt-0.5">{s.status}</span>
-                  <div className="text-[11px] text-muted-foreground">{s.scheduledAt}</div>
-                </div>
-                <button onClick={() => onStartSession(s.name)} className="h-9 w-9 rounded-full border-2 border-primary text-primary flex items-center justify-center shrink-0">
-                  <Play className="h-3.5 w-3.5 fill-current" />
-                </button>
-              </div>
+        {/* ---------- sessions ---------- */}
+        <section className="rounded-[22px] border border-white/[0.06] bg-card p-4">
+          <div className="grid grid-cols-2 rounded-full border border-white/[0.06] bg-white/[0.03] p-1">
+            {([["today", "Today"], ["all", "This week"]] as const).map(([id, label]) => (
+              <button key={id} onClick={() => setTab(id)}
+                className={cn("h-8 rounded-full text-[12.5px] font-medium transition", tab === id ? "bg-white/[0.09] text-foreground shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]" : "text-muted-foreground hover:text-foreground")}>
+                {label}
+              </button>
             ))}
           </div>
-        ) : (
-          <div className="space-y-3 -mx-4">
-            <div className="flex items-center justify-between px-4">
-              <button onClick={() => shiftWeek(-1)} className="p-1.5 rounded-md text-muted-foreground"><ChevronLeft className="h-4 w-4" /></button>
-              <div className="text-xs font-medium">{monthLabel}</div>
-              <button onClick={() => shiftWeek(1)} className="p-1.5 rounded-md text-muted-foreground"><ChevronRight className="h-4 w-4" /></button>
-            </div>
-            <div className="overflow-x-auto px-4 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
-              <div className="grid grid-flow-col auto-cols-[64px] gap-2">
-                {dayDates.map((d, i) => {
-                  const isToday = isCurrentWeek && i === todayDayIndex;
-                  const slots = WEEK_SCHEDULE[i] ?? [];
-                  return (
-                    <div key={i} className="flex flex-col items-center gap-2">
-                      <span className={`text-[10px] font-semibold uppercase ${isToday ? "text-primary" : "text-muted-foreground"}`}>{WEEK_DAYS[i]}</span>
-                      <span className={`h-7 w-7 flex items-center justify-center rounded-full text-sm ${isToday ? "bg-primary text-primary-foreground font-semibold" : "text-foreground/80"}`}>
-                        {d.getDate()}
-                      </span>
-                      <div className="w-full flex flex-col gap-1.5 pt-1">
-                        {slots.length === 0 ? (
-                          <div className="h-7 w-full rounded-md border border-dashed border-border/60" />
-                        ) : (
-                          slots.map((s, idx) => {
-                            const clickable = isToday || s.status === "done" || s.status === "missed";
-                            const handleClick = () => {
-                              if (isToday) onStartSession(exerciseList[0].name);
-                              else if (s.status === "done" || s.status === "missed") setSelectedExercise(exerciseList[0]);
-                            };
-                            return (
-                              <button
-                                key={idx}
-                                onClick={handleClick}
-                                disabled={!clickable}
-                                className={`h-7 w-full rounded-md border text-[10px] font-medium flex items-center justify-center ${SLOT_STYLES[s.status]} ${clickable ? "cursor-pointer hover:opacity-80" : "cursor-default"}`}
-                              >
-                                {s.time}
-                              </button>
-                            );
-                          })
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        )}
-      </section>
 
-      <section className="glass-card p-4 space-y-3">
-        <h2 className="text-base font-semibold">Exercise List</h2>
-        <div className="space-y-2">
-          {exerciseList.map((e) => (
-            <button key={e.name} onClick={() => setSelectedExercise(e)}
-              className="w-full text-left rounded-xl border border-border bg-card p-2 flex gap-3 items-center">
-              <div className={`h-14 w-16 rounded-lg bg-gradient-to-br ${e.thumbnailGradient} flex items-center justify-center shrink-0`}>
-                <Play className="h-4 w-4 text-white fill-current" />
+          {tab === "today" ? (
+            <ol className="mt-3 overflow-hidden rounded-[16px] border border-white/[0.06]">
+              {todaySessions.map((s, i) => (
+                <li key={s.name} className={cn("flex items-center gap-3 px-3.5 py-3", i > 0 && "border-t border-white/[0.05]")}>
+                  <div className="w-[58px] shrink-0">
+                    <div className="text-[13px] font-semibold tabular-nums">{s.scheduledAt.replace(" AM", "").replace(" PM", "")}</div>
+                    <div className="text-[10.5px] text-muted-foreground">{s.scheduledAt.slice(-2)}</div>
+                  </div>
+                  <span className="h-8 w-px bg-white/[0.07]" />
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-[14px] font-semibold">{s.name}</div>
+                    <div className="mt-0.5 flex items-center gap-1.5 text-[11.5px] text-muted-foreground">
+                      <span className="h-1.5 w-1.5 rounded-full bg-warning" /> Not started · {s.sessionLabel}
+                    </div>
+                  </div>
+                  <button onClick={() => onStartSession(s.name)} aria-label={`Start ${s.name}`}
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/12 text-primary ring-1 ring-inset ring-primary/25 transition hover:bg-primary hover:text-white">
+                    <Play className="h-3.5 w-3.5 translate-x-px fill-current" />
+                  </button>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <div className="mt-3">
+              <div className="flex items-center justify-between">
+                <button onClick={() => shiftWeek(-1)} aria-label="Previous week" className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white/[0.06] hover:text-foreground"><ChevronLeft className="h-4 w-4" /></button>
+                <div className="text-[12.5px] font-medium tabular-nums">Week of {weekStart.getDate()}/{monthLabel}</div>
+                <button onClick={() => shiftWeek(1)} aria-label="Next week" className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white/[0.06] hover:text-foreground"><ChevronRight className="h-4 w-4" /></button>
               </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-sm">{e.name}</h3>
-                <p className="text-[11px] text-muted-foreground line-clamp-1">{e.description}</p>
-                <div className="flex items-center gap-1.5 mt-1">
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-primary text-primary-foreground font-medium">{e.badge}</span>
-                  <span className="text-[10px] text-muted-foreground">{e.sessions}</span>
+              <div className="-mx-4 mt-2 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <div className="grid auto-cols-[minmax(40px,1fr)] grid-flow-col gap-1">
+                  {dayDates.map((d, i) => {
+                    const isToday = isCurrentWeek && i === todayDayIndex;
+                    const slots = WEEK_SCHEDULE[i] ?? [];
+                    return (
+                      <div key={i} className={cn("flex flex-col items-center gap-1.5 rounded-[14px] px-1 pb-2 pt-2", isToday && "bg-primary/10 ring-1 ring-inset ring-primary/25")}>
+                        <span className={cn("text-[10px] font-semibold tracking-wider", isToday ? "text-primary" : "text-muted-foreground")}>{WEEK_DAYS[i]}</span>
+                        <span className={cn("text-[15px] font-semibold tabular-nums", !isToday && "text-foreground/85")}>{d.getDate()}</span>
+                        <div className="mt-1 flex w-full flex-col gap-1">
+                          {slots.length === 0 ? (
+                            <div className="flex h-7 items-center justify-center text-[10px] text-muted-foreground/50">Rest</div>
+                          ) : (
+                            slots.map((sl, idx) => {
+                              const clickable = isToday || sl.status === "done" || sl.status === "missed";
+                              const handleClick = () => {
+                                if (isToday) onStartSession(exerciseList[0].name);
+                                else if (sl.status === "done" || sl.status === "missed") setSelectedExercise(exerciseList[0]);
+                              };
+                              return (
+                                <button key={idx} onClick={handleClick} disabled={!clickable}
+                                  className={cn("flex h-7 w-full items-center justify-center gap-0.5 rounded-[8px] text-[10px] font-semibold tabular-nums transition", SLOT_STYLES[sl.status], clickable ? "cursor-pointer hover:brightness-125" : "cursor-default")}>
+                                  {sl.status === "done" && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
+                                  {sl.time.replace(" PM", "").replace(" AM", "")}
+                                </button>
+                              );
+                            })
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
+              <div className="mt-3 flex items-center justify-center gap-4 text-[11px] text-muted-foreground">
+                <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-success" />Done</span>
+                <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-destructive" />Missed</span>
+                <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-white/25" />Upcoming</span>
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* ---------- exercises ---------- */}
+        <section className="overflow-hidden rounded-[22px] border border-white/[0.06] bg-card">
+          <div className="flex items-baseline gap-2 px-5 pb-2 pt-4">
+            <h2 className="text-[14px] font-semibold">Exercises</h2>
+            <span className="text-[12px] text-muted-foreground">{exerciseList.length}</span>
+          </div>
+          {exerciseList.map((e, i) => (
+            <button key={e.name} onClick={() => setSelectedExercise(e)}
+              className={cn("flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-white/[0.03]", i > 0 && "border-t border-white/[0.05]")}>
+              <div className={cn("flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-gradient-to-br ring-1 ring-inset ring-white/[0.08]", e.thumbnailGradient)}>
+                <Play className="h-4 w-4 translate-x-px fill-white/90 text-white/90" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-[14px] font-semibold">{e.name}</div>
+                <div className="mt-1 flex items-center gap-2 text-[11.5px] text-muted-foreground">
+                  <span className="shrink-0 rounded-full bg-primary/12 px-2 py-0.5 text-[10.5px] font-semibold text-primary">{e.badge}</span>
+                  <span className="inline-flex items-center gap-1 whitespace-nowrap"><Clock3 className="h-3 w-3" />{e.sessions}</span>
+                </div>
+              </div>
+              <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
             </button>
           ))}
-        </div>
-      </section>
+        </section>
       </div>
 
       {rescheduleOpen && (

@@ -1,8 +1,9 @@
 import { useImmersive } from "@/hooks/useImmersive";
-import { ChevronLeft, ChevronDown, Play, Volume2, Maximize2, TrendingUp, Sparkles, AlertCircle, Target, Dumbbell, Share2, Facebook, Twitter, Linkedin, MessageCircle, Send, Users, X } from "lucide-react";
+import { ChevronLeft, ChevronDown, ChevronRight, Play, Volume2, Maximize2, TrendingUp, Sparkles, AlertCircle, Lightbulb, Share2, Clock, Facebook, Twitter, Linkedin, MessageCircle, Send, Users, X } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { ScoreGauge } from "@/components/ScoreGauge";
+import { ScoreRing, scoreBand } from "@/components/SessionResult";
+import { cn } from "@/lib/utils";
 import { SessionEvaluationDetail } from "@/components/SessionEvaluationDetail";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
@@ -26,6 +27,8 @@ interface Props {
   onClose: () => void;
   onPrev?: () => void;
   onNext?: () => void;
+  /** start today's session of this exercise */
+  onStart?: () => void;
 }
 
 type Phase = "warm" | "main" | "cool";
@@ -63,7 +66,7 @@ function ShareToggle({ label, checked, onChange }: { label: string; checked: boo
   );
 }
 
-export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext }: Props) {
+export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, onStart }: Props) {
   useImmersive();
   const [phase, setPhase] = useState<Phase>("warm");
   const [chartOpen, setChartOpen] = useState(true);
@@ -78,6 +81,9 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext }:
   const [incImprovement, setIncImprovement] = useState(true);
   const [incAdvice, setIncAdvice] = useState(true);
   const navigate = useNavigate();
+  const band = scoreBand(ACCURACY_AVG);
+  const best = Math.max(...accuracySeries);
+  const trend = accuracySeries[accuracySeries.length - 1] - accuracySeries[0];
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
 
   const publishToCommunity = () => {
@@ -103,20 +109,23 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext }:
 
   return (
     <div className="space-y-4 land:grid land:grid-cols-2 hinge-split land:items-start land:gap-x-6 land:gap-y-4 land:space-y-0">
-      <div className="flex items-center justify-between land:col-span-2">
-        <button onClick={onClose} className="inline-flex items-center gap-1 text-sm text-muted-foreground transition hover:text-foreground">
-          <ChevronLeft className="h-4 w-4" /> Details
+      {/* ---------- header ---------- */}
+      <div className="flex items-center gap-3 land:col-span-2">
+        <button onClick={onClose} aria-label="Back" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/[0.08] text-foreground/80 transition hover:border-primary/40 hover:text-foreground">
+          <ChevronLeft className="h-[18px] w-[18px]" />
         </button>
-        <div className="flex items-center gap-3 text-xs">
-          {onPrev && <button onClick={onPrev} className="text-primary transition hover:opacity-80">Prev</button>}
-          {onNext && <button onClick={onNext} className="text-primary transition hover:opacity-80">Next</button>}
+        <div className="min-w-0 flex-1">
+          <div className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Exercise</div>
+          <h1 className="truncate text-[19px] font-semibold leading-tight tracking-tight">{exerciseName}</h1>
         </div>
-      </div>
-
-      <div className="flex items-center gap-2 flex-wrap land:col-span-2">
-        <h1 className="text-xl font-bold flex-1">{exerciseName}</h1>
-        <span className="text-[11px] px-2 py-0.5 rounded-full bg-primary text-primary-foreground font-medium">{badge}</span>
-        <button onClick={() => setShareOpen(true)} aria-label="Share" className="h-9 w-9 rounded-lg border border-border bg-card flex items-center justify-center text-primary">
+        <span className="shrink-0 rounded-full bg-success/12 px-2.5 py-1 text-[11px] font-semibold text-success ring-1 ring-inset ring-success/25">{badge}</span>
+        {(onPrev || onNext) && (
+          <div className="flex shrink-0 overflow-hidden rounded-full border border-white/[0.08]">
+            <button onClick={onPrev} disabled={!onPrev} aria-label="Previous exercise" className="flex h-9 w-9 items-center justify-center text-foreground/80 transition enabled:hover:bg-white/[0.06] disabled:opacity-30"><ChevronLeft className="h-4 w-4" /></button>
+            <button onClick={onNext} disabled={!onNext} aria-label="Next exercise" className="flex h-9 w-9 items-center justify-center border-l border-white/[0.08] text-foreground/80 transition enabled:hover:bg-white/[0.06] disabled:opacity-30"><ChevronRight className="h-4 w-4" /></button>
+          </div>
+        )}
+        <button onClick={() => setShareOpen(true)} aria-label="Share" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/[0.08] text-foreground/80 transition hover:border-primary/40 hover:text-primary">
           <Share2 className="h-4 w-4" />
         </button>
       </div>
@@ -194,164 +203,205 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext }:
         </div>
       )}
 
+      {/* ---------- left: score + trend ---------- */}
       <div className="space-y-4 land:sticky land:top-[72px]">
-      <section className="rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-transparent p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <TrendingUp className="h-4 w-4 text-primary" />
-          <div className="text-sm font-semibold">Accuracy Average</div>
-        </div>
-        <div className="flex flex-col items-center">
-          <ScoreGauge value={76} size={140} />
-          <div className="w-full mt-3 space-y-1">
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Progress</span>
-              <span><span className="font-bold">2</span><span className="text-muted-foreground">/40 sessions</span></span>
+        <section className="relative overflow-hidden rounded-[22px] border border-white/[0.06] bg-card p-5">
+          <div aria-hidden className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full opacity-60"
+            style={{ background: `radial-gradient(closest-side, color-mix(in oklab, ${band.ring} 22%, transparent), transparent)` }} />
+          <div className="relative flex items-center gap-5">
+            <ScoreRing score={ACCURACY_AVG} size={118} />
+            <div className="min-w-0 flex-1">
+              <div className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Accuracy average</div>
+              <div className="mt-1 inline-flex items-center gap-1.5 text-[13px] font-semibold" style={{ color: band.ring }}>
+                <span className="h-1.5 w-1.5 rounded-full" style={{ background: band.ring }} />{band.label}
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2">
+                <Stat label="Best" value={`${best}`} />
+                <Stat label="Trend" value={`${trend >= 0 ? "+" : ""}${trend}`} tone={trend >= 0 ? "text-success" : "text-destructive"} />
+              </div>
             </div>
-            <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-primary to-secondary" style={{ width: "5%" }} />
+          </div>
+          <div className="relative mt-5">
+            <div className="flex items-baseline justify-between text-[12px]">
+              <span className="text-muted-foreground">Program progress</span>
+              <span className="tabular-nums"><b className="font-semibold">2</b><span className="text-muted-foreground"> of 40 sessions</span></span>
+            </div>
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
+              <div className="h-full rounded-full bg-gradient-to-r from-primary to-secondary" style={{ width: "5%" }} />
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="glass-card p-4">
-        <button onClick={() => setChartOpen((v) => !v)} className="w-full flex items-center justify-between">
-          <h2 className="font-semibold text-sm">Accuracy Over Time</h2>
-          <ChevronDown className={`h-4 w-4 transition ${chartOpen ? "" : "-rotate-90"}`} />
-        </button>
-        {chartOpen && (
-          <div className="mt-3">
-            <AccuracyChart data={accuracySeries} onPointClick={(i, v) => setSessionDetail({ date: `Session ${i + 1}`, time: "06:00 PM", score: v })} />
-          </div>
-        )}
-      </section>
-
-      </div>
-
-      <div className="space-y-4">
-      <section className="rounded-2xl border-2 border-secondary/30 bg-gradient-to-br from-secondary/10 to-transparent p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <Dumbbell className="h-4 w-4 text-secondary" />
-          <div className="text-sm font-semibold">Today's Session</div>
-        </div>
-        <div className="rounded-xl border border-border bg-card/80 p-3 flex items-center justify-between gap-2">
-          <div className="min-w-0">
-            <h3 className="font-semibold text-sm truncate">Cat Cow</h3>
-            <span className="inline-block text-[10px] px-1.5 py-0.5 rounded-md bg-destructive/15 text-destructive font-medium mt-0.5">Incompleted</span>
-          </div>
-          <button className="h-9 w-9 rounded-full border-2 border-primary text-primary flex items-center justify-center transition hover:bg-primary/10">
-            <Play className="h-3.5 w-3.5 fill-current" />
+        <section className="rounded-[22px] border border-white/[0.06] bg-card p-5">
+          <button onClick={() => setChartOpen((v) => !v)} className="flex w-full items-center gap-2 text-left">
+            <h2 className="flex-1 text-[14px] font-semibold">Accuracy over time</h2>
+            <span className="rounded-full bg-white/[0.05] px-2.5 py-1 text-[11px] text-muted-foreground">Last {accuracySeries.length} sessions</span>
+            <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition", !chartOpen && "-rotate-90")} />
           </button>
-        </div>
-      </section>
-
-
-      <section className="glass-card p-4">
-        <h2 className="font-semibold text-sm mb-3">Exercise Evaluation</h2>
-        <div className="space-y-2">
-          <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-primary mb-1">
-              <TrendingUp className="h-3.5 w-3.5" /> Overall
+          {chartOpen && (
+            <div className="mt-4">
+              <AccuracyChart data={accuracySeries} onPointClick={(i, v) => setSessionDetail({ date: `Session ${i + 1}`, time: "06:00 PM", score: v })} />
+              <p className="mt-2 text-[11.5px] text-muted-foreground">Tap a point to see that session's evaluation.</p>
             </div>
-            <p className="text-xs text-foreground/80">Stable posture and controlled movement throughout.</p>
-          </div>
-          <div className="rounded-lg border border-success/30 bg-success/5 p-3">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-success mb-1">
-              <Sparkles className="h-3.5 w-3.5" /> Improvement
-            </div>
-            <p className="text-xs text-foreground/80">Lumbar improved by 7° since last session.</p>
-          </div>
-          <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-destructive mb-1">
-              <AlertCircle className="h-3.5 w-3.5" /> Advice
-            </div>
-            <p className="text-xs text-foreground/80">Avoid extended forward or side head tilt.</p>
-          </div>
-        </div>
-      </section>
-
-      <section className="glass-card p-4 space-y-3">
-        <button onClick={() => setDetailsOpen((v) => !v)} className="w-full flex items-center justify-between">
-          <h2 className="font-semibold text-sm">Exercise Details</h2>
-          <ChevronDown className={`h-4 w-4 transition ${detailsOpen ? "" : "-rotate-90"}`} />
-        </button>
-        {detailsOpen && (
-          <>
-            <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-emerald-200 via-teal-300 to-cyan-400">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <button className="h-12 w-12 rounded-full bg-white/30 backdrop-blur-sm border border-white/60 flex items-center justify-center transition hover:bg-white/45 active:scale-95">
-                  <Play className="h-5 w-5 text-white fill-white" />
-                </button>
-              </div>
-              <div className="absolute bottom-0 inset-x-0 p-2 flex items-center gap-2 bg-gradient-to-t from-black/60 text-white text-xs">
-                <span className="tabular-nums">33:00 | 45:00</span>
-                <div className="flex-1 h-1 bg-white/30 rounded-full"><div className="h-full bg-primary" style={{ width: "73%" }} /></div>
-                <Volume2 className="h-3.5 w-3.5" /><Maximize2 className="h-3.5 w-3.5" />
-              </div>
-            </div>
-            <p className="text-xs text-foreground/80">Relieves tension and improves mobility in the shoulders and neck.</p>
-            <div className="grid grid-cols-3 gap-2">
-              <Meta label="Every" value="1" suffix="day" />
-              <Meta label="Per day" value="3" suffix="time" />
-              <Meta label="Repeat" value="4" suffix="hr" />
-            </div>
-            <div className="flex items-center gap-2">
-              {(["warm", "main", "cool"] as Phase[]).map((p) => (
-                <button key={p} onClick={() => setPhase(p)}
-                  className={`px-3 py-1 rounded-full border text-xs font-medium ${phase === p ? "border-primary text-primary bg-primary/5" : "border-border"}`}>
-                  {p === "warm" ? "Warm" : p === "main" ? "Main" : "Cool"}
-                </button>
-              ))}
-            </div>
-            <ol className="relative space-y-3 pl-2">
-              {steps[phase].map((s, idx) => {
-                const isStart = s.marker === "Start";
-                const isEnd = s.marker === "End";
-                return (
-                  <li key={idx} className="relative pl-9">
-                    {idx !== steps[phase].length - 1 && <span className="absolute left-3 top-7 bottom-[-0.75rem] w-px bg-border" />}
-                    <span className={`absolute left-0 top-0 h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                      isStart ? "bg-primary text-primary-foreground" : isEnd ? "bg-success text-white" : "bg-card border border-primary/40 text-primary"
-                    }`}>{s.marker}</span>
-                    <h4 className="text-xs font-semibold">{s.title}</h4>
-                    {s.description && <p className="text-[11px] text-foreground/75 mt-0.5">{s.description}</p>}
-                  </li>
-                );
-              })}
-            </ol>
-          </>
-        )}
-      </section>
+          )}
+        </section>
       </div>
+
+      {/* ---------- right: today + evaluation + details ---------- */}
+      <div className="space-y-4">
+        <section className="rounded-[22px] border border-white/[0.06] bg-card p-4">
+          <div className="px-1 text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Today's session</div>
+          <div className="mt-3 flex items-center gap-3">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-gradient-to-br from-emerald-400/25 to-sky-500/20 ring-1 ring-inset ring-white/[0.08]">
+              <Clock className="h-5 w-5 text-emerald-300" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-[15px] font-semibold">Cat Cow</div>
+              <div className="mt-0.5 flex items-center gap-1.5 whitespace-nowrap text-[12px] text-muted-foreground">
+                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-warning" /> 05:15 AM
+              </div>
+            </div>
+            <button onClick={onStart} className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-r from-primary to-secondary px-4 text-[13px] font-semibold text-white shadow-[0_10px_26px_-14px] shadow-primary transition hover:brightness-110 active:scale-[0.98]">
+              <Play className="h-3.5 w-3.5 fill-current" /> Start
+            </button>
+          </div>
+        </section>
+
+        <section className="overflow-hidden rounded-[22px] border border-white/[0.06] bg-card">
+          <h2 className="px-5 pb-1 pt-4 text-[14px] font-semibold">Evaluation</h2>
+          {[
+            { icon: TrendingUp, label: "Overall", text: EVAL_OVERALL, tone: "text-primary", bg: "bg-primary/12" },
+            { icon: Sparkles, label: "Improvement", text: EVAL_IMPROVEMENT, tone: "text-success", bg: "bg-success/12" },
+            { icon: Lightbulb, label: "Advice", text: EVAL_ADVICE, tone: "text-warning", bg: "bg-warning/12" },
+          ].map((r, i) => (
+            <div key={r.label} className={cn("flex gap-3 px-5 py-3.5", i > 0 && "border-t border-white/[0.05]")}>
+              <span className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px]", r.bg)}><r.icon className={cn("h-4 w-4", r.tone)} /></span>
+              <div className="min-w-0">
+                <div className={cn("text-[12px] font-semibold", r.tone)}>{r.label}</div>
+                <p className="mt-0.5 text-[13px] leading-relaxed text-foreground/85">{r.text}</p>
+              </div>
+            </div>
+          ))}
+        </section>
+
+        <section className="overflow-hidden rounded-[22px] border border-white/[0.06] bg-card">
+          <button onClick={() => setDetailsOpen((v) => !v)} className="flex w-full items-center gap-2 px-5 py-4 text-left transition hover:bg-white/[0.03]">
+            <h2 className="flex-1 text-[14px] font-semibold">How to do it</h2>
+            <span className="text-[12px] text-muted-foreground">{detailsOpen ? "Hide" : "Video & steps"}</span>
+            <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition", !detailsOpen && "-rotate-90")} />
+          </button>
+          {detailsOpen && (
+            <div className="space-y-4 border-t border-white/[0.05] p-4">
+              <div className="relative aspect-video w-full overflow-hidden rounded-[16px] bg-gradient-to-br from-emerald-300/80 via-teal-400/70 to-sky-500/70">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <button aria-label="Play video" className="flex h-12 w-12 items-center justify-center rounded-full border border-white/60 bg-white/25 backdrop-blur-md transition hover:bg-white/40 active:scale-95">
+                    <Play className="h-5 w-5 translate-x-px fill-white text-white" />
+                  </button>
+                </div>
+                <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 bg-gradient-to-t from-black/60 px-3 pb-2 pt-6 text-[11px] text-white">
+                  <span className="tabular-nums">0:33 / 0:45</span>
+                  <div className="h-1 flex-1 rounded-full bg-white/30"><div className="h-full rounded-full bg-white" style={{ width: "73%" }} /></div>
+                  <Volume2 className="h-3.5 w-3.5" /><Maximize2 className="h-3.5 w-3.5" />
+                </div>
+              </div>
+              <p className="text-[13px] leading-relaxed text-muted-foreground">Relieves tension and improves mobility in the shoulders and neck.</p>
+              <div className="grid grid-cols-3 divide-x divide-white/[0.06] rounded-[14px] border border-white/[0.06]">
+                <Meta label="Every" value="1" suffix="day" />
+                <Meta label="Per day" value="3" suffix="times" />
+                <Meta label="Repeat" value="4" suffix="hr" />
+              </div>
+              <div className="grid grid-cols-3 rounded-full border border-white/[0.06] bg-white/[0.03] p-1">
+                {(["warm", "main", "cool"] as Phase[]).map((p) => (
+                  <button key={p} onClick={() => setPhase(p)}
+                    className={cn("h-8 rounded-full text-[12.5px] font-medium transition", phase === p ? "bg-white/[0.09] text-foreground shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]" : "text-muted-foreground hover:text-foreground")}>
+                    {p === "warm" ? "Warm up" : p === "main" ? "Main" : "Cool down"}
+                  </button>
+                ))}
+              </div>
+              <ol key={phase} className="overflow-hidden rounded-[16px] border border-white/[0.06] animate-in fade-in duration-300">
+                {steps[phase].filter((st) => st.description).map((st, idx) => (
+                  <li key={idx} className="flex gap-3.5 px-4 py-3 [&+&]:border-t [&+&]:border-white/[0.05]">
+                    <span className="mt-px flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/12 text-[11.5px] font-semibold tabular-nums text-primary ring-1 ring-inset ring-primary/25">{idx + 1}</span>
+                    <div className="min-w-0">
+                      <div className="text-[13.5px] font-semibold">{st.title}</div>
+                      <div className="mt-0.5 text-[12.5px] leading-relaxed text-muted-foreground">{st.description}</div>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function Stat({ label, value, tone }: { label: string; value: string; tone?: string }) {
+  return (
+    <div>
+      <div className="text-[11px] text-muted-foreground">{label}</div>
+      <div className={cn("text-[17px] font-semibold tabular-nums leading-tight", tone)}>{value}</div>
     </div>
   );
 }
 
 function Meta({ label, value, suffix }: { label: string; value: string; suffix: string }) {
   return (
-    <div className="rounded-lg border border-border bg-card p-2">
-      <div className="text-[10px] text-muted-foreground">{label}</div>
-      <div><span className="text-base font-bold">{value}</span><span className="text-[10px] text-muted-foreground ml-1">{suffix}</span></div>
+    <div className="px-3 py-2.5 text-center">
+      <div className="text-[11px] text-muted-foreground">{label}</div>
+      <div className="mt-0.5"><span className="text-[17px] font-semibold tabular-nums">{value}</span><span className="ml-1 text-[11px] text-muted-foreground">{suffix}</span></div>
     </div>
   );
 }
 
+/** Smooth area chart: gradient fill, faint 50/100 guides, last point labelled; every point opens that session. */
 function AccuracyChart({ data, onPointClick }: { data: number[]; onPointClick?: (i: number, v: number) => void }) {
-  const w = 360, h = 180, pad = 28, max = 100;
-  const stepX = (w - pad * 2) / (data.length - 1);
-  const points = data.map((v, i) => `${pad + i * stepX},${h - pad - (v / max) * (h - pad * 2)}`).join(" ");
+  const w = 360, h = 170, padX = 14, top = 18, bottom = 22;
+  const x = (i: number) => padX + (i * (w - padX * 2)) / (data.length - 1);
+  const y = (v: number) => top + (1 - v / 100) * (h - top - bottom);
+  const pts = data.map((v, i) => [x(i), y(v)] as const);
+  const line = pts.reduce((d, [px, py], i) => {
+    if (i === 0) return `M${px},${py}`;
+    const [qx, qy] = pts[i - 1]; const cx = (qx + px) / 2;
+    return `${d} C${cx},${qy} ${cx},${py} ${px},${py}`;
+  }, "");
+  const area = `${line} L${x(data.length - 1)},${h - bottom} L${x(0)},${h - bottom} Z`;
+  const last = pts[pts.length - 1];
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-auto">
-      {[0, 50, 100].map((y) => (
-        <line key={y} x1={pad} x2={w - pad} y1={h - pad - (y / max) * (h - pad * 2)} y2={h - pad - (y / max) * (h - pad * 2)}
-          stroke="var(--color-border)" strokeDasharray="2 4" />
+    <svg viewBox={`0 0 ${w} ${h}`} className="h-auto w-full overflow-visible">
+      <defs>
+        <linearGradient id="acc-fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="var(--color-primary)" stopOpacity=".32" />
+          <stop offset="1" stopColor="var(--color-primary)" stopOpacity="0" />
+        </linearGradient>
+        <linearGradient id="acc-line" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor="var(--color-primary)" />
+          <stop offset="1" stopColor="var(--color-secondary)" />
+        </linearGradient>
+      </defs>
+      {[50, 100].map((g) => (
+        <g key={g}>
+          <line x1={padX} x2={w - padX} y1={y(g)} y2={y(g)} stroke="white" strokeOpacity=".06" strokeDasharray="3 5" />
+          <text x={w - padX} y={y(g) - 4} textAnchor="end" fontSize="9" fill="currentColor" className="text-muted-foreground">{g}</text>
+        </g>
       ))}
-      <polyline fill="none" stroke="var(--color-primary)" strokeWidth="2" points={points} />
-      {data.map((v, i) => (
-        <circle key={i} cx={pad + i * stepX} cy={h - pad - (v / max) * (h - pad * 2)} r="4"
-          fill="var(--color-primary)" className="cursor-pointer" onClick={() => onPointClick?.(i, v)} />
+      <path d={area} fill="url(#acc-fill)" />
+      <path d={line} fill="none" stroke="url(#acc-line)" strokeWidth="2.5" strokeLinecap="round" />
+      {pts.map(([px, py], i) => (
+        <g key={i} className="cursor-pointer" onClick={() => onPointClick?.(i, data[i])}>
+          <circle cx={px} cy={py} r="11" fill="transparent" />
+          <circle cx={px} cy={py} r={i === pts.length - 1 ? 0 : 2.6} fill="var(--color-card)" stroke="var(--color-primary)" strokeWidth="1.6" />
+        </g>
       ))}
+      <circle cx={last[0]} cy={last[1]} r="9" fill="var(--color-secondary)" opacity=".2" />
+      <circle cx={last[0]} cy={last[1]} r="4.5" fill="var(--color-secondary)" stroke="var(--color-card)" strokeWidth="2" />
+      <g transform={`translate(${last[0] - 16} ${last[1] - 26})`}>
+        <rect width="32" height="18" rx="9" fill="var(--color-secondary)" />
+        <text x="16" y="12.5" textAnchor="middle" fontSize="10.5" fontWeight="700" fill="#06121f">{data[data.length - 1]}</text>
+      </g>
+      <text x={x(0)} y={h - 6} fontSize="9" fill="currentColor" className="text-muted-foreground">S1</text>
+      <text x={x(data.length - 1)} y={h - 6} textAnchor="end" fontSize="9" fill="currentColor" className="text-muted-foreground">S{data.length}</text>
     </svg>
   );
 }
-
