@@ -81,7 +81,7 @@ function ReportPage() {
         <button
           onClick={() => router.history.back()}
           aria-label="Back"
-          className="h-9 w-9 -ml-2 rounded-full flex items-center justify-center hover:bg-muted"
+          className="h-9 w-9 -ml-2 rounded-full flex items-center justify-center hover:bg-white/[0.08] hover:text-foreground"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
@@ -89,7 +89,7 @@ function ReportPage() {
         <Link
           to="/support/tickets"
           aria-label="My tickets"
-          className="h-9 w-9 rounded-full flex items-center justify-center hover:bg-muted"
+          className="h-9 w-9 rounded-full flex items-center justify-center hover:bg-white/[0.08] hover:text-foreground"
         >
           <ListChecks className="h-5 w-5" />
         </Link>
@@ -199,7 +199,7 @@ function ReportPage() {
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
-            className="w-full rounded-xl border-2 border-dashed border-border hover:border-primary/60 hover:bg-muted/30 transition-colors py-6 flex flex-col items-center justify-center gap-2 text-muted-foreground"
+            className="w-full rounded-xl border-2 border-dashed border-border hover:border-primary/60 hover:bg-white/[0.07] hover:text-foreground transition-colors py-6 flex flex-col items-center justify-center gap-2 text-muted-foreground"
           >
             <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
               <Camera className="h-5 w-5" />

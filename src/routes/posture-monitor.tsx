@@ -88,14 +88,14 @@ function PostureMonitor() {
               >
                 <Settings className="h-3 w-3 shrink-0" /> <span className="truncate @max-[300px]:hidden!">{cameraSource}</span>
               </button>
-              <button className="inline-flex shrink-0 items-center gap-1 px-2 py-1 rounded-md bg-background/80 backdrop-blur-sm border border-border text-[10px] text-muted-foreground">
+              <button className="inline-flex shrink-0 items-center gap-1 px-2 py-1 rounded-md bg-background/80 backdrop-blur-sm border border-border text-[10px] text-muted-foreground transition hover:bg-background">
                 Setup Guide
               </button>
             </div>
             <Camera className="h-12 w-12 text-muted-foreground/40" strokeWidth={1.5} />
             <div className="max-w-[220px] text-sm text-muted-foreground @max-[240px]:text-[12.5px]!">Camera feed will appear here</div>
             <button onClick={handleStart}
-              className="mt-2 h-11 shrink-0 whitespace-nowrap px-5 @max-[240px]:h-10! @max-[240px]:px-4! @max-[240px]:text-[13px]! @max-[240px]:gap-1.5! rounded-full bg-gradient-to-r from-primary to-secondary text-primary-foreground font-semibold text-sm flex items-center gap-2 shadow-lg glow-primary">
+              className="mt-2 h-11 shrink-0 whitespace-nowrap px-5 @max-[240px]:h-10! @max-[240px]:px-4! @max-[240px]:text-[13px]! @max-[240px]:gap-1.5! rounded-full bg-gradient-to-r from-primary to-secondary text-primary-foreground font-semibold text-sm flex items-center gap-2 shadow-lg glow-primary transition enabled:hover:brightness-110 active:scale-[0.98]">
               <Play className="h-4 w-4 fill-current" /> Start monitoring
             </button>
           </div>

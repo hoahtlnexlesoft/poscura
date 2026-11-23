@@ -54,7 +54,7 @@ export function DiscomfortDialog({ open, onClose, onSubmit, onSkip }: Props) {
     <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-end sm:items-center justify-center sm:p-4">
       <div className="glass-card w-full max-w-md max-h-[92vh] overflow-auto rounded-b-none sm:rounded-2xl">
         <div className="flex items-center justify-between px-4 h-14 border-b border-border sticky top-0 bg-background/80 backdrop-blur-md z-10">
-          <button onClick={onClose} className="h-8 w-8 rounded-full bg-card border border-border flex items-center justify-center">
+          <button onClick={onClose} className="h-8 w-8 rounded-full bg-card border border-border flex items-center justify-center transition hover:border-primary/40 hover:bg-white/[0.04] hover:text-foreground">
             <X className="h-4 w-4" />
           </button>
           <h2 className="font-semibold text-sm">Log Discomfort</h2>
@@ -140,10 +140,10 @@ export function DiscomfortDialog({ open, onClose, onSubmit, onSkip }: Props) {
           </div>
 
           <div className="flex gap-2 pt-2">
-            <button onClick={onSkip} className="flex-1 py-2.5 rounded-lg border border-primary/40 text-primary text-sm font-medium">
+            <button onClick={onSkip} className="flex-1 py-2.5 rounded-lg border border-primary/40 text-primary text-sm font-medium transition hover:bg-primary/10">
               Skip
             </button>
-            <button onClick={onSubmit} className="flex-1 py-2.5 rounded-lg bg-gradient-to-r from-primary to-secondary text-primary-foreground text-sm font-medium shadow-lg">
+            <button onClick={onSubmit} className="flex-1 py-2.5 rounded-lg bg-gradient-to-r from-primary to-secondary text-primary-foreground text-sm font-medium shadow-lg transition enabled:hover:brightness-110 active:scale-[0.98]">
               Submit
             </button>
           </div>

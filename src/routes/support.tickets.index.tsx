@@ -23,7 +23,7 @@ function TicketsPage() {
         <button
           onClick={() => router.history.back()}
           aria-label="Back"
-          className="h-9 w-9 -ml-2 rounded-full flex items-center justify-center hover:bg-muted"
+          className="h-9 w-9 -ml-2 rounded-full flex items-center justify-center hover:bg-white/[0.08] hover:text-foreground"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
@@ -31,7 +31,7 @@ function TicketsPage() {
         <Link
           to="/support/report"
           aria-label="New report"
-          className="h-9 w-9 rounded-full flex items-center justify-center hover:bg-muted"
+          className="h-9 w-9 rounded-full flex items-center justify-center hover:bg-white/[0.08] hover:text-foreground"
         >
           <Plus className="h-5 w-5" />
         </Link>
@@ -69,7 +69,7 @@ function TicketsPage() {
                   <Link
                     to="/support/tickets/$id"
                     params={{ id: t.id }}
-                    className="glass-card p-4 flex items-center gap-3 hover:bg-muted/30 transition-colors"
+                    className="glass-card p-4 flex items-center gap-3 hover:bg-white/[0.07] hover:text-foreground transition-colors"
                   >
                     <div className="flex-1 min-w-0 space-y-2">
                       <div className="flex items-center gap-2 flex-wrap">

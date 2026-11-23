@@ -23,7 +23,7 @@ export function ExerciseIntro({
   return (
     <div data-screen="Exercise intro" className="pb-4">
       <div className="flex items-center gap-2">
-        <button onClick={onBack} aria-label="Back" className="flex h-9 w-9 -ml-1.5 items-center justify-center rounded-full hover:bg-muted">
+        <button onClick={onBack} aria-label="Back" className="flex h-9 w-9 -ml-1.5 items-center justify-center rounded-full hover:bg-white/[0.08] hover:text-foreground">
           <ChevronLeft className="h-5 w-5" />
         </button>
         <span className="flex-1" />

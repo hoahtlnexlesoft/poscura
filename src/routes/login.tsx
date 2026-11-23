@@ -110,5 +110,5 @@ function LoginPage() {
 }
 
 function SocialButton({ label, onClick }: { label: string; onClick: () => void }) {
-  return <button type="button" onClick={onClick} className="h-10 rounded-lg border border-border bg-card text-xs font-medium">{label}</button>;
+  return <button type="button" onClick={onClick} className="h-10 rounded-lg border border-border bg-card text-xs font-medium transition hover:border-primary/40 hover:bg-white/[0.04] hover:text-foreground">{label}</button>;
 }

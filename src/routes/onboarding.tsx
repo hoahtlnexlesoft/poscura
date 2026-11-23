@@ -82,7 +82,7 @@ function OnboardingPage() {
                   type="button"
                   disabled={n > step}
                   onClick={() => setStep(n as 1 | 2)}
-                  className={cn("flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition", on ? "bg-primary/10" : "hover:bg-muted/40 disabled:hover:bg-transparent")}
+                  className={cn("flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition", on ? "bg-primary/10" : "hover:bg-white/[0.07] hover:text-foreground disabled:hover:bg-transparent")}
                 >
                   <span
                     className={cn(

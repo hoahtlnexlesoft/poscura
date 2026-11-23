@@ -15,7 +15,7 @@ export function SessionEvaluationDetail({ date, time, score, onClose }: Props) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <button onClick={onClose} className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground">
+        <button onClick={onClose} className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground transition hover:text-foreground">
           <ChevronLeft className="h-4 w-4" /> Back
         </button>
         <h1 className="text-base font-bold">Session Details</h1>
@@ -69,7 +69,7 @@ export function SessionEvaluationDetail({ date, time, score, onClose }: Props) {
         <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-muted">
           <div className="absolute inset-0 bg-gradient-to-br from-amber-200 via-rose-200 to-orange-300" />
           <div className="absolute inset-0 flex items-center justify-center">
-            <button className="h-14 w-14 rounded-full bg-white/30 backdrop-blur-sm border border-white/60 flex items-center justify-center">
+            <button className="h-14 w-14 rounded-full bg-white/30 backdrop-blur-sm border border-white/60 flex items-center justify-center transition hover:bg-white/45 active:scale-95">
               <Play className="h-6 w-6 text-white fill-white" />
             </button>
           </div>

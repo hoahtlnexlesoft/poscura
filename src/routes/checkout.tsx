@@ -19,7 +19,7 @@ function ChoosePlanPage() {
         <button
           onClick={() => router.history.back()}
           aria-label="Back"
-          className="absolute left-0 flex h-9 w-9 -ml-1.5 items-center justify-center rounded-full hover:bg-muted"
+          className="absolute left-0 flex h-9 w-9 -ml-1.5 items-center justify-center rounded-full hover:bg-white/[0.08] hover:text-foreground"
         >
           <ChevronLeft className="h-6 w-6" />
         </button>

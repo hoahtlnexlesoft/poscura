@@ -242,7 +242,7 @@ function AccountPage() {
         <button
           onClick={() => router.history.back()}
           aria-label="Back"
-          className="h-9 w-9 -ml-2 rounded-full flex items-center justify-center hover:bg-muted"
+          className="h-9 w-9 -ml-2 rounded-full flex items-center justify-center hover:bg-white/[0.08] hover:text-foreground"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
@@ -679,7 +679,7 @@ function InviteTab() {
   return (
     <>
       <Section title="Your Referral Code">
-        <button onClick={copy} className="w-full flex items-center justify-between rounded-lg border border-dashed border-primary/40 bg-primary/5 p-3">
+        <button onClick={copy} className="w-full flex items-center justify-between rounded-lg border border-dashed border-primary/40 bg-primary/5 p-3 transition hover:bg-primary/10">
           <span className="font-mono font-bold text-sm">{code}</span>
           {copied ? <Check className="h-4 w-4 text-secondary" /> : <Copy className="h-4 w-4 text-primary" />}
         </button>

@@ -62,7 +62,7 @@ export function CameraSettingDialog({ open, onClose, onConnect }: Props) {
                 <Wifi className="h-4 w-4 text-primary" />
                 <span className="text-sm font-semibold">External camera</span>
               </div>
-              <button className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-primary/40 text-primary text-[11px]">
+              <button className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-primary/40 text-primary text-[11px] transition hover:bg-primary/10">
                 <Search className="h-3 w-3" /> Scan network
               </button>
             </div>
@@ -113,7 +113,7 @@ export function CameraSettingDialog({ open, onClose, onConnect }: Props) {
         <div className="flex justify-end pt-2">
           <button
             onClick={handleConnect}
-            className="px-5 py-2 rounded-full bg-gradient-to-r from-primary to-secondary text-primary-foreground text-sm font-semibold shadow-lg glow-primary"
+            className="px-5 py-2 rounded-full bg-gradient-to-r from-primary to-secondary text-primary-foreground text-sm font-semibold shadow-lg glow-primary transition enabled:hover:brightness-110 active:scale-[0.98]"
           >
             Connect
           </button>

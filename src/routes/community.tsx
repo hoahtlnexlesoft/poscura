@@ -348,7 +348,7 @@ function CommunityPage() {
           <button
             onClick={submitPost}
             disabled={!canPost}
-            className="h-8 px-4 shrink-0 rounded-full bg-gradient-to-r from-primary to-secondary text-white text-sm font-semibold disabled:opacity-40"
+            className="h-8 px-4 shrink-0 rounded-full bg-gradient-to-r from-primary to-secondary text-white text-sm font-semibold disabled:opacity-40 transition enabled:hover:brightness-110 active:scale-[0.98]"
           >
             Post
           </button>
@@ -390,13 +390,8 @@ function CommunityPage() {
 
       {filtered.length === 0 && (
         <div className="flex flex-col items-center px-6 py-14 text-center">
-          <div className="relative">
-            <div aria-hidden className="absolute -inset-7 rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--primary)_26%,transparent),transparent)]" />
-            <div className="relative flex h-16 w-16 items-center justify-center rounded-[20px] border border-white/[0.08] bg-gradient-to-br from-primary/25 to-secondary/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
-              <SearchX className="h-7 w-7 text-primary" strokeWidth={1.6} />
-            </div>
-          </div>
-          <h3 className="mt-5 text-[15.5px] font-semibold">{searchQ ? `Nothing for “${searchQ}”` : "No posts here yet"}</h3>
+          <EmptyFeedArt />
+          <h3 className="mt-3 text-[15.5px] font-semibold">{searchQ ? `Nothing for “${searchQ}”` : "No posts here yet"}</h3>
           <p className="mt-1 max-w-[280px] text-[13px] leading-relaxed text-muted-foreground">
             {searchQ ? "Try a different word, or clear the search to see every post." : `Nobody has posted in ${category} yet. Be the first, or browse all feeds.`}
           </p>
@@ -652,7 +647,7 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
             className="min-w-0 flex-1 bg-transparent px-1 text-[13.5px] outline-none placeholder:text-muted-foreground"
           />
           <button onClick={submit} disabled={!text.trim()} aria-label="Send"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-white transition-all disabled:bg-transparent disabled:text-muted-foreground/60">
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-white transition-all enabled:hover:bg-primary/85 disabled:bg-transparent disabled:text-muted-foreground/60">
             <Send className="h-3.5 w-3.5" />
           </button>
         </div>
@@ -810,7 +805,7 @@ function FilterPanel({
           </div>
         </div>
         <button onClick={onClose}
-          className="w-full py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold">Apply</button>
+          className="w-full py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold transition hover:bg-primary/85">Apply</button>
       </div>
     </>
   );
@@ -846,7 +841,7 @@ function CommunitySide({
                 onClick={() => setCategory(f)}
                 className={cn(
                   "relative flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-left text-[13px] transition",
-                  on ? "bg-primary/12 font-semibold text-foreground" : "text-muted-foreground hover:bg-muted/40 hover:text-foreground",
+                  on ? "bg-primary/12 font-semibold text-foreground" : "text-muted-foreground hover:bg-white/[0.07] hover:text-foreground",
                 )}
               >
                 {on && <span className="absolute inset-y-2 left-0 w-[3px] rounded-r-full bg-primary" />}
@@ -965,9 +960,59 @@ function Lightbox({ list, start, onClose }: { list: string[]; start: number; onC
           </>
         )}
       </div>
-      <button data-lightbox-close aria-label="Close" className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white outline-none"><X className="h-4 w-4" /></button>
+      <button data-lightbox-close aria-label="Close" className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white outline-none transition hover:bg-white/20"><X className="h-4 w-4" /></button>
     </div>
   );
 }
 
 const EMOJIS = ["😀","😄","😅","😂","🥲","😍","🤩","😎","🤔","😴","😮‍💨","💪","🙌","👏","👍","🙏","🔥","✨","🎉","💯","❤️","💙","💚","✅","🧘","🏃","🚶","🪑","💻","☕","💧","🌿"];
+
+/** Empty feed illustration: two faded post cards with a fresh, glowing "new post" card in front. */
+function EmptyFeedArt() {
+  return (
+    <svg width="148" height="112" viewBox="0 0 148 112" fill="none" aria-hidden className="drop-shadow-[0_18px_40px_rgba(59,130,246,0.18)]">
+      <defs>
+        <linearGradient id="ef-card" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#1e2a45" /><stop offset="1" stopColor="#141c31" />
+        </linearGradient>
+        <linearGradient id="ef-accent" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#5fd6ae" /><stop offset="1" stopColor="#3b82f6" />
+        </linearGradient>
+        <radialGradient id="ef-glow" cx=".5" cy=".55" r=".5">
+          <stop offset="0" stopColor="#3b82f6" stopOpacity=".28" /><stop offset="1" stopColor="#3b82f6" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <ellipse cx="74" cy="60" rx="70" ry="50" fill="url(#ef-glow)" />
+      {/* back cards */}
+      <g opacity=".45" transform="rotate(-9 44 52)">
+        <rect x="16" y="26" width="62" height="50" rx="10" fill="url(#ef-card)" stroke="#ffffff" strokeOpacity=".08" />
+        <circle cx="28" cy="38" r="5" fill="#ffffff" fillOpacity=".14" />
+        <rect x="37" y="35" width="28" height="4" rx="2" fill="#ffffff" fillOpacity=".14" />
+        <rect x="24" y="50" width="44" height="4" rx="2" fill="#ffffff" fillOpacity=".09" />
+        <rect x="24" y="59" width="32" height="4" rx="2" fill="#ffffff" fillOpacity=".09" />
+      </g>
+      <g opacity=".45" transform="rotate(9 104 52)">
+        <rect x="70" y="26" width="62" height="50" rx="10" fill="url(#ef-card)" stroke="#ffffff" strokeOpacity=".08" />
+        <circle cx="82" cy="38" r="5" fill="#ffffff" fillOpacity=".14" />
+        <rect x="91" y="35" width="28" height="4" rx="2" fill="#ffffff" fillOpacity=".14" />
+        <rect x="78" y="50" width="44" height="4" rx="2" fill="#ffffff" fillOpacity=".09" />
+        <rect x="78" y="59" width="26" height="4" rx="2" fill="#ffffff" fillOpacity=".09" />
+      </g>
+      {/* front card */}
+      <rect x="40" y="18" width="68" height="76" rx="13" fill="url(#ef-card)" stroke="url(#ef-accent)" strokeOpacity=".55" />
+      <circle cx="54" cy="33" r="6" fill="url(#ef-accent)" />
+      <rect x="65" y="29" width="30" height="4" rx="2" fill="#ffffff" fillOpacity=".55" />
+      <rect x="65" y="36" width="18" height="3" rx="1.5" fill="#ffffff" fillOpacity=".22" />
+      <rect x="48" y="48" width="52" height="22" rx="6" fill="#ffffff" fillOpacity=".05" stroke="#ffffff" strokeOpacity=".1" strokeDasharray="3 3" />
+      <rect x="48" y="77" width="40" height="4" rx="2" fill="#ffffff" fillOpacity=".16" />
+      {/* plus badge */}
+      <circle cx="104" cy="88" r="13" fill="url(#ef-accent)" />
+      <circle cx="104" cy="88" r="13" fill="none" stroke="#0b1222" strokeWidth="3" />
+      <path d="M104 82.5v11M98.5 88h11" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" />
+      {/* sparkles */}
+      <path d="M126 20l1.6 4.2 4.2 1.6-4.2 1.6-1.6 4.2-1.6-4.2-4.2-1.6 4.2-1.6z" fill="#5fd6ae" opacity=".85" />
+      <circle cx="22" cy="92" r="2" fill="#3b82f6" opacity=".7" />
+      <circle cx="132" cy="64" r="1.6" fill="#ffffff" opacity=".35" />
+    </svg>
+  );
+}

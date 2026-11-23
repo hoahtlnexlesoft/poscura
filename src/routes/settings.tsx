@@ -35,7 +35,7 @@ function SettingsPage() {
         <button
           onClick={() => router.history.back()}
           aria-label="Back"
-          className="h-9 w-9 -ml-2 rounded-full flex items-center justify-center hover:bg-muted"
+          className="h-9 w-9 -ml-2 rounded-full flex items-center justify-center hover:bg-white/[0.08] hover:text-foreground"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>

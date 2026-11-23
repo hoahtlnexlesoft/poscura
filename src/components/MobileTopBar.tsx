@@ -109,7 +109,7 @@ export function MobileTopBar() {
                   <button
                     key={item.label}
                     onClick={() => go(item.to)}
-                    className={`w-full flex items-center justify-between gap-3 px-4 py-3.5 text-left hover:bg-muted/40 transition-colors ${i > 0 ? "border-t border-border" : ""}`}
+                    className={`w-full flex items-center justify-between gap-3 px-4 py-3.5 text-left hover:bg-white/[0.07] hover:text-foreground transition-colors ${i > 0 ? "border-t border-border" : ""}`}
                   >
                     <span className="flex items-center gap-3">
                       <span className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
@@ -130,7 +130,7 @@ export function MobileTopBar() {
                   <button
                     key={item.label}
                     onClick={() => go(item.to)}
-                    className={`w-full flex items-center justify-between gap-3 px-4 py-3.5 text-left hover:bg-muted/40 transition-colors ${i > 0 ? "border-t border-border" : ""}`}
+                    className={`w-full flex items-center justify-between gap-3 px-4 py-3.5 text-left hover:bg-white/[0.07] hover:text-foreground transition-colors ${i > 0 ? "border-t border-border" : ""}`}
                   >
                     <span className="flex items-center gap-3">
                       <span className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
@@ -167,16 +167,16 @@ export function MobileTopBar() {
           Portalled to <body> so the header's backdrop blur doesn't trap the fixed position. */}
       {mounted && createPortal(<div data-side-toolbar className="fixed right-3 top-[84px] landscape:top-[60px] z-40 w-[72px] flex-col items-center gap-2 py-2.5 rounded-[28px] border border-sidebar-border bg-sidebar/85 backdrop-blur-xl shadow-[0_18px_40px_-12px_rgba(0,0,0,.6)]">
         <button onClick={() => setMenuOpen(true)} aria-label="Open menu"
-          className="h-10 w-10 rounded-full flex items-center justify-center text-sidebar-foreground/80 hover:bg-white/5">
+          className="h-10 w-10 rounded-full flex items-center justify-center text-sidebar-foreground/80 hover:bg-white/[0.08] hover:text-foreground">
           <Menu className="h-[18px] w-[18px]" />
         </button>
         <span aria-hidden className="h-px w-7 bg-sidebar-border" />
         <button onClick={() => navigate({ to: "/discomfort" })} aria-label="Log discomfort"
-          className="h-10 w-10 rounded-full flex items-center justify-center text-sidebar-foreground/80 hover:bg-white/5">
+          className="h-10 w-10 rounded-full flex items-center justify-center text-sidebar-foreground/80 hover:bg-white/[0.08] hover:text-foreground">
           <ClipboardList className="h-[18px] w-[18px]" />
         </button>
         <button onClick={() => navigate({ to: "/notifications" })} aria-label="Notifications"
-          className="relative h-10 w-10 rounded-full flex items-center justify-center text-sidebar-foreground/80 hover:bg-white/5">
+          className="relative h-10 w-10 rounded-full flex items-center justify-center text-sidebar-foreground/80 hover:bg-white/[0.08] hover:text-foreground">
           <Bell className="h-[18px] w-[18px]" />
           <span className="absolute top-0.5 right-0 text-[9px] px-1 rounded-full bg-destructive text-destructive-foreground font-semibold">9+</span>
         </button>

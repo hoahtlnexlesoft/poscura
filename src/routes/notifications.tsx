@@ -73,7 +73,7 @@ function NotificationsPage() {
           {TABS.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={cn("flex w-full items-center justify-between rounded-xl px-3.5 py-3 text-sm font-medium transition",
-                tab === t.id ? "bg-primary/12 text-foreground" : "text-muted-foreground hover:bg-muted/30 hover:text-foreground")}>
+                tab === t.id ? "bg-primary/12 text-foreground" : "text-muted-foreground hover:bg-white/[0.07] hover:text-foreground")}>
               <span className="flex items-center gap-2.5">
                 <span className={cn("h-1.5 w-1.5 rounded-full", tab === t.id ? "bg-primary" : "bg-transparent")} />
                 {t.label}
@@ -150,7 +150,7 @@ function NotificationsPage() {
                   <button
                     key={n.id}
                     onClick={() => open(n)}
-                    className="relative flex w-full items-start gap-3 rounded-xl p-3 text-left transition hover:bg-muted/30"
+                    className="relative flex w-full items-start gap-3 rounded-xl p-3 text-left transition hover:bg-white/[0.07] hover:text-foreground"
                   >
                     <span className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-full border", m.tone)}>
                       <Icon className="h-4 w-4" />

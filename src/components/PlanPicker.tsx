@@ -80,7 +80,7 @@ function PlanCard({ plan, cycle }: { plan: Plan; cycle: BillingCycle }) {
       </ul>
 
       {plan.current ? (
-        <button disabled className="mt-5 h-11 w-full rounded-xl border border-border text-sm font-medium text-muted-foreground">
+        <button disabled className="mt-5 h-11 w-full rounded-xl border border-border text-sm font-medium text-muted-foreground transition hover:border-primary/40 hover:bg-white/[0.04] hover:text-foreground">
           Current plan
         </button>
       ) : (

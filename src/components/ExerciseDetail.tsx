@@ -104,12 +104,12 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext }:
   return (
     <div className="space-y-4 land:grid land:grid-cols-2 hinge-split land:items-start land:gap-x-6 land:gap-y-4 land:space-y-0">
       <div className="flex items-center justify-between land:col-span-2">
-        <button onClick={onClose} className="inline-flex items-center gap-1 text-sm text-muted-foreground">
+        <button onClick={onClose} className="inline-flex items-center gap-1 text-sm text-muted-foreground transition hover:text-foreground">
           <ChevronLeft className="h-4 w-4" /> Details
         </button>
         <div className="flex items-center gap-3 text-xs">
-          {onPrev && <button onClick={onPrev} className="text-primary">Prev</button>}
-          {onNext && <button onClick={onNext} className="text-primary">Next</button>}
+          {onPrev && <button onClick={onPrev} className="text-primary transition hover:opacity-80">Prev</button>}
+          {onNext && <button onClick={onNext} className="text-primary transition hover:opacity-80">Next</button>}
         </div>
       </div>
 
@@ -188,7 +188,7 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext }:
 
             <div className="flex justify-end gap-2">
               <button onClick={() => setComposerOpen(false)} className="px-3 py-2 rounded-lg border border-border text-sm">Cancel</button>
-              <button onClick={publishToCommunity} className="px-3 py-2 rounded-lg bg-gradient-to-r from-primary to-secondary text-primary-foreground text-sm font-semibold">Post to Community</button>
+              <button onClick={publishToCommunity} className="px-3 py-2 rounded-lg bg-gradient-to-r from-primary to-secondary text-primary-foreground text-sm font-semibold transition enabled:hover:brightness-110 active:scale-[0.98]">Post to Community</button>
             </div>
           </div>
         </div>
@@ -239,7 +239,7 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext }:
             <h3 className="font-semibold text-sm truncate">Cat Cow</h3>
             <span className="inline-block text-[10px] px-1.5 py-0.5 rounded-md bg-destructive/15 text-destructive font-medium mt-0.5">Incompleted</span>
           </div>
-          <button className="h-9 w-9 rounded-full border-2 border-primary text-primary flex items-center justify-center">
+          <button className="h-9 w-9 rounded-full border-2 border-primary text-primary flex items-center justify-center transition hover:bg-primary/10">
             <Play className="h-3.5 w-3.5 fill-current" />
           </button>
         </div>
@@ -279,7 +279,7 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext }:
           <>
             <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-emerald-200 via-teal-300 to-cyan-400">
               <div className="absolute inset-0 flex items-center justify-center">
-                <button className="h-12 w-12 rounded-full bg-white/30 backdrop-blur-sm border border-white/60 flex items-center justify-center">
+                <button className="h-12 w-12 rounded-full bg-white/30 backdrop-blur-sm border border-white/60 flex items-center justify-center transition hover:bg-white/45 active:scale-95">
                   <Play className="h-5 w-5 text-white fill-white" />
                 </button>
               </div>

@@ -99,11 +99,11 @@ export function WorkoutProgramDetail({ onClose, onStartSession }: Props) {
   return (
     <div className="space-y-4 land:grid land:grid-cols-2 hinge-split land:items-start land:gap-x-6 land:gap-y-4 land:space-y-0">
       <div className="flex items-center justify-between land:col-span-2">
-        <button onClick={onClose} className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground">
+        <button onClick={onClose} className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground transition hover:text-foreground">
           <ChevronLeft className="h-4 w-4" /> Workout
         </button>
         <div className="flex items-center gap-2">
-          <button onClick={onClose} className="px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium">
+          <button onClick={onClose} className="px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium transition hover:border-primary/40 hover:bg-white/[0.04] hover:text-foreground">
             Cancel
           </button>
           <button onClick={() => setRescheduleOpen(true)} className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium">

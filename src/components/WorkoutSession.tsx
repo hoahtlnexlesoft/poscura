@@ -176,7 +176,7 @@ export function WorkoutSession({ workoutName, videoSrc, session = 1, sessions = 
 
       {/* bottom actions */}
       <div className="grid grid-cols-[1fr_auto_1fr] items-center border-t border-white/10 bg-[#0b1220] px-4 py-3 pb-[max(12px,env(safe-area-inset-bottom))]">
-        <button onClick={onClose} className="inline-flex items-center gap-1 justify-self-start text-[15px] font-medium text-primary">
+        <button onClick={onClose} className="inline-flex items-center gap-1 justify-self-start text-[15px] font-medium text-primary transition hover:opacity-80">
           <ChevronLeft className="h-5 w-5" /> Back
         </button>
         {running ? (
@@ -195,7 +195,7 @@ export function WorkoutSession({ workoutName, videoSrc, session = 1, sessions = 
         <button
           onClick={onNext}
           disabled={!onNext}
-          className="inline-flex items-center gap-1 justify-self-end text-[15px] font-medium text-primary disabled:opacity-40"
+          className="inline-flex items-center gap-1 justify-self-end text-[15px] font-medium text-primary disabled:opacity-40 transition hover:opacity-80"
         >
           Next <ChevronRight className="h-5 w-5" />
         </button>

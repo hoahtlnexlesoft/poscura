@@ -85,7 +85,7 @@ function SupportPage() {
         <button
           onClick={() => router.history.back()}
           aria-label="Back"
-          className="h-9 w-9 -ml-2 rounded-full flex items-center justify-center hover:bg-muted"
+          className="h-9 w-9 -ml-2 rounded-full flex items-center justify-center hover:bg-white/[0.08] hover:text-foreground"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
@@ -129,7 +129,7 @@ function SupportPage() {
                   "shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors fold:relative fold:flex fold:items-center fold:justify-between fold:rounded-lg fold:border-0 fold:px-3 fold:py-2.5 fold:text-left fold:text-[13px]",
                   topic === t.id
                     ? "border-transparent bg-gradient-to-r from-primary to-secondary text-white fold:bg-none fold:bg-primary/12 fold:font-semibold fold:text-foreground"
-                    : "border-border bg-card/60 text-muted-foreground hover:text-foreground fold:bg-transparent fold:hover:bg-muted/40",
+                    : "border-border bg-card/60 text-muted-foreground hover:text-foreground fold:bg-transparent fold:hover:bg-white/[0.07] hover:text-foreground",
                 )}
               >
                 {topic === t.id && <span className="absolute inset-y-2 left-0 hidden w-[3px] rounded-r-full bg-primary fold:block" />}
@@ -154,7 +154,7 @@ function SupportPage() {
                     value={`item-${faq.n}`}
                     className="rounded-xl border border-border bg-card/60 px-3.5 data-[state=open]:border-primary/40 transition-colors"
                   >
-                    <AccordionTrigger className="gap-3 py-3.5 text-left text-sm font-semibold hover:no-underline">
+                    <AccordionTrigger className="gap-3 py-3.5 text-left text-sm font-semibold hover:no-underline hover:text-primary transition-colors">
                       <span className="flex items-center gap-3">
                         <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-[10px] font-bold text-primary">
                           {String(faq.n).padStart(2, "0")}

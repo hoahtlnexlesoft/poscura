@@ -254,3 +254,18 @@ html[data-side] [data-lightbox] img { max-width: 100%; }
 }
 .mac-scroll:hover::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, 0.32); }
 .mac-scroll::-webkit-scrollbar-corner { background: transparent; }
+
+/* Hover fallback: any button/link that doesn't define its own hover still answers the pointer.
+   Explicit `hover:` utilities always win (they're excluded here). Touch screens are unaffected. */
+@media (hover: hover) {
+  @layer components {
+    :is(button, a[href], [role="button"], [role="tab"]):not([class*="hover:"]):not(:disabled):not([aria-disabled="true"]):not([class*="bg-gradient"]):is([class*="bg-"], [class*="border"], [class*="px-"], [class*="rounded"]):hover {
+      background-image: linear-gradient(rgb(255 255 255 / 0.07), rgb(255 255 255 / 0.07));
+      color: var(--color-foreground);
+    }
+    :is(button, a[href], [role="button"]):not([class*="hover:"]):not(:disabled)[class*="bg-gradient"]:hover { filter: brightness(1.1); }
+    :is(button, a[href], [role="button"]):not([class*="hover:"]):not(:disabled):not([class*="bg-"]):not([class*="border"]):not([class*="px-"]):not([class*="rounded"]):hover { opacity: 0.75; }
+    [data-app-nav] :is(a, button):not([class*="hover:"]):hover { color: var(--color-foreground); }
+    [data-app-nav] :is(a, button).active:hover, [data-app-nav] :is(a, button)[aria-current="page"]:hover { color: var(--color-primary); }
+  }
+}

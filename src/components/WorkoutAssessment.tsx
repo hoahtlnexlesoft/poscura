@@ -80,7 +80,7 @@ export function WorkoutAssessment({ workoutName, recordedVideoUrl, onClose }: Pr
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <button onClick={onClose} className="inline-flex items-center gap-1 text-sm text-muted-foreground">
+        <button onClick={onClose} className="inline-flex items-center gap-1 text-sm text-muted-foreground transition hover:text-foreground">
           <ChevronLeft className="h-4 w-4" /> Assessment
         </button>
         <button onClick={() => setShareOpen(true)} aria-label="Share" className="h-9 w-9 rounded-lg border border-border bg-card flex items-center justify-center text-primary">
@@ -163,7 +163,7 @@ export function WorkoutAssessment({ workoutName, recordedVideoUrl, onClose }: Pr
 
             <div className="flex justify-end gap-2">
               <button onClick={() => setComposerOpen(false)} className="px-3 py-2 rounded-lg border border-border text-sm">Cancel</button>
-              <button onClick={publishToCommunity} className="px-3 py-2 rounded-lg bg-gradient-to-r from-primary to-secondary text-primary-foreground text-sm font-semibold">Post to Community</button>
+              <button onClick={publishToCommunity} className="px-3 py-2 rounded-lg bg-gradient-to-r from-primary to-secondary text-primary-foreground text-sm font-semibold transition enabled:hover:brightness-110 active:scale-[0.98]">Post to Community</button>
             </div>
           </div>
         </div>
@@ -182,10 +182,10 @@ export function WorkoutAssessment({ workoutName, recordedVideoUrl, onClose }: Pr
           )}
         </div>
         <div className="flex justify-center gap-2">
-          <button onClick={togglePlay} className="h-9 w-9 rounded-lg border border-border bg-card flex items-center justify-center" disabled={!recordedVideoUrl}>
+          <button onClick={togglePlay} className="h-9 w-9 rounded-lg border border-border bg-card flex items-center justify-center transition hover:border-primary/40 hover:bg-white/[0.04] hover:text-foreground" disabled={!recordedVideoUrl}>
             {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
           </button>
-          <button onClick={replay} className="h-9 w-9 rounded-lg border border-border bg-card flex items-center justify-center" disabled={!recordedVideoUrl}>
+          <button onClick={replay} className="h-9 w-9 rounded-lg border border-border bg-card flex items-center justify-center transition hover:border-primary/40 hover:bg-white/[0.04] hover:text-foreground" disabled={!recordedVideoUrl}>
             <RotateCcw className="h-4 w-4" />
           </button>
         </div>
