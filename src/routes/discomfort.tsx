@@ -46,7 +46,7 @@ function DiscomfortPage() {
         <p className="text-xs text-muted-foreground mt-0.5">Tap areas where you feel pain. Multiple allowed.</p>
       </div>
 
-      <div className="glass-card p-4 flex flex-col items-center fold:col-start-1 fold:row-start-3 fold:sticky fold:top-[72px]">
+      <div className="glass-card p-4 flex flex-col items-center fold:col-start-1 fold:row-start-3 fold:justify-center fold:min-h-[calc(100dvh-194px)]">
         {/* the figure is sized by screen height so the whole body fits above the pinned Skip / Submit bar */}
         <div className="relative w-auto">
           <img src={bodyImg} alt="Body" className="w-auto h-[calc(100dvh-340px)] min-h-[260px] pointer-events-none select-none fold:h-[calc(100dvh-260px)] fold:min-h-[300px]" draggable={false} />
@@ -79,7 +79,7 @@ function DiscomfortPage() {
         )}
       </div>
 
-      <div className="space-y-4 fold:col-start-2 fold:row-start-3">
+      <div className="space-y-4 fold:col-start-2 fold:row-start-3 fold:pb-[88px]">
       <div className="glass-card p-4 space-y-4">
         <div>
           <label className="text-xs text-muted-foreground flex items-center gap-1.5">
@@ -113,7 +113,7 @@ function DiscomfortPage() {
       </div>
 
       {/* pinned to the bottom so Skip / Submit are always visible, content fades out behind them */}
-      <div className="sticky bottom-0 z-20 -mx-4 bg-gradient-to-t from-background from-60% to-transparent px-4 pb-4 pt-6 fold:col-start-2 fold:mx-0 fold:px-0">
+      <div className="sticky bottom-0 z-20 -mx-4 bg-gradient-to-t from-background from-60% to-transparent px-4 pb-4 pt-6 fold:col-start-2 fold:row-start-3 fold:self-end fold:mx-0 fold:px-0 fold:pb-0">
         <div className="flex gap-3">
           <button onClick={() => navigate({ to: "/" })} className="h-12 flex-[0_0_34%] rounded-full border border-white/10 bg-white/[0.03] text-[15px] font-medium text-muted-foreground transition hover:border-white/20 hover:bg-white/[0.07] hover:text-foreground active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
             Skip
