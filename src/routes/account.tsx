@@ -274,7 +274,7 @@ function AccountPage() {
             </TabsList>
           </div>
           <TabsContent data-screen="Information tab" value="info" className="flex flex-col gap-4 mt-4 fold:block fold:columns-2 fold:gap-4 land:gap-6 fold:[&>*>*]:break-inside-avoid fold:[&>*>*]:mb-4 hinge-split land:items-start land:gap-y-4"><AccountInfo /></TabsContent>
-          <TabsContent data-screen="Plan tab" value="subscription" className="space-y-4 mt-4 fold:grid fold:grid-cols-2 fold:gap-4 land:gap-x-6 fold:space-y-0 fold:items-start hinge-split land:items-start"><PlanTab plan={plan ?? "free"} /></TabsContent>
+          <TabsContent data-screen="Plan tab" value="subscription" className="mt-4 space-y-4 fold:space-y-0"><PlanTab plan={plan ?? "free"} /></TabsContent>
           <TabsContent data-screen="Invite & Rewards tab" value="invite" className="space-y-4 mt-4 fold:space-y-0 fold:columns-2 fold:gap-4 land:gap-6 fold:[&>*]:break-inside-avoid fold:[&>*]:mb-4 hinge-split land:items-start land:gap-y-4"><InviteTab /></TabsContent>
         </Tabs>
       </div>

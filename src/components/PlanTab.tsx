@@ -156,8 +156,8 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
 
   return (
     <>
-      {/* ---------- left: plan, usage, benefits ---------- */}
-      <div className="space-y-4 fold:col-start-1">
+      {/* ---------- cards flow in two balanced columns on wide screens (no empty hole under a short column) ---------- */}
+      <div className="space-y-4 fold:block fold:columns-2 fold:gap-4 fold:space-y-0 land:gap-6 fold:[&>*]:mb-4 [&>*]:break-inside-avoid">
         {/* current plan */}
         <Card className={cn(plan === "business" && "border-success/25 bg-gradient-to-b from-success/[0.06] to-card")}>
           <div className="flex items-start justify-between gap-3">
@@ -245,10 +245,6 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
             </ul>
           </Card>
         )}
-      </div>
-
-      {/* ---------- right: history, add-ons, vouchers ---------- */}
-      <div className="space-y-4 fold:col-start-2">
         <Card title="Subscription history">
           <ul className="space-y-2">
             {(histOpen ? hist : hist.slice(0, 3)).map((h, i) => (
@@ -299,7 +295,7 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
       </div>
 
       {/* ---------- last: plans to upgrade to ---------- */}
-      <section id="upgrade-your-plan" className="scroll-mt-20 rounded-[22px] border border-white/[0.06] bg-card p-5 fold:col-span-2">
+      <section id="upgrade-your-plan" className="scroll-mt-20 rounded-[22px] border border-white/[0.06] bg-card p-5">
         <h2 className="mb-4 text-center text-[17px] font-semibold tracking-tight">Upgrade your plan</h2>
         <PlanPicker currentId={plan === "free" ? "freemium" : plan === "individual" ? "individual" : "none"} />
       </section>
