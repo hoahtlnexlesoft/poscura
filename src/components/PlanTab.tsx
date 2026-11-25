@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import {
-  Star, CircleCheck, Check, ChevronDown, CalendarClock, CreditCard, Ticket, Building2, Plus, Copy, LogOut, X,
+  ChevronRight, Star, Sparkles, CircleCheck, Check, ChevronDown, CalendarClock, CreditCard, Ticket, Building2, Plus, Copy, LogOut, X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PlanPicker } from "@/components/PlanPicker";
@@ -56,9 +56,9 @@ const VOUCHERS: Voucher[] = [
 ];
 
 /* ---------- small building blocks ---------- */
-function Card({ title, action, children, className }: { title?: string; action?: React.ReactNode; children: React.ReactNode; className?: string }) {
+function Card({ title, action, children, className, id }: { title?: string; action?: React.ReactNode; children: React.ReactNode; className?: string; id?: string }) {
   return (
-    <section className={cn("rounded-[22px] border border-white/[0.06] bg-card p-5", className)}>
+    <section id={id} className={cn("rounded-[22px] border border-white/[0.06] bg-card p-5", className)}>
       {(title || action) && (
         <div className="mb-4 flex items-center justify-between gap-3">
           {title && <h2 className="text-[15px] font-semibold tracking-tight">{title}</h2>}
@@ -73,11 +73,63 @@ const outlineBtn = "inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full b
 const gradBtn = "inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-r from-primary to-secondary px-4 text-[13px] font-semibold text-white shadow-[0_10px_26px_-14px] shadow-primary transition hover:brightness-110 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60";
 const statusTone = { Used: "bg-primary/12 text-primary ring-primary/25", Active: "bg-success/12 text-success ring-success/25", Expired: "bg-white/[0.05] text-muted-foreground ring-white/10", Cancelled: "bg-destructive/12 text-destructive ring-destructive/25" };
 
-function MoreButton({ open, onClick }: { open: boolean; onClick: () => void }) {
+function MoreButton({ count, onClick }: { count: number; onClick: () => void }) {
   return (
-    <button onClick={onClick} className="mx-auto mt-4 flex h-9 items-center gap-1 rounded-full px-3 text-[12.5px] font-semibold text-primary transition hover:bg-primary/10">
-      {open ? "View less" : "View more"} <ChevronDown className={cn("h-4 w-4 transition-transform", open && "rotate-180")} />
+    <button onClick={onClick} className="mx-auto mt-4 flex h-9 items-center gap-1 rounded-full px-3 text-[12.5px] font-semibold text-primary transition hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+      View all ({count}) <ChevronRight className="h-4 w-4" />
     </button>
+  );
+}
+
+/** Full list in a modal, so the cards on the page keep their height and the two columns stay level */
+function ListModal({ open, onOpenChange, title, subtitle, filters, children }: {
+  open: boolean; onOpenChange: (v: boolean) => void; title: string; subtitle?: string;
+  filters?: React.ReactNode; children: React.ReactNode;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="flex max-h-[min(640px,calc(100dvh-48px))] w-[calc(100vw-32px)] max-w-[460px] flex-col gap-0 overflow-hidden rounded-[22px] p-0">
+        <DialogHeader className="border-b border-white/[0.06] px-5 pb-4 pt-5 text-left">
+          <DialogTitle className="text-[17px]">{title}</DialogTitle>
+          {subtitle && <DialogDescription className="text-[12.5px]">{subtitle}</DialogDescription>}
+          {filters && <div className="pt-2">{filters}</div>}
+        </DialogHeader>
+        <div className="mac-scroll min-h-0 flex-1 overflow-y-auto p-4">{children}</div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function HistRow({ h }: { h: Hist }) {
+  return (
+    <li className="rounded-[16px] border border-white/[0.06] bg-white/[0.02] p-3.5">
+      <div className="flex items-baseline justify-between gap-3">
+        <span className="text-[14px] font-semibold">{h.plan} · {h.cycle}</span>
+        <span className="shrink-0 text-[14px] font-semibold tabular-nums">{h.price}</span>
+      </div>
+      <div className="mt-1.5 flex items-center justify-between gap-3">
+        <span className={cn("rounded-full px-2 py-px text-[10.5px] font-semibold ring-1 ring-inset", statusTone[h.status])}>{h.status}</span>
+        <span className="text-[11.5px] text-muted-foreground">{h.date}</span>
+      </div>
+    </li>
+  );
+}
+
+type VFilter = "All" | "Active" | "Used" | "Expired";
+function VoucherFilter({ value, onChange }: { value: VFilter; onChange: (v: VFilter) => void }) {
+  return (
+    <div role="tablist" className="inline-flex rounded-full border border-white/[0.06] bg-white/[0.03] p-1">
+      {(["All", "Active", "Used", "Expired"] as const).map((f) => {
+        const n = f === "All" ? VOUCHERS.length : VOUCHERS.filter((v) => v.status === f).length;
+        return (
+          <button key={f} role="tab" aria-selected={value === f} onClick={() => onChange(f)}
+            className={cn("flex h-8 items-center gap-1.5 rounded-full px-3 text-[12.5px] font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
+              value === f ? "bg-white/[0.09] text-foreground" : "text-muted-foreground hover:text-foreground")}>
+            {f}<span className="text-[11px] tabular-nums text-muted-foreground">{n}</span>
+          </button>
+        );
+      })}
+    </div>
   );
 }
 
@@ -99,6 +151,12 @@ function Confirm({ trigger, title, body, action, onConfirm }: { trigger: React.R
   );
 }
 
+const toBenefits = () => {
+  const el = document.getElementById("member-benefits");
+  if (!el) return;
+  el.scrollIntoView({ behavior: "smooth", block: "start" });
+  el.animate([{ boxShadow: "0 0 0 2px color-mix(in oklab, var(--color-success) 70%, transparent)" }, { boxShadow: "0 0 0 2px transparent" }], { duration: 1600, delay: 350, easing: "ease-out" });
+};
 const toUpgrade = () => document.getElementById("upgrade-your-plan")?.scrollIntoView({ behavior: "smooth", block: "start" });
 
 /* ---------- voucher as a ticket: discount stub, perforation, details ---------- */
@@ -183,11 +241,11 @@ function BusinessPlanCard() {
           </div>
         </dl>
 
-        <p className="mt-3 text-[12.5px] leading-relaxed text-muted-foreground">All Professional benefits are active. You can still pick a personal plan any time.</p>
+        <p className="mt-3 text-[12.5px] leading-relaxed text-muted-foreground">All Professional benefits are active and paid for by your business.</p>
 
         <div className="mt-4 grid grid-cols-2 gap-2">
-          <button onClick={toUpgrade} className={cn(outlineBtn, "h-10 justify-center")}>
-            <Star className="h-3.5 w-3.5" /> Personal plan
+          <button onClick={toBenefits} className={cn(outlineBtn, "h-10 justify-center")}>
+            <Sparkles className="h-3.5 w-3.5" /> Member benefits
           </button>
           <Confirm
             trigger={<button className={cn(outlineBtn, "h-10 justify-center text-muted-foreground hover:border-destructive/50 hover:bg-destructive/10 hover:text-destructive")}><LogOut className="h-3.5 w-3.5" /> Leave business</button>}
@@ -211,6 +269,8 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
   const [browse, setBrowse] = useState(false);
   const [histOpen, setHistOpen] = useState(false);
   const [vouOpen, setVouOpen] = useState(false);
+  const [vf, setVf] = useState<VFilter>("All");
+  const vList = vf === "All" ? VOUCHERS : VOUCHERS.filter((v) => v.status === vf);
   const hist = HISTORY[plan];
   const unlimited = plan !== "free";
 
@@ -279,7 +339,7 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
         </Card>
 
         {plan === "business" && (
-          <Card title="Professional benefits">
+          <Card id="member-benefits" title="Professional benefits" className="scroll-mt-20">
             <ul className="grid gap-x-4 gap-y-2.5 sm:grid-cols-2">
               {BENEFITS.map((b) => (
                 <li key={b} className="flex items-center gap-2.5 text-[13.5px]">
@@ -313,36 +373,38 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
         <div className="space-y-4 fold:flex fold:flex-col fold:gap-4 fold:space-y-0 fold:[&>*:last-child]:flex-1">
         <Card title="Subscription history">
           <ul className="space-y-2">
-            {(histOpen ? hist : hist.slice(0, 2)).map((h, i) => (
-              <li key={i} className="rounded-[16px] border border-white/[0.06] bg-white/[0.02] p-3.5">
-                <div className="flex items-baseline justify-between gap-3">
-                  <span className="text-[14px] font-semibold">{h.plan} · {h.cycle}</span>
-                  <span className="shrink-0 text-[14px] font-semibold tabular-nums">{h.price}</span>
-                </div>
-                <div className="mt-1.5 flex items-center justify-between gap-3">
-                  <span className={cn("rounded-full px-2 py-px text-[10.5px] font-semibold ring-1 ring-inset", statusTone[h.status])}>{h.status}</span>
-                  <span className="text-[11.5px] text-muted-foreground">{h.date}</span>
-                </div>
-              </li>
-            ))}
+            {hist.slice(0, 2).map((h, i) => <HistRow key={i} h={h} />)}
           </ul>
-          {hist.length > 2 && <MoreButton open={histOpen} onClick={() => setHistOpen((v) => !v)} />}
+          {hist.length > 2 && <MoreButton count={hist.length} onClick={() => setHistOpen(true)} />}
         </Card>
 
         <Card title="Vouchers" action={<span className="text-[12px] text-muted-foreground">{VOUCHERS.filter((x) => x.status === "Active").length} active · tap a code to copy</span>}>
           <ul className="space-y-3">
-            {(vouOpen ? VOUCHERS : VOUCHERS.slice(0, 2)).map((v) => <VoucherTicket key={v.code} v={v} />)}
+            {VOUCHERS.filter((v) => v.status === "Active").slice(0, 2).map((v) => <VoucherTicket key={v.code} v={v} />)}
           </ul>
-          {VOUCHERS.length > 2 && <MoreButton open={vouOpen} onClick={() => setVouOpen((v) => !v)} />}
+          {VOUCHERS.length > 2 && <MoreButton count={VOUCHERS.length} onClick={() => setVouOpen(true)} />}
         </Card>
         </div>
       </div>
 
-      {/* ---------- last: plans to upgrade to ---------- */}
+      {/* ---------- last: plans to upgrade to (not for business members, their plan is paid by the business) ---------- */}
+      {plan !== "business" && (
       <section id="upgrade-your-plan" className="mt-4 scroll-mt-20 rounded-[22px] border border-white/[0.06] bg-card p-5">
         <h2 className="mb-4 text-center text-[17px] font-semibold tracking-tight">Upgrade your plan</h2>
         <PlanPicker currentId={plan === "free" ? "freemium" : plan === "individual" ? "individual" : "none"} />
       </section>
+      )}
+
+      <ListModal open={histOpen} onOpenChange={setHistOpen} title="Subscription history" subtitle={`${hist.length} periods, newest first`}>
+        <ul className="space-y-2">{hist.map((h, i) => <HistRow key={i} h={h} />)}</ul>
+      </ListModal>
+
+      <ListModal open={vouOpen} onOpenChange={setVouOpen} title="Vouchers" subtitle="Tap a code to copy it."
+        filters={<VoucherFilter value={vf} onChange={setVf} />}>
+        {vList.length
+          ? <ul className="space-y-3">{vList.map((v) => <VoucherTicket key={v.code} v={v} />)}</ul>
+          : <p className="py-10 text-center text-[13px] text-muted-foreground">No {vf.toLowerCase()} vouchers.</p>}
+      </ListModal>
 
       <Dialog open={browse} onOpenChange={setBrowse}>
         <DialogContent className="max-w-sm rounded-[22px]">

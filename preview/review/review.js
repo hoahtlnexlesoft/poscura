@@ -54,7 +54,7 @@
     var v = null; try { v = window.poscuraDevice && window.poscuraDevice(); } catch (e) {}
     if (!v) { var w = window.innerWidth; v = { name: w <= 640 ? 'Mobile' : w <= 1024 ? 'Tablet' : 'Desktop', size: w + '×' + window.innerHeight }; }
     // the screen inside the route (exercise intro, guided session, a tab…): the app marks it with data-screen
-    var sc = ''; try { var fd = frameEl(); var ms = (fd ? fd.contentDocument : document).querySelectorAll('[data-screen]'); if (ms.length) sc = ms[ms.length - 1].getAttribute('data-screen'); } catch (e) {}
+    var sc = ''; try { var fd = frameEl(); var ms = (fd ? fd.contentDocument : document).querySelectorAll('[data-screen]'); for (var mi = ms.length - 1; mi >= 0; mi--) { var me = ms[mi]; if (me.closest('[hidden]') || !me.getClientRects().length) continue; sc = me.getAttribute('data-screen'); break; } } catch (e) {}
     return { view: v.name, size: v.size, os: os, browser: br, screen: sc };
   }
   // device names changed over time; show older comments under today's names
