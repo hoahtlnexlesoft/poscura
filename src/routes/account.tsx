@@ -38,7 +38,7 @@ type Connection = { id: string; name: string; icon: React.ReactNode; status: Con
 function UnifiedAccountSection() {
   const [connections, setConnections] = useState<Connection[]>([
     { id: "facebook", name: "Facebook", icon: <span className="h-7 w-7 rounded-full bg-[#1877F2] text-white flex items-center justify-center"><Facebook className="h-4 w-4" /></span>, status: "connected" },
-    { id: "google", name: "Google", icon: <span className="h-7 w-7 rounded-full bg-white border border-border flex items-center justify-center text-xs font-bold">G</span>, status: "connected" },
+    { id: "google", name: "Google", icon: <span className="h-7 w-7 rounded-full bg-white flex items-center justify-center text-[15px] font-bold leading-none text-[#4285F4]">G</span>, status: "connected" },
     { id: "apple", name: "Apple ID", icon: <span className="h-7 w-7 rounded-full bg-black text-white flex items-center justify-center"><Apple className="h-4 w-4" /></span>, status: "disconnected" },
   ]);
   const [email, setEmail] = useState("marc.john@example.com");
