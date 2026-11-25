@@ -280,9 +280,7 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
                 <div className="mt-2.5 text-[11.5px] text-muted-foreground">Next billing</div>
                 <div className="text-[13px] font-semibold text-success">26 Nov, 2026</div>
               </div>
-            ) : (
-              <span className={cn("shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ring-1 ring-inset", statusTone.Active)}>Active</span>
-            )}
+            ) : null}
           </div>
 
           {(
