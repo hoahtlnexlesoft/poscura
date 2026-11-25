@@ -318,10 +318,6 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
                   <span className={cn("rounded-full px-2 py-px text-[10.5px] font-semibold ring-1 ring-inset", statusTone[h.status])}>{h.status}</span>
                   <span className="text-[11.5px] text-muted-foreground">{h.date}</span>
                 </div>
-                <div className="mt-2.5 space-y-1 border-t border-white/[0.05] pt-2.5 text-[12px] text-muted-foreground">
-                  <div className="flex items-start gap-1.5"><CalendarClock className="mt-px h-3.5 w-3.5 shrink-0" /> {h.period}</div>
-                  <div className="flex items-start gap-1.5">{h.price === "Covered" ? <Building2 className="mt-px h-3.5 w-3.5 shrink-0" /> : <CreditCard className="mt-px h-3.5 w-3.5 shrink-0" />} {h.paid}</div>
-                </div>
               </li>
             ))}
           </ul>
