@@ -46,12 +46,13 @@ const ADDON_SHOP = [
   { id: "heavy", name: "Heavy Monitoring", hours: "+40 hours / month", price: 299000 },
 ];
 
-type Voucher = { name: string; code: string; off: string; until: string };
+type Voucher = { name: string; code: string; off: string; until: string; status: "Active" | "Used" | "Expired" };
 const VOUCHERS: Voucher[] = [
-  { name: "Voucher Individual Only", code: "CODE1111", off: "80% OFF", until: "12/11/2026 10:11" },
-  { name: "SNTKDEDVD", code: "ANTRUONG98", off: "10% OFF", until: "12/10/2026 17:47" },
-  { name: "WorldCup2026", code: "WCSM2026", off: "10% OFF", until: "11/28/2026 11:45" },
-  { name: "Welcome back", code: "WELCOME10", off: "10% OFF", until: "01/15/2027 23:59" },
+  { name: "Voucher Individual Only", code: "CODE1111", off: "80% OFF", until: "12/11/2026 10:11", status: "Active" },
+  { name: "SNTKDEDVD", code: "ANTRUONG98", off: "10% OFF", until: "12/10/2026 17:47", status: "Active" },
+  { name: "WorldCup2026", code: "WCSM2026", off: "10% OFF", until: "11/28/2026 11:45", status: "Active" },
+  { name: "Welcome back", code: "WELCOME10", off: "10% OFF", until: "01/15/2027 23:59", status: "Used" },
+  { name: "Summer Posture", code: "SUMMER26", off: "20% OFF", until: "08/31/2026 23:59", status: "Expired" },
 ];
 
 /* ---------- small building blocks ---------- */
@@ -70,7 +71,7 @@ function Card({ title, action, children, className }: { title?: string; action?:
 }
 const outlineBtn = "inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border border-white/10 px-3.5 text-[12.5px] font-semibold text-foreground/85 transition hover:border-primary/50 hover:bg-primary/10 hover:text-foreground active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60";
 const gradBtn = "inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-r from-primary to-secondary px-4 text-[13px] font-semibold text-white shadow-[0_10px_26px_-14px] shadow-primary transition hover:brightness-110 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60";
-const statusTone = { Active: "bg-success/12 text-success ring-success/25", Expired: "bg-white/[0.05] text-muted-foreground ring-white/10", Cancelled: "bg-destructive/12 text-destructive ring-destructive/25" };
+const statusTone = { Used: "bg-primary/12 text-primary ring-primary/25", Active: "bg-success/12 text-success ring-success/25", Expired: "bg-white/[0.05] text-muted-foreground ring-white/10", Cancelled: "bg-destructive/12 text-destructive ring-destructive/25" };
 
 function MoreButton({ open, onClick }: { open: boolean; onClick: () => void }) {
   return (
@@ -106,7 +107,8 @@ function VoucherTicket({ v }: { v: Voucher }) {
   const [mm, dd, rest] = v.until.split("/");
   const end = new Date(`${rest.slice(0, 4)}-${mm}-${dd}T${rest.slice(5) || "23:59"}`);
   const days = Math.ceil((end.getTime() - Date.now()) / 86400000);
-  const soon = days >= 0 && days <= 7;
+  const live = v.status === "Active";
+  const soon = live && days >= 0 && days <= 7;
   const pct = v.off.replace(/\s*OFF/i, "");
   const copy = () => {
     navigator.clipboard?.writeText(v.code);
@@ -114,7 +116,7 @@ function VoucherTicket({ v }: { v: Voucher }) {
     setTimeout(() => setCopied(false), 1600);
   };
   return (
-    <li className="group relative flex overflow-hidden rounded-[18px] bg-gradient-to-r from-white/[0.05] to-white/[0.02] ring-1 ring-inset ring-white/[0.07] transition hover:ring-primary/30">
+    <li className={cn("group relative flex overflow-hidden rounded-[18px] bg-gradient-to-r from-white/[0.05] to-white/[0.02] ring-1 ring-inset ring-white/[0.07] transition hover:ring-primary/30", !live && "opacity-60 saturate-50")}>
       {/* stub */}
       <div className="relative flex w-[92px] shrink-0 flex-col items-center justify-center bg-gradient-to-br from-primary/30 via-primary/15 to-secondary/25 py-4">
         <span className="text-[26px] font-bold leading-none tracking-tight">{pct}</span>
@@ -127,14 +129,17 @@ function VoucherTicket({ v }: { v: Voucher }) {
       </div>
       {/* details */}
       <div className="min-w-0 flex-1 p-3.5 pl-4">
-        <div className="line-clamp-2 text-[14px] font-semibold leading-snug">{v.name}</div>
+        <div className="flex items-start justify-between gap-2">
+          <div className="line-clamp-2 text-[14px] font-semibold leading-snug">{v.name}</div>
+          <span className={cn("shrink-0 rounded-full px-2 py-px text-[10.5px] font-semibold ring-1 ring-inset", statusTone[v.status])}>{v.status}</span>
+        </div>
         <button onClick={copy} aria-label={`Copy code ${v.code}`}
           className="mt-2 inline-flex h-8 items-center gap-2 rounded-lg border border-dashed border-primary/40 bg-primary/[0.08] px-2.5 font-mono text-[12.5px] font-semibold tracking-[0.08em] text-foreground transition hover:border-primary/70 hover:bg-primary/15 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
           {v.code}
           {copied ? <Check className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5 text-primary" />}
         </button>
         <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11.5px] text-muted-foreground">
-          <span>Valid until {end.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+          <span>{v.status === "Expired" ? "Expired on" : v.status === "Used" ? "Used · was valid until" : "Valid until"} {end.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
           {soon && <span className="rounded-full bg-warning/12 px-2 py-px font-semibold text-warning ring-1 ring-inset ring-warning/25">{days <= 1 ? "Ends today" : `${days} days left`}</span>}
         </div>
       </div>
@@ -324,7 +329,7 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
           {hist.length > 2 && <MoreButton open={histOpen} onClick={() => setHistOpen((v) => !v)} />}
         </Card>
 
-        <Card title="Vouchers" action={<span className="text-[12px] text-muted-foreground">{VOUCHERS.length} active · tap a code to copy</span>}>
+        <Card title="Vouchers" action={<span className="text-[12px] text-muted-foreground">{VOUCHERS.filter((x) => x.status === "Active").length} active · tap a code to copy</span>}>
           <ul className="space-y-3">
             {(vouOpen ? VOUCHERS : VOUCHERS.slice(0, 2)).map((v) => <VoucherTicket key={v.code} v={v} />)}
           </ul>
