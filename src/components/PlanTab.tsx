@@ -142,6 +142,61 @@ function VoucherTicket({ v }: { v: Voucher }) {
   );
 }
 
+/* ---------- covered by a business: who pays, since when, and the two ways out ---------- */
+function BusinessPlanCard() {
+  return (
+    <section className="relative overflow-hidden rounded-[22px] border border-white/[0.07] bg-card">
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[radial-gradient(80%_100%_at_0%_0%,color-mix(in_oklab,var(--color-success)_18%,transparent),transparent_70%),radial-gradient(60%_90%_at_100%_0%,color-mix(in_oklab,var(--color-primary)_16%,transparent),transparent_70%)]" />
+      <div className="relative p-5">
+        <div className="flex items-center justify-between">
+          <span className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Current plan</span>
+          <span className={cn("inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ring-1 ring-inset", statusTone.Active)}>
+            <span className="h-1.5 w-1.5 rounded-full bg-success" /> Active
+          </span>
+        </div>
+
+        <div className="mt-3 flex items-center gap-3.5">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-gradient-to-br from-success/30 to-primary/25 ring-1 ring-inset ring-white/10">
+            <Building2 className="h-5 w-5 text-success" />
+          </span>
+          <div className="min-w-0">
+            <div className="text-[22px] font-bold leading-tight tracking-tight">Professional</div>
+            <div className="mt-0.5 flex items-center gap-1.5 text-[12.5px] text-muted-foreground">
+              <CircleCheck className="h-3.5 w-3.5 shrink-0 text-success" /> Covered by your business
+            </div>
+          </div>
+        </div>
+
+        <dl className="mt-4 grid grid-cols-2 divide-x divide-white/[0.06] rounded-[16px] border border-white/[0.06] bg-background/30">
+          <div className="px-3.5 py-3">
+            <dt className="text-[11px] text-muted-foreground">Paid by</dt>
+            <dd className="mt-0.5 truncate text-[14px] font-semibold">Uyen86SME</dd>
+          </div>
+          <div className="px-3.5 py-3">
+            <dt className="text-[11px] text-muted-foreground">Member since</dt>
+            <dd className="mt-0.5 text-[14px] font-semibold">Nov 23, 2026</dd>
+          </div>
+        </dl>
+
+        <p className="mt-3 text-[12.5px] leading-relaxed text-muted-foreground">All Professional benefits are active. You can still pick a personal plan any time.</p>
+
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          <button onClick={toUpgrade} className={cn(outlineBtn, "h-10 justify-center")}>
+            <Star className="h-3.5 w-3.5" /> Personal plan
+          </button>
+          <Confirm
+            trigger={<button className={cn(outlineBtn, "h-10 justify-center text-muted-foreground hover:border-destructive/50 hover:bg-destructive/10 hover:text-destructive")}><LogOut className="h-3.5 w-3.5" /> Leave business</button>}
+            title="Leave Uyen86SME?"
+            body="You lose the Professional benefits your business pays for and move back to Freemium. Your history and reports stay with you."
+            action="Leave business"
+            onConfirm={() => toast("You left Uyen86SME")}
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ---------- the tab ---------- */
 export function PlanTab({ plan }: { plan: PlanKind }) {
   const [addons, setAddons] = useState<AddOn[]>([
@@ -159,17 +214,17 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
       {/* ---------- cards flow in two balanced columns on wide screens (no empty hole under a short column) ---------- */}
       <div className="space-y-4 fold:block fold:columns-2 fold:gap-4 fold:space-y-0 land:gap-6 fold:[&>*]:mb-4 [&>*]:break-inside-avoid">
         {/* current plan */}
-        <Card className={cn(plan === "business" && "border-success/25 bg-gradient-to-b from-success/[0.06] to-card")}>
+        {plan === "business" ? <BusinessPlanCard /> : (
+        <Card>
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <div className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Current plan</div>
               <div className="mt-1.5 text-[24px] font-bold leading-tight tracking-tight">
-                {plan === "free" ? "Freemium" : plan === "individual" ? "Individual" : "Professional"}
+                {plan === "free" ? "Freemium" : "Individual"}
               </div>
               <div className="mt-0.5 text-[13px] text-muted-foreground">
                 {plan === "free" && "Free forever. No billing."}
                 {plan === "individual" && <><span className="font-semibold text-foreground">{vnd(299000)}</span> / month · Visa •••• 4417</>}
-                {plan === "business" && <>Business member · <span className="text-foreground/90">Uyen86SME</span></>}
               </div>
             </div>
             {plan === "individual" ? (
@@ -189,30 +244,14 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
             )}
           </div>
 
-          {plan === "business" ? (
-            <>
-              <div className="mt-4 flex gap-2.5 rounded-[16px] bg-success/[0.08] p-3.5 ring-1 ring-inset ring-success/20">
-                <CircleCheck className="mt-0.5 h-4 w-4 shrink-0 text-success" />
-                <div>
-                  <div className="text-[13.5px] font-semibold">Covered by Uyen86SME</div>
-                  <p className="mt-0.5 text-[12.5px] leading-relaxed text-muted-foreground">All Professional benefits are active. You can also choose a personal plan at any time.</p>
-                </div>
-              </div>
-              <Confirm
-                trigger={<button className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-full border border-white/10 text-[13.5px] font-semibold text-foreground/85 transition hover:border-destructive/50 hover:bg-destructive/10 hover:text-destructive"><LogOut className="h-4 w-4" /> Leave business</button>}
-                title="Leave Uyen86SME?"
-                body="You lose the Professional benefits your business pays for and move back to Freemium. Your history and reports stay with you."
-                action="Leave business"
-                onConfirm={() => toast("You left Uyen86SME")}
-              />
-            </>
-          ) : (
+          {(
             <div className="mt-4 flex items-center justify-between gap-3 rounded-[16px] bg-gradient-to-r from-primary/20 via-primary/[0.08] to-transparent p-3.5 ring-1 ring-inset ring-primary/20">
               <p className="text-[13px] font-medium">{plan === "free" ? "Upgrade your plan to access advanced tools." : "Get team features with Family or Professional."}</p>
               <button onClick={toUpgrade} className={gradBtn}><Star className="h-3.5 w-3.5 fill-current" /> Upgrade</button>
             </div>
           )}
         </Card>
+        )}
 
         {/* usage */}
         <Card title="Usage this month">
