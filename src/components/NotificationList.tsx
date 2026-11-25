@@ -63,7 +63,6 @@ function NotiRow({ n, onOpen, compact }: { n: Noti; onOpen?: () => void; compact
   const navigate = useNavigate();
   const { markRead } = useNotifications();
   const k = KIND[n.kind];
-  const Icon = k.icon;
   const open = () => {
     markRead(n.id);
     onOpen?.();
@@ -74,13 +73,10 @@ function NotiRow({ n, onOpen, compact }: { n: Noti; onOpen?: () => void; compact
       role="button" tabIndex={0} onClick={open}
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } }}
       className={cn(
-        "group relative flex cursor-pointer gap-3 overflow-hidden rounded-xl px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
+        "group relative flex cursor-pointer overflow-hidden rounded-xl px-4 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
         // unread: tinted row; read rows stay quiet
         n.unread ? "bg-primary/[0.04] hover:bg-primary/[0.07]" : "hover:bg-white/[0.04]",
       )}>
-      <span className={cn("flex shrink-0 items-center justify-center rounded-full ring-1 ring-inset", k.tone, compact ? "h-9 w-9" : "h-10 w-10", !n.unread && "opacity-60 saturate-50")}>
-        <Icon className="h-4 w-4" />
-      </span>
       <div className={cn("min-w-0 flex-1", n.unread ? "pr-11" : "pr-1")}>
         <div className="flex items-baseline gap-1.5 text-[12px] text-muted-foreground">
           <span className={cn("truncate font-semibold", n.unread ? "text-foreground" : "text-foreground/55")}>{k.label}</span>
