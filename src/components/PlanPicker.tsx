@@ -102,12 +102,12 @@ function PlanCard({ plan, cycle }: { plan: Plan; cycle: BillingCycle }) {
 }
 
 /** Plan cards only; side by side when there is room. */
-export function PlanCards({ cycle, className }: { cycle: BillingCycle; className?: string }) {
+export function PlanCards({ cycle, className, currentId }: { cycle: BillingCycle; className?: string; currentId?: string }) {
   return (
     <div className={cn("@container", className)}>
       <div className="grid gap-3 @[620px]:grid-cols-3 @[620px]:items-stretch @[620px]:gap-4 @[620px]:pt-[26px]">
         {PLANS.map((p) => (
-          <PlanCard key={p.id} plan={p} cycle={cycle} />
+          <PlanCard key={p.id} plan={currentId ? { ...p, current: p.id === currentId } : p} cycle={cycle} />
         ))}
       </div>
     </div>
@@ -115,12 +115,13 @@ export function PlanCards({ cycle, className }: { cycle: BillingCycle; className
 }
 
 /** Monthly/annual toggle + plan cards. */
-export function PlanPicker({ className }: { className?: string }) {
+/** currentId marks which card is the user's plan (defaults to the one flagged in PLANS) */
+export function PlanPicker({ className, currentId }: { className?: string; currentId?: string }) {
   const [cycle, setCycle] = useState<BillingCycle>("monthly");
   return (
     <div className={cn("space-y-5", className)}>
       <BillingToggle cycle={cycle} onChange={setCycle} />
-      <PlanCards cycle={cycle} />
+      <PlanCards cycle={cycle} currentId={currentId} />
     </div>
   );
 }

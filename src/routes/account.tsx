@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { PlanPicker } from "@/components/PlanPicker";
+import { PlanTab } from "@/components/PlanTab";
+import { z } from "zod";
 import { cn } from "@/lib/utils";
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
@@ -232,10 +234,14 @@ function FamilyMembersSection() {
   );
 }
 
-export const Route = createFileRoute("/account")({ component: AccountPage });
+export const Route = createFileRoute("/account")({
+  component: AccountPage,
+  validateSearch: z.object({ tab: z.enum(["info", "plan", "invite"]).optional(), plan: z.enum(["free", "individual", "business"]).optional() }),
+});
 
 function AccountPage() {
   const router = useRouter();
+  const { tab, plan } = Route.useSearch();
   return (
     <div className="-mx-4 -mt-4">
       <header className="h-14 sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border flex items-center px-4 gap-2">
@@ -249,7 +255,7 @@ function AccountPage() {
         <h1 className="text-base font-semibold">My Account</h1>
       </header>
       <div className="p-4 space-y-4">
-        <Tabs defaultValue="info">
+        <Tabs key={tab ?? "info"} defaultValue={tab === "plan" ? "subscription" : tab ?? "info"}>
           <div className="-mx-4 border-b border-border px-2">
             <TabsList className="h-auto w-full justify-center gap-1 rounded-none bg-transparent p-0">
               {[
@@ -268,7 +274,7 @@ function AccountPage() {
             </TabsList>
           </div>
           <TabsContent data-screen="Information tab" value="info" className="flex flex-col gap-4 mt-4 fold:block fold:columns-2 fold:gap-4 land:gap-6 fold:[&>*>*]:break-inside-avoid fold:[&>*>*]:mb-4 hinge-split land:items-start land:gap-y-4"><AccountInfo /></TabsContent>
-          <TabsContent data-screen="Plan tab" value="subscription" className="space-y-4 mt-4 fold:grid fold:grid-cols-2 fold:gap-4 land:gap-x-6 fold:space-y-0 hinge-split"><SubscriptionTab /></TabsContent>
+          <TabsContent data-screen="Plan tab" value="subscription" className="space-y-4 mt-4 fold:grid fold:grid-cols-2 fold:gap-4 land:gap-x-6 fold:space-y-0 fold:items-start hinge-split land:items-start"><PlanTab plan={plan ?? "free"} /></TabsContent>
           <TabsContent data-screen="Invite & Rewards tab" value="invite" className="space-y-4 mt-4 fold:space-y-0 fold:columns-2 fold:gap-4 land:gap-6 fold:[&>*]:break-inside-avoid fold:[&>*]:mb-4 hinge-split land:items-start land:gap-y-4"><InviteTab /></TabsContent>
         </Tabs>
       </div>
