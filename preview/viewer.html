@@ -16,10 +16,14 @@
   .left h1 { font-size:26px; font-weight:700; margin:0 0 14px; letter-spacing:-.01em; line-height:1.2; }
   .left p { color:var(--muted); font-size:14.5px; line-height:1.5; margin:0 0 18px; }
   .screens { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:0; }
-  .screens button { width:100%; text-align:left; font:inherit; font-size:15px; font-weight:500; color:var(--text); background:transparent; border:0; border-radius:8px; padding:6px 12px; cursor:pointer; line-height:1.3; }
+  .screens button { display:flex; align-items:baseline; width:100%; text-align:left; font:inherit; font-size:15px; font-weight:500; color:var(--text); background:transparent; border:0; border-radius:8px; padding:6px 12px; cursor:pointer; line-height:1.3; }
   .screens button:hover { background:var(--item); }
-  .screens button.on { background:var(--accent-soft); color:var(--accent); font-weight:600; }
-  .screens .num { font-variant-numeric: tabular-nums; display:inline-block; width:34px; color:var(--muted); }
+  .screens button.on { background:var(--accent-soft); color:var(--accent); }
+  /* same weight when active, so the label never re-wraps; wrapped lines hang under the label, not the number */
+  .screens .lbl { flex:1; min-width:0; }
+  .screens button:focus-visible { outline:2px solid var(--accent); outline-offset:-2px; }
+  .screens button:focus:not(:focus-visible) { outline:none; }
+  .screens .num { font-variant-numeric: tabular-nums; flex:none; width:40px; color:var(--muted); }
   .screens button.on .num { color:var(--accent); }
 
   /* ---------- center: phone ---------- */
@@ -129,8 +133,8 @@
     { n:"03", label:"Home", path:"/" },
     { n:"04", label:"Posture Monitor", path:"/posture-monitor" },
     { n:"05", label:"Workout", path:"/workout" },
-    { n:"05b", label:"Exercise detail — AI evaluation", path:"/workout?exercise=Cat%20Cow" },
-    { n:"05c", label:"Exercise detail — no AI yet", path:"/workout?exercise=Posterior%20Neck%20Muscle%20Stretch" },
+    { n:"05b", label:"Exercise — AI evaluation", path:"/workout?exercise=Cat%20Cow" },
+    { n:"05c", label:"Exercise — no AI yet", path:"/workout?exercise=Posterior%20Neck%20Muscle%20Stretch" },
     { n:"06", label:"Community", path:"/community" },
     { n:"07", label:"Notifications", path:"/notifications" },
     { n:"08", label:"Log Discomfort", path:"/discomfort" },
@@ -362,7 +366,7 @@
 
   // ---------- lists ----------
   document.getElementById("screens").innerHTML = SCREENS.map(function (s) {
-    return '<li><button type="button" data-path="' + s.path + '"><span class="num">' + s.n + "</span> " + s.label + "</button></li>";
+    return '<li><button type="button" data-path="' + s.path + '"><span class="num">' + s.n + '</span><span class="lbl">' + s.label + "</span></button></li>";
   }).join("");
   document.getElementById("screens").addEventListener("click", function (e) {
     var b = e.target.closest("button"); if (b) go(b.dataset.path);
