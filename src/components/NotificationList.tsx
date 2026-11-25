@@ -50,7 +50,7 @@ export function NotiList({ tab, onOpen, compact }: { tab: NotiTab; onOpen?: () =
       {[["Today", today], ["Earlier", earlier]].map(([label, xs]) => (xs as Noti[]).length > 0 && (
         <section key={label as string}>
           <h3 className="mb-1 px-3 text-[11.5px] font-semibold text-muted-foreground">{label as string}</h3>
-          <ul className="divide-y divide-white/[0.05]">
+          <ul className="space-y-1">
             {(xs as Noti[]).map((n) => <li key={n.id}><NotiRow n={n} onOpen={onOpen} compact={compact} /></li>)}
           </ul>
         </section>
@@ -73,20 +73,25 @@ function NotiRow({ n, onOpen, compact }: { n: Noti; onOpen?: () => void; compact
     <div
       role="button" tabIndex={0} onClick={open}
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } }}
-      className="group relative flex cursor-pointer gap-3 rounded-xl px-3 py-3 text-left transition hover:bg-white/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
-      <span className={cn("flex shrink-0 items-center justify-center rounded-full ring-1 ring-inset", k.tone, compact ? "h-9 w-9" : "h-10 w-10")}>
+      className={cn(
+        "group relative flex cursor-pointer gap-3 overflow-hidden rounded-xl px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
+        // unread: tinted row + accent bar on the left; read rows stay quiet
+        n.unread ? "bg-primary/[0.08] hover:bg-primary/[0.12]" : "hover:bg-white/[0.04]",
+      )}>
+      {n.unread && <span aria-hidden className="absolute inset-y-2 left-0 w-[3px] rounded-r-full bg-gradient-to-b from-primary to-secondary" />}
+      <span className={cn("flex shrink-0 items-center justify-center rounded-full ring-1 ring-inset", k.tone, compact ? "h-9 w-9" : "h-10 w-10", !n.unread && "opacity-60 saturate-50")}>
         <Icon className="h-4 w-4" />
       </span>
-      <div className="min-w-0 flex-1 pr-4">
+      <div className={cn("min-w-0 flex-1", n.unread ? "pr-11" : "pr-1")}>
         <div className="flex items-baseline gap-1.5 text-[12px] text-muted-foreground">
-          <span className={cn("truncate font-semibold", n.unread ? "text-foreground/90" : "text-foreground/60")}>{k.label}</span>
+          <span className={cn("truncate font-semibold", n.unread ? "text-foreground" : "text-foreground/55")}>{k.label}</span>
           <span aria-hidden>·</span>
           <span className="shrink-0 tabular-nums">{stamp(n.ago)}</span>
         </div>
-        <p className={cn("mt-0.5 text-[13.5px] leading-snug", compact && "line-clamp-2", n.unread ? "text-foreground" : "text-muted-foreground")}>{n.text}</p>
+        <p className={cn("mt-0.5 text-[13.5px] leading-snug", compact && "line-clamp-2", n.unread ? "font-medium text-foreground" : "text-muted-foreground/80")}>{n.text}</p>
 
       </div>
-      {n.unread && <span aria-label="Unread" className="absolute right-3 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]" />}
+      {n.unread && <span className="absolute right-3 top-3 rounded-full bg-primary px-1.5 py-px text-[10px] font-bold uppercase tracking-wide text-white">New</span>}
     </div>
   );
 }
