@@ -295,7 +295,7 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
                     <span className="shrink-0 text-[14px] font-semibold tabular-nums">{vnd(a.price)}</span>
                   </div>
                   <div className="mt-1.5 flex items-center justify-between gap-3 text-[11.5px] text-muted-foreground">
-                    <span className="flex items-center gap-2"><span className={cn("rounded-full px-2 py-px text-[10.5px] font-semibold ring-1 ring-inset", statusTone.Active)}>Active</span>{a.hours}</span>
+                    <span className={cn("rounded-full px-2 py-px text-[10.5px] font-semibold ring-1 ring-inset", statusTone.Active)}>Active</span>
                     <span>{a.date}</span>
                   </div>
                 </li>
