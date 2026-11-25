@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Play, Calendar, Dumbbell, Clock, CheckCircle2, XCircle, AlertTriangle, Eye, ChevronRight } from "lucide-react";
 import { WorkoutSession } from "@/components/WorkoutSession";
 import { ExerciseIntro } from "@/components/ExerciseIntro";
@@ -11,7 +11,7 @@ import { ExerciseDetail } from "@/components/ExerciseDetail";
 import { NEXT_WORKOUT, TODAYS_WORKOUTS, TODAY_TIME } from "@/lib/todays-workouts";
 
 export const Route = createFileRoute("/workout")({
-  validateSearch: z.object({ session: z.string().optional() }),
+  validateSearch: z.object({ session: z.string().optional(), exercise: z.string().optional() }),
   component: WorkoutPage,
 });
 
@@ -39,8 +39,13 @@ type View =
   | { kind: "program" };
 
 function WorkoutPage() {
-  const { session } = Route.useSearch();
-  const [view, setView] = useState<View>(session ? { kind: "intro", name: session } : { kind: "list" });
+  const { session, exercise } = Route.useSearch();
+  const [view, setView] = useState<View>(session ? { kind: "intro", name: session } : exercise ? { kind: "exercise", name: exercise } : { kind: "list" });
+  // deep links (?exercise= / ?session=) also work when the page is already open
+  useEffect(() => {
+    if (session) setView({ kind: "intro", name: session });
+    else if (exercise) setView({ kind: "exercise", name: exercise });
+  }, [session, exercise]);
 
   if (view.kind === "intro") {
     const w = TODAYS_WORKOUTS.find((x) => x.name === view.name);
@@ -80,7 +85,11 @@ function WorkoutPage() {
     );
   }
   if (view.kind === "assessment") return <WorkoutAssessment workoutName={view.name} recordedVideoUrl={view.recordedUrl} onClose={() => setView({ kind: "result", name: view.name, score: view.score, recordedUrl: view.recordedUrl })} />;
-  if (view.kind === "exercise") return <ExerciseDetail exerciseName={view.name} badge="Completed" onClose={() => setView({ kind: "list" })} onStart={() => setView({ kind: "intro", name: view.name })} />;
+  if (view.kind === "exercise") {
+    const w = TODAYS_WORKOUTS.find((x) => x.name === view.name);
+    const done = w ? w.done >= w.sessions : true;
+    return <ExerciseDetail exerciseName={view.name} badge={done ? "Completed" : "Main"} sessionLabel={w ? `${w.done}/${w.sessions}` : undefined} onClose={() => setView({ kind: "list" })} onStart={() => setView({ kind: "intro", name: view.name })} />;
+  }
   if (view.kind === "program") return <WorkoutProgramDetail onClose={() => setView({ kind: "list" })} onStartSession={(name) => setView({ kind: "intro", name })} />;
 
   return (
@@ -107,7 +116,7 @@ function WorkoutPage() {
             return (
               <div key={w.name} className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
                 <div className="min-w-0 flex-1">
-                  <h3 className="text-sm font-semibold leading-snug">{w.name}</h3>
+                  <button onClick={() => setView({ kind: "exercise", name: w.name })} className="text-left text-sm font-semibold leading-snug transition hover:text-primary">{w.name}</button>
                   <div className="mt-0.5 text-[11px] text-muted-foreground">Scheduled at {TODAY_TIME}</div>
                   <div className="mt-1.5 flex flex-wrap items-center gap-2">
                     <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-medium ${completed ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive"}`}>

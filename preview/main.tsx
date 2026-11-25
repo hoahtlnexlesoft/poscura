@@ -64,13 +64,14 @@ function tell(msg: Record<string, unknown>) { if (inFrame) window.parent.postMes
   await applyAuth(boot.auth);
 
   const router = createRouter({ routeTree, context: { queryClient: new QueryClient() }, history: createHashHistory() });
-  router.subscribe("onResolved", () => tell({ type: "route", path: router.state.location.pathname }));
+  const here = () => router.state.location.pathname + (router.state.location.searchStr || "");
+  router.subscribe("onResolved", () => tell({ type: "route", path: here() }));
 
   window.addEventListener("message", async (e) => {
     const m = e.data;
     if (!m || m.poscura !== true || m.type !== "go") return;
     await applyAuth(m.auth);
-    const cur = router.state.location.pathname;
+    const cur = here();
     if (cur !== m.path) router.history.push(m.path);
     else tell({ type: "route", path: cur });
   });

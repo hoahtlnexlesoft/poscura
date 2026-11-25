@@ -1,5 +1,5 @@
 import { useImmersive } from "@/hooks/useImmersive";
-import { ChevronLeft, ChevronDown, ChevronRight, Play, Volume2, Maximize2, TrendingUp, Sparkles, AlertCircle, Lightbulb, Share2, Clock, Facebook, Twitter, Linkedin, MessageCircle, Send, Users, X } from "lucide-react";
+import { ChevronLeft, ChevronDown, ChevronRight, Play, Volume2, Maximize2, TrendingUp, Sparkles, AlertCircle, Lightbulb, Share2, Clock, Target, Package, Lock, Facebook, Twitter, Linkedin, MessageCircle, Send, Users, X } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { ScoreRing, scoreBand } from "@/components/SessionResult";
@@ -29,7 +29,15 @@ interface Props {
   onNext?: () => void;
   /** start today's session of this exercise */
   onStart?: () => void;
+  /** false when the exercise has no AI evaluation yet (never done): shows the plain detail layout */
+  evaluated?: boolean;
+  /** e.g. "0/2" for today's session counter */
+  sessionLabel?: string;
 }
+
+/** Exercises the demo user has already done, so they have accuracy data and an AI evaluation */
+const EVALUATED = new Set(["Squeeze Blades", "Cat Cow"]);
+export const hasEvaluation = (name: string) => EVALUATED.has(name);
 
 type Phase = "warm" | "main" | "cool";
 
@@ -42,9 +50,11 @@ const steps: Record<Phase, { title: string; description: string; marker: "Start"
     { marker: "End", title: "Complete", description: "" },
   ],
   main: [
-    { marker: "Start", title: "Begin Main Set", description: "Engage core and maintain steady breathing." },
-    { marker: 2, title: "Repetition 1", description: "Controlled tempo throughout." },
-    { marker: "End", title: "Main Set Complete", description: "" },
+    { marker: "Start", title: "Setup", description: "Sit upright with your spine tall and shoulders relaxed. Rest your hands lightly behind your head, elbows relaxed." },
+    { marker: 2, title: "Movement (right side)", description: "Gently turn your head to the right, looking over your right shoulder. Move slowly and only as far as is comfortable." },
+    { marker: 3, title: "Return", description: "Slowly bring your head back to the centre." },
+    { marker: 4, title: "Movement (left side)", description: "Turn your head to the left with the same control, keep your shoulders relaxed, then return to centre." },
+    { marker: "End", title: "Main set complete", description: "" },
   ],
   cool: [
     { marker: "Start", title: "Cool Down", description: "Lower intensity and stretch." },
@@ -66,9 +76,9 @@ function ShareToggle({ label, checked, onChange }: { label: string; checked: boo
   );
 }
 
-export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, onStart }: Props) {
+export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, onStart, evaluated = hasEvaluation(exerciseName), sessionLabel = "0/2" }: Props) {
   useImmersive();
-  const [phase, setPhase] = useState<Phase>("warm");
+  const [phase, setPhase] = useState<Phase>("main");
   const [chartOpen, setChartOpen] = useState(true);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [sessionDetail, setSessionDetail] = useState<{ date: string; time: string; score: number } | null>(null);
@@ -92,10 +102,10 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
         kind: "exercise",
         text: postText.trim(),
         title: incTitle ? exerciseName : "",
-        accuracyAverage: incAccuracy ? ACCURACY_AVG : null,
-        overall: incOverall ? EVAL_OVERALL : "",
-        improvement: incImprovement ? EVAL_IMPROVEMENT : "",
-        advice: incAdvice ? EVAL_ADVICE : "",
+        accuracyAverage: evaluated && incAccuracy ? ACCURACY_AVG : null,
+        overall: evaluated && incOverall ? EVAL_OVERALL : "",
+        improvement: evaluated && incImprovement ? EVAL_IMPROVEMENT : "",
+        advice: evaluated && incAdvice ? EVAL_ADVICE : "",
       }));
     } catch {}
     setComposerOpen(false);
@@ -118,7 +128,7 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
           <div className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Exercise</div>
           <h1 className="truncate text-[19px] font-semibold leading-tight tracking-tight">{exerciseName}</h1>
         </div>
-        <span className="shrink-0 rounded-full bg-success/12 px-2.5 py-1 text-[11px] font-semibold text-success ring-1 ring-inset ring-success/25">{badge}</span>
+        <span className={cn("shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset", badge === "Completed" ? "bg-success/12 text-success ring-success/25" : "bg-primary/12 text-primary ring-primary/25")}>{badge}</span>
         {(onPrev || onNext) && (
           <div className="flex shrink-0 overflow-hidden rounded-full border border-white/[0.08]">
             <button onClick={onPrev} disabled={!onPrev} aria-label="Previous exercise" className="flex h-9 w-9 items-center justify-center text-foreground/80 transition enabled:hover:bg-white/[0.06] disabled:opacity-30"><ChevronLeft className="h-4 w-4" /></button>
@@ -170,6 +180,7 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
               <ShareToggle label="Exercise title" checked={incTitle} onChange={setIncTitle} />
               {incTitle && <div className="text-sm font-semibold">{exerciseName}</div>}
 
+              {evaluated && (<>
               <ShareToggle label="Accuracy Average" checked={incAccuracy} onChange={setIncAccuracy} />
               {incAccuracy && (
                 <div className="flex items-center gap-2 text-xs">
@@ -193,6 +204,7 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
               {incAdvice && (
                 <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-2 text-[11px] text-foreground/80">{EVAL_ADVICE}</div>
               )}
+              </>)}
             </div>
 
             <div className="flex justify-end gap-2">
@@ -203,6 +215,7 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
         </div>
       )}
 
+      {evaluated ? (<>
       {/* ---------- left: score + trend ---------- */}
       <div className="space-y-4 land:sticky land:top-[72px]">
         <section className="relative overflow-hidden rounded-[22px] border border-white/[0.06] bg-card p-5">
@@ -249,23 +262,7 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
 
       {/* ---------- right: today + evaluation + details ---------- */}
       <div className="space-y-4">
-        <section className="rounded-[22px] border border-white/[0.06] bg-card p-4">
-          <div className="px-1 text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Today's session</div>
-          <div className="mt-3 flex items-center gap-3">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-gradient-to-br from-emerald-400/25 to-sky-500/20 ring-1 ring-inset ring-white/[0.08]">
-              <Clock className="h-5 w-5 text-emerald-300" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="truncate text-[15px] font-semibold">Cat Cow</div>
-              <div className="mt-0.5 flex items-center gap-1.5 whitespace-nowrap text-[12px] text-muted-foreground">
-                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-warning" /> 05:15 AM
-              </div>
-            </div>
-            <button onClick={onStart} className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-r from-primary to-secondary px-4 text-[13px] font-semibold text-white shadow-[0_10px_26px_-14px] shadow-primary transition hover:brightness-110 active:scale-[0.98]">
-              <Play className="h-3.5 w-3.5 fill-current" /> Start
-            </button>
-          </div>
-        </section>
+        <TodayCard name={exerciseName} label={sessionLabel} onStart={onStart} />
 
         <section className="overflow-hidden rounded-[22px] border border-white/[0.06] bg-card">
           <h2 className="px-5 pb-1 pt-4 text-[14px] font-semibold">Evaluation</h2>
@@ -291,48 +288,126 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
             <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition", !detailsOpen && "-rotate-90")} />
           </button>
           {detailsOpen && (
-            <div className="space-y-4 border-t border-white/[0.05] p-4">
-              <div className="relative aspect-video w-full overflow-hidden rounded-[16px] bg-gradient-to-br from-emerald-300/80 via-teal-400/70 to-sky-500/70">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <button aria-label="Play video" className="flex h-12 w-12 items-center justify-center rounded-full border border-white/60 bg-white/25 backdrop-blur-md transition hover:bg-white/40 active:scale-95">
-                    <Play className="h-5 w-5 translate-x-px fill-white text-white" />
-                  </button>
-                </div>
-                <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 bg-gradient-to-t from-black/60 px-3 pb-2 pt-6 text-[11px] text-white">
-                  <span className="tabular-nums">0:33 / 0:45</span>
-                  <div className="h-1 flex-1 rounded-full bg-white/30"><div className="h-full rounded-full bg-white" style={{ width: "73%" }} /></div>
-                  <Volume2 className="h-3.5 w-3.5" /><Maximize2 className="h-3.5 w-3.5" />
-                </div>
-              </div>
-              <p className="text-[13px] leading-relaxed text-muted-foreground">Relieves tension and improves mobility in the shoulders and neck.</p>
-              <div className="grid grid-cols-3 divide-x divide-white/[0.06] rounded-[14px] border border-white/[0.06]">
-                <Meta label="Every" value="1" suffix="day" />
-                <Meta label="Per day" value="3" suffix="times" />
-                <Meta label="Repeat" value="4" suffix="hr" />
-              </div>
-              <div className="grid grid-cols-3 rounded-full border border-white/[0.06] bg-white/[0.03] p-1">
-                {(["warm", "main", "cool"] as Phase[]).map((p) => (
-                  <button key={p} onClick={() => setPhase(p)}
-                    className={cn("h-8 rounded-full text-[12.5px] font-medium transition", phase === p ? "bg-white/[0.09] text-foreground shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]" : "text-muted-foreground hover:text-foreground")}>
-                    {p === "warm" ? "Warm up" : p === "main" ? "Main" : "Cool down"}
-                  </button>
-                ))}
-              </div>
-              <ol key={phase} className="overflow-hidden rounded-[16px] border border-white/[0.06] animate-in fade-in duration-300">
-                {steps[phase].filter((st) => st.description).map((st, idx) => (
-                  <li key={idx} className="flex gap-3.5 px-4 py-3 [&+&]:border-t [&+&]:border-white/[0.05]">
-                    <span className="mt-px flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/12 text-[11.5px] font-semibold tabular-nums text-primary ring-1 ring-inset ring-primary/25">{idx + 1}</span>
-                    <div className="min-w-0">
-                      <div className="text-[13.5px] font-semibold">{st.title}</div>
-                      <div className="mt-0.5 text-[12.5px] leading-relaxed text-muted-foreground">{st.description}</div>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </div>
+            <div className="border-t border-white/[0.05] p-4"><HowTo phase={phase} setPhase={setPhase} /></div>
           )}
         </section>
       </div>
+      </>) : (<>
+      {/* ---------- not evaluated yet: today's session + why there's no score (left), how to do it (right) ---------- */}
+      <div className="space-y-4 land:sticky land:top-[72px]">
+        <TodayCard name={exerciseName} label={sessionLabel} onStart={onStart} />
+        <section className="relative overflow-hidden rounded-[22px] border border-dashed border-white/[0.1] bg-gradient-to-br from-primary/[0.07] via-transparent to-secondary/[0.05] p-5">
+          <div className="flex items-start gap-3.5">
+            <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-gradient-to-br from-primary/25 to-secondary/20 ring-1 ring-inset ring-white/10">
+              <Sparkles className="h-5 w-5 text-primary" />
+            </span>
+            <div className="min-w-0">
+              <h2 className="text-[14.5px] font-semibold">No AI evaluation yet</h2>
+              <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">Finish your first session and Poscura scores your accuracy, tracks your progress and gives you personal advice here.</p>
+            </div>
+          </div>
+          <div className="mt-4 grid grid-cols-3 divide-x divide-white/[0.06] rounded-[14px] border border-white/[0.06] bg-background/30">
+            {["Accuracy", "Best", "Trend"].map((l) => (
+              <div key={l} className="px-3 py-2.5 text-center">
+                <div className="text-[11px] text-muted-foreground">{l}</div>
+                <div className="mt-0.5 flex items-center justify-center gap-1 text-[15px] font-semibold text-muted-foreground/60"><Lock className="h-3 w-3" />—</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <section className="rounded-[22px] border border-white/[0.06] bg-card p-4">
+        <h2 className="mb-3 px-1 text-[14px] font-semibold">How to do it</h2>
+        <HowTo phase={phase} setPhase={setPhase} withExtras />
+      </section>
+      </>)}
+    </div>
+  );
+}
+
+function TodayCard({ name, label, onStart }: { name: string; label?: string; onStart?: () => void }) {
+  return (
+    <section className="rounded-[22px] border border-white/[0.06] bg-card p-4">
+      <div className="flex items-center justify-between px-1">
+        <span className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Today's session</span>
+        {label && <span className="rounded-full bg-white/[0.05] px-2 py-0.5 text-[11px] tabular-nums text-muted-foreground">Session {label}</span>}
+      </div>
+      <div className="mt-3 flex items-center gap-3">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-gradient-to-br from-emerald-400/25 to-sky-500/20 ring-1 ring-inset ring-white/[0.08]">
+          <Clock className="h-5 w-5 text-emerald-300" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-[15px] font-semibold">{name}</div>
+          <div className="mt-0.5 flex items-center gap-1.5 whitespace-nowrap text-[12px] text-muted-foreground">
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-warning" /> Not started · 05:15 AM
+          </div>
+        </div>
+        <button onClick={onStart} className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-r from-primary to-secondary px-4 text-[13px] font-semibold text-white shadow-[0_10px_26px_-14px] shadow-primary transition hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+          <Play className="h-3.5 w-3.5 fill-current" /> Start
+        </button>
+      </div>
+    </section>
+  );
+}
+
+/** Video, schedule, goal / equipment and the step list. Shared by both detail layouts. */
+function HowTo({ phase, setPhase, withExtras }: { phase: Phase; setPhase: (p: Phase) => void; withExtras?: boolean }) {
+  return (
+    <div className="space-y-4">
+              <div className="relative aspect-video w-full overflow-hidden rounded-[16px] bg-gradient-to-br from-emerald-300/80 via-teal-400/70 to-sky-500/70">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <button aria-label="Play video" className="flex h-12 w-12 items-center justify-center rounded-full border border-white/60 bg-white/25 backdrop-blur-md transition hover:bg-white/40 active:scale-95">
+            <Play className="h-5 w-5 translate-x-px fill-white text-white" />
+          </button>
+        </div>
+        <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 bg-gradient-to-t from-black/60 px-3 pb-2 pt-6 text-[11px] text-white">
+          <span className="tabular-nums">0:33 / 0:45</span>
+          <div className="h-1 flex-1 rounded-full bg-white/30"><div className="h-full rounded-full bg-white" style={{ width: "73%" }} /></div>
+          <Volume2 className="h-3.5 w-3.5" /><Maximize2 className="h-3.5 w-3.5" />
+        </div>
+      </div>
+      <p className="text-[13px] leading-relaxed text-muted-foreground">Relieves tension and improves mobility in the shoulders and neck.</p>
+      <div className="grid grid-cols-3 divide-x divide-white/[0.06] rounded-[14px] border border-white/[0.06]">
+        <Meta label="Every" value="1" suffix="day" />
+        <Meta label="Per day" value="3" suffix="times" />
+        <Meta label="Repeat" value="4" suffix="hr" />
+      </div>
+      {withExtras && (
+        <div className="grid grid-cols-2 gap-3">
+          <Extra icon={Target} label="Goal" text="Improve mobility and reduce muscle tension in the neck." tone="bg-primary/12 text-primary" />
+          <Extra icon={Package} label="You need" text="No equipment. A chair or a yoga mat is enough." tone="bg-secondary/12 text-secondary" />
+        </div>
+      )}
+      <div className="grid grid-cols-3 rounded-full border border-white/[0.06] bg-white/[0.03] p-1">
+        {(["warm", "main", "cool"] as Phase[]).map((p) => (
+          <button key={p} onClick={() => setPhase(p)}
+            className={cn("h-8 rounded-full text-[12.5px] font-medium transition", phase === p ? "bg-white/[0.09] text-foreground shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]" : "text-muted-foreground hover:text-foreground")}>
+            {p === "warm" ? "Warm up" : p === "main" ? "Main" : "Cool down"}
+          </button>
+        ))}
+      </div>
+      <ol key={phase} className="overflow-hidden rounded-[16px] border border-white/[0.06] animate-in fade-in duration-300">
+        {steps[phase].filter((st) => st.description).map((st, idx) => (
+          <li key={idx} className="flex gap-3.5 px-4 py-3 [&+&]:border-t [&+&]:border-white/[0.05]">
+            <span className="mt-px flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/12 text-[11.5px] font-semibold tabular-nums text-primary ring-1 ring-inset ring-primary/25">{idx + 1}</span>
+            <div className="min-w-0">
+              <div className="text-[13.5px] font-semibold">{st.title}</div>
+              <div className="mt-0.5 text-[12.5px] leading-relaxed text-muted-foreground">{st.description}</div>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+function Extra({ icon: Icon, label, text, tone }: { icon: typeof Target; label: string; text: string; tone: string }) {
+  return (
+    <div className="rounded-[16px] border border-white/[0.06] bg-white/[0.02] p-3.5">
+      <span className={cn("flex h-8 w-8 items-center justify-center rounded-[10px]", tone)}><Icon className="h-4 w-4" /></span>
+      <div className="mt-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">{label}</div>
+      <p className="mt-0.5 text-[12.5px] leading-snug text-foreground/85">{text}</p>
     </div>
   );
 }
