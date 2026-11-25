@@ -2,6 +2,7 @@ import { useImmersive } from "@/hooks/useImmersive";
 import { useState } from "react";
 import { Armchair, ChevronLeft, Lightbulb, Play, ShieldCheck, SkipForward, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { StepTimeline } from "@/components/StepTimeline";
 import { guideFor, type Motion } from "@/lib/exercise-guides";
 
 type Tab = "warmUp" | "steps" | "coolDown";
@@ -86,23 +87,13 @@ export function ExerciseIntro({
             ))}
           </div>
 
-          <ol key={tab} className="mt-3 overflow-hidden rounded-[18px] border border-white/[0.06] bg-card animate-in fade-in duration-300">
-            {items.map((s, i) => (
-              <li key={s.title} className="relative flex gap-3.5 px-4 py-3.5 [&+&]:border-t [&+&]:border-white/[0.05]">
-                <span className="mt-px flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/12 text-[12.5px] font-semibold tabular-nums text-primary ring-1 ring-inset ring-primary/25">{i + 1}</span>
-                <div className="min-w-0">
-                  <div className="text-[14.5px] font-semibold leading-snug">{s.title}</div>
-                  <div className="mt-1 text-[13px] leading-relaxed text-muted-foreground">{s.text}</div>
-                </div>
-              </li>
-            ))}
-            {tab === "steps" && g.tip && (
-              <li className="flex items-start gap-2.5 border-t border-white/[0.05] bg-white/[0.02] px-4 py-3 text-[12.5px] leading-relaxed text-muted-foreground">
-                <Lightbulb className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warning" />
-                <span>{g.tip}</span>
-              </li>
-            )}
-          </ol>
+          <div className="mt-4"><StepTimeline key={tab} items={items.map((s) => ({ title: s.title, text: s.text }))} /></div>
+          {tab === "steps" && g.tip && (
+            <div className="mt-4 flex items-start gap-2.5 rounded-[14px] bg-warning/[0.06] px-3.5 py-3 text-[12.5px] leading-relaxed text-muted-foreground ring-1 ring-inset ring-warning/15">
+              <Lightbulb className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warning" />
+              <span>{g.tip}</span>
+            </div>
+          )}
 
           <div className="mt-3 flex gap-2.5 rounded-[14px] border border-white/[0.06] px-3.5 py-3 text-[12px] leading-relaxed text-muted-foreground">
             <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />

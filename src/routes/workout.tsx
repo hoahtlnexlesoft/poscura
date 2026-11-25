@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import { Play, Calendar, Dumbbell, Clock, CheckCircle2, XCircle, AlertTriangle, Eye, ChevronRight } from "lucide-react";
@@ -43,13 +43,15 @@ function WorkoutPage() {
   const [view, setView] = useState<View>(session ? { kind: "intro", name: session } : exercise ? { kind: "exercise", name: exercise } : { kind: "list" });
   // deep links (?exercise= / ?session=) also work when the page is already open
   useEffect(() => {
-    if (session) setView({ kind: "intro", name: session });
-    else if (exercise) setView({ kind: "exercise", name: exercise });
+    setView(session ? { kind: "intro", name: session } : exercise ? { kind: "exercise", name: exercise } : { kind: "list" });
   }, [session, exercise]);
+  const navigate = useNavigate();
+  // leaving a deep-linked screen also clears the ?exercise= / ?session= from the URL
+  const toList = () => { setView({ kind: "list" }); if (session || exercise) navigate({ to: "/workout", search: {}, replace: true }); };
 
   if (view.kind === "intro") {
     const w = TODAYS_WORKOUTS.find((x) => x.name === view.name);
-    return <ExerciseIntro name={view.name} session={(w?.done ?? 0) + 1} sessions={w?.sessions ?? 1} onBack={() => setView({ kind: "list" })} onStart={() => setView({ kind: "session", name: view.name })} />;
+    return <ExerciseIntro name={view.name} session={(w?.done ?? 0) + 1} sessions={w?.sessions ?? 1} onBack={toList} onStart={() => setView({ kind: "session", name: view.name })} />;
   }
   if (view.kind === "session") {
     const idx = TODAYS_WORKOUTS.findIndex((x) => x.name === view.name);
@@ -88,7 +90,7 @@ function WorkoutPage() {
   if (view.kind === "exercise") {
     const w = TODAYS_WORKOUTS.find((x) => x.name === view.name);
     const done = w ? w.done >= w.sessions : true;
-    return <ExerciseDetail exerciseName={view.name} badge={done ? "Completed" : "Main"} sessionLabel={w ? `${w.done}/${w.sessions}` : undefined} onClose={() => setView({ kind: "list" })} onStart={() => setView({ kind: "intro", name: view.name })} />;
+    return <ExerciseDetail exerciseName={view.name} badge={done ? "Completed" : "Main"} sessionLabel={w ? `${w.done}/${w.sessions}` : undefined} onClose={toList} onStart={() => setView({ kind: "intro", name: view.name })} />;
   }
   if (view.kind === "program") return <WorkoutProgramDetail onClose={() => setView({ kind: "list" })} onStartSession={(name) => setView({ kind: "intro", name })} />;
 

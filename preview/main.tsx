@@ -65,6 +65,7 @@ function tell(msg: Record<string, unknown>) { if (inFrame) window.parent.postMes
 
   const router = createRouter({ routeTree, context: { queryClient: new QueryClient() }, history: createHashHistory() });
   const here = () => router.state.location.pathname + (router.state.location.searchStr || "");
+  const norm = (p: string) => { try { return decodeURIComponent(p.replace(/\+/g, " ")); } catch { return p; } };
   router.subscribe("onResolved", () => tell({ type: "route", path: here() }));
 
   window.addEventListener("message", async (e) => {
@@ -72,7 +73,7 @@ function tell(msg: Record<string, unknown>) { if (inFrame) window.parent.postMes
     if (!m || m.poscura !== true || m.type !== "go") return;
     await applyAuth(m.auth);
     const cur = here();
-    if (cur !== m.path) router.history.push(m.path);
+    if (norm(cur) !== norm(m.path)) router.history.push(m.path);
     else tell({ type: "route", path: cur });
   });
 

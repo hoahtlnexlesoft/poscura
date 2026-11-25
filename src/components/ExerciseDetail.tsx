@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { ScoreRing, scoreBand } from "@/components/SessionResult";
 import { cn } from "@/lib/utils";
+import { StepTimeline } from "@/components/StepTimeline";
 import { SessionEvaluationDetail } from "@/components/SessionEvaluationDetail";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
@@ -387,17 +388,7 @@ function HowTo({ phase, setPhase, withExtras }: { phase: Phase; setPhase: (p: Ph
           </button>
         ))}
       </div>
-      <ol key={phase} className="overflow-hidden rounded-[16px] border border-white/[0.06] animate-in fade-in duration-300">
-        {steps[phase].filter((st) => st.description).map((st, idx) => (
-          <li key={idx} className="flex gap-3.5 px-4 py-3 [&+&]:border-t [&+&]:border-white/[0.05]">
-            <span className="mt-px flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/12 text-[11.5px] font-semibold tabular-nums text-primary ring-1 ring-inset ring-primary/25">{idx + 1}</span>
-            <div className="min-w-0">
-              <div className="text-[13.5px] font-semibold">{st.title}</div>
-              <div className="mt-0.5 text-[12.5px] leading-relaxed text-muted-foreground">{st.description}</div>
-            </div>
-          </li>
-        ))}
-      </ol>
+      <StepTimeline key={phase} items={steps[phase].filter((st) => st.description).map((st) => ({ title: st.title, text: st.description }))} />
     </div>
   );
 }

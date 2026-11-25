@@ -347,8 +347,11 @@
   window.poscuraGo = function (path) { go(path); };
   // which simulated device the reviewer is looking at (read by the comment kit)
   window.poscuraDevice = function () { var d = view(); if (d.kind === "desktop" && frame) return { name: "Desktop browser", size: frame.clientWidth + "×" + frame.clientHeight + " px" }; return { name: d.name, size: d.w + "×" + d.h + " " + d.unit }; };
+  // routes may come back with the query encoded differently ("+" vs "%20"), so compare decoded
+  function norm(p) { try { return decodeURIComponent(String(p || "").replace(/\+/g, " ")); } catch (e) { return String(p || ""); } }
   function markActive(path) {
-    document.querySelectorAll("#screens button").forEach(function (b) { b.classList.toggle("on", b.dataset.path === path); });
+    var want = norm(path);
+    document.querySelectorAll("#screens button").forEach(function (b) { b.classList.toggle("on", norm(b.dataset.path) === want); });
   }
   window.addEventListener("message", function (e) {
     var m = e.data;
