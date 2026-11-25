@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import {
-  ChevronRight, Star, Sparkles, CircleCheck, Check, ChevronDown, CalendarClock, CreditCard, Ticket, Building2, Plus, Copy, LogOut, X,
+  ChevronRight, Star, CircleCheck, Check, Ticket, Plus, Copy, X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PlanPicker } from "@/components/PlanPicker";
@@ -151,12 +151,6 @@ function Confirm({ trigger, title, body, action, onConfirm }: { trigger: React.R
   );
 }
 
-const toBenefits = () => {
-  const el = document.getElementById("member-benefits");
-  if (!el) return;
-  el.scrollIntoView({ behavior: "smooth", block: "start" });
-  el.animate([{ boxShadow: "0 0 0 2px color-mix(in oklab, var(--color-success) 70%, transparent)" }, { boxShadow: "0 0 0 2px transparent" }], { duration: 1600, delay: 350, easing: "ease-out" });
-};
 const toUpgrade = () => document.getElementById("upgrade-your-plan")?.scrollIntoView({ behavior: "smooth", block: "start" });
 
 /* ---------- voucher as a ticket: discount stub, perforation, details ---------- */
@@ -209,7 +203,7 @@ function VoucherTicket({ v }: { v: Voucher }) {
 function BusinessPlanCard() {
   return (
     <section className="relative overflow-hidden rounded-[22px] border border-white/[0.07] bg-card">
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[radial-gradient(80%_100%_at_0%_0%,color-mix(in_oklab,var(--color-success)_18%,transparent),transparent_70%),radial-gradient(60%_90%_at_100%_0%,color-mix(in_oklab,var(--color-primary)_16%,transparent),transparent_70%)]" />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[radial-gradient(80%_100%_at_0%_0%,color-mix(in_oklab,var(--color-success)_14%,transparent),transparent_70%),radial-gradient(60%_90%_at_100%_0%,color-mix(in_oklab,var(--color-primary)_14%,transparent),transparent_70%)]" />
       <div className="relative p-5">
         <div className="flex items-center justify-between">
           <span className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Current plan</span>
@@ -218,43 +212,24 @@ function BusinessPlanCard() {
           </span>
         </div>
 
-        <div className="mt-3 flex items-center gap-3.5">
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-gradient-to-br from-success/30 to-primary/25 ring-1 ring-inset ring-white/10">
-            <Building2 className="h-5 w-5 text-success" />
-          </span>
+        <div className="mt-2 text-[24px] font-bold leading-tight tracking-tight">Professional</div>
+        <div className="mt-0.5 text-[13px] text-muted-foreground">Business member · <span className="text-foreground/90">Uyen86SME</span></div>
+
+        <div className="mt-4 flex gap-2.5 rounded-[16px] border border-success/20 bg-success/[0.06] p-3.5">
+          <CircleCheck className="mt-0.5 h-4 w-4 shrink-0 text-success" />
           <div className="min-w-0">
-            <div className="text-[22px] font-bold leading-tight tracking-tight">Professional</div>
-            <div className="mt-0.5 flex items-center gap-1.5 text-[12.5px] text-muted-foreground">
-              <CircleCheck className="h-3.5 w-3.5 shrink-0 text-success" /> Covered by your business
-            </div>
+            <div className="text-[13.5px] font-semibold">Covered by Uyen86SME</div>
+            <p className="mt-0.5 text-[12.5px] leading-relaxed text-muted-foreground">All Professional benefits are active. You can also choose a personal plan at any time.</p>
           </div>
         </div>
 
-        <dl className="mt-4 grid grid-cols-2 divide-x divide-white/[0.06] rounded-[16px] border border-white/[0.06] bg-background/30">
-          <div className="px-3.5 py-3">
-            <dt className="text-[11px] text-muted-foreground">Paid by</dt>
-            <dd className="mt-0.5 truncate text-[14px] font-semibold">Uyen86SME</dd>
-          </div>
-          <div className="px-3.5 py-3">
-            <dt className="text-[11px] text-muted-foreground">Member since</dt>
-            <dd className="mt-0.5 text-[14px] font-semibold">Nov 23, 2026</dd>
-          </div>
-        </dl>
-
-        <p className="mt-3 text-[12.5px] leading-relaxed text-muted-foreground">All Professional benefits are active and paid for by your business.</p>
-
-        <div className="mt-4 grid grid-cols-2 gap-2">
-          <button onClick={toBenefits} className={cn(outlineBtn, "h-10 justify-center")}>
-            <Sparkles className="h-3.5 w-3.5" /> Member benefits
-          </button>
-          <Confirm
-            trigger={<button className={cn(outlineBtn, "h-10 justify-center text-muted-foreground hover:border-destructive/50 hover:bg-destructive/10 hover:text-destructive")}><LogOut className="h-3.5 w-3.5" /> Leave business</button>}
-            title="Leave Uyen86SME?"
-            body="You lose the Professional benefits your business pays for and move back to Freemium. Your history and reports stay with you."
-            action="Leave business"
-            onConfirm={() => toast("You left Uyen86SME")}
-          />
-        </div>
+        <Confirm
+          trigger={<button className={cn(outlineBtn, "mt-3 h-11 w-full justify-center text-[13.5px] hover:border-destructive/50 hover:bg-destructive/10 hover:text-destructive")}>Leave Business</button>}
+          title="Leave Uyen86SME?"
+          body="You lose the Professional benefits your business pays for and move back to Freemium. Your history and reports stay with you."
+          action="Leave business"
+          onConfirm={() => toast("You left Uyen86SME")}
+        />
       </div>
     </section>
   );
