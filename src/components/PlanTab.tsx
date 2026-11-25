@@ -74,7 +74,7 @@ const statusTone = { Active: "bg-success/12 text-success ring-success/25", Expir
 
 function MoreButton({ open, onClick }: { open: boolean; onClick: () => void }) {
   return (
-    <button onClick={onClick} className="mx-auto mt-3 flex h-9 items-center gap-1 rounded-full px-3 text-[12.5px] font-semibold text-primary transition hover:bg-primary/10">
+    <button onClick={onClick} className="mx-auto mt-4 flex h-9 items-center gap-1 rounded-full px-3 text-[12.5px] font-semibold text-primary transition hover:bg-primary/10">
       {open ? "View less" : "View more"} <ChevronDown className={cn("h-4 w-4 transition-transform", open && "rotate-180")} />
     </button>
   );
@@ -211,8 +211,9 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
 
   return (
     <>
-      {/* ---------- cards flow in two balanced columns on wide screens (no empty hole under a short column) ---------- */}
-      <div className="space-y-4 fold:block fold:columns-2 fold:gap-4 fold:space-y-0 land:gap-6 fold:[&>*]:mb-4 [&>*]:break-inside-avoid">
+      {/* ---------- two columns on wide screens, sized to end close together; one column on phones ---------- */}
+      <div className="space-y-4 fold:grid fold:grid-cols-2 fold:items-stretch fold:gap-4 fold:space-y-0 land:gap-x-6 hinge-split land:items-stretch">
+        <div className="space-y-4 fold:flex fold:flex-col fold:gap-4 fold:space-y-0 fold:[&>*:last-child]:flex-1">
         {/* current plan */}
         {plan === "business" ? <BusinessPlanCard /> : (
         <Card>
@@ -274,7 +275,7 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
 
         {plan === "business" && (
           <Card title="Professional benefits">
-            <ul className="grid gap-2.5 sm:grid-cols-2 fold:grid-cols-1">
+            <ul className="grid gap-x-4 gap-y-2.5 sm:grid-cols-2">
               {BENEFITS.map((b) => (
                 <li key={b} className="flex items-center gap-2.5 text-[13.5px]">
                   <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-success/15"><Check className="h-3 w-3 text-success" /></span>
@@ -284,28 +285,6 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
             </ul>
           </Card>
         )}
-        <Card title="Subscription history">
-          <ul className="space-y-2">
-            {(histOpen ? hist : hist.slice(0, 3)).map((h, i) => (
-              <li key={i} className="rounded-[16px] border border-white/[0.06] bg-white/[0.02] p-3.5">
-                <div className="flex items-baseline justify-between gap-3">
-                  <span className="text-[14px] font-semibold">{h.plan} · {h.cycle}</span>
-                  <span className="shrink-0 text-[14px] font-semibold tabular-nums">{h.price}</span>
-                </div>
-                <div className="mt-1.5 flex items-center justify-between gap-3">
-                  <span className={cn("rounded-full px-2 py-px text-[10.5px] font-semibold ring-1 ring-inset", statusTone[h.status])}>{h.status}</span>
-                  <span className="text-[11.5px] text-muted-foreground">{h.date}</span>
-                </div>
-                <div className="mt-2.5 space-y-1 border-t border-white/[0.05] pt-2.5 text-[12px] text-muted-foreground">
-                  <div className="flex items-start gap-1.5"><CalendarClock className="mt-px h-3.5 w-3.5 shrink-0" /> {h.period}</div>
-                  <div className="flex items-start gap-1.5">{h.price === "Covered" ? <Building2 className="mt-px h-3.5 w-3.5 shrink-0" /> : <CreditCard className="mt-px h-3.5 w-3.5 shrink-0" />} {h.paid}</div>
-                </div>
-              </li>
-            ))}
-          </ul>
-          {hist.length > 3 && <MoreButton open={histOpen} onClick={() => setHistOpen((v) => !v)} />}
-        </Card>
-
         <Card title="Add-ons" action={<button onClick={() => setBrowse(true)} className={outlineBtn}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button>}>
           {addons.length ? (
             <ul className="space-y-2">
@@ -325,16 +304,41 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
           ) : <p className="text-[13px] text-muted-foreground">No add-ons yet.</p>}
         </Card>
 
+        </div>
+        <div className="space-y-4 fold:flex fold:flex-col fold:gap-4 fold:space-y-0 fold:[&>*:last-child]:flex-1">
+        <Card title="Subscription history">
+          <ul className="space-y-2">
+            {(histOpen ? hist : hist.slice(0, 2)).map((h, i) => (
+              <li key={i} className="rounded-[16px] border border-white/[0.06] bg-white/[0.02] p-3.5">
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="text-[14px] font-semibold">{h.plan} · {h.cycle}</span>
+                  <span className="shrink-0 text-[14px] font-semibold tabular-nums">{h.price}</span>
+                </div>
+                <div className="mt-1.5 flex items-center justify-between gap-3">
+                  <span className={cn("rounded-full px-2 py-px text-[10.5px] font-semibold ring-1 ring-inset", statusTone[h.status])}>{h.status}</span>
+                  <span className="text-[11.5px] text-muted-foreground">{h.date}</span>
+                </div>
+                <div className="mt-2.5 space-y-1 border-t border-white/[0.05] pt-2.5 text-[12px] text-muted-foreground">
+                  <div className="flex items-start gap-1.5"><CalendarClock className="mt-px h-3.5 w-3.5 shrink-0" /> {h.period}</div>
+                  <div className="flex items-start gap-1.5">{h.price === "Covered" ? <Building2 className="mt-px h-3.5 w-3.5 shrink-0" /> : <CreditCard className="mt-px h-3.5 w-3.5 shrink-0" />} {h.paid}</div>
+                </div>
+              </li>
+            ))}
+          </ul>
+          {hist.length > 2 && <MoreButton open={histOpen} onClick={() => setHistOpen((v) => !v)} />}
+        </Card>
+
         <Card title="Vouchers" action={<span className="text-[12px] text-muted-foreground">{VOUCHERS.length} active · tap a code to copy</span>}>
           <ul className="space-y-3">
-            {(vouOpen ? VOUCHERS : VOUCHERS.slice(0, 3)).map((v) => <VoucherTicket key={v.code} v={v} />)}
+            {(vouOpen ? VOUCHERS : VOUCHERS.slice(0, 2)).map((v) => <VoucherTicket key={v.code} v={v} />)}
           </ul>
-          {VOUCHERS.length > 3 && <MoreButton open={vouOpen} onClick={() => setVouOpen((v) => !v)} />}
+          {VOUCHERS.length > 2 && <MoreButton open={vouOpen} onClick={() => setVouOpen((v) => !v)} />}
         </Card>
+        </div>
       </div>
 
       {/* ---------- last: plans to upgrade to ---------- */}
-      <section id="upgrade-your-plan" className="scroll-mt-20 rounded-[22px] border border-white/[0.06] bg-card p-5">
+      <section id="upgrade-your-plan" className="mt-4 scroll-mt-20 rounded-[22px] border border-white/[0.06] bg-card p-5">
         <h2 className="mb-4 text-center text-[17px] font-semibold tracking-tight">Upgrade your plan</h2>
         <PlanPicker currentId={plan === "free" ? "freemium" : plan === "individual" ? "individual" : "none"} />
       </section>

@@ -293,7 +293,7 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
               <Sparkles className="h-5 w-5 text-primary" />
             </span>
             <div className="min-w-0">
-              <h2 className="text-[14.5px] font-semibold">No AI evaluation yet</h2>
+              <h2 className="text-[14.5px] font-semibold">Your progress starts here</h2>
               <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">Finish your first session and Poscura scores your accuracy, tracks your progress and gives you personal advice here.</p>
             </div>
           </div>
