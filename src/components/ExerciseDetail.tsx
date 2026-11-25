@@ -219,12 +219,11 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
         </div>
       )}
 
-      {/* today's session sits right under the exercise name, across the full width */}
-      <div className="land:col-span-2"><TodayCard label={sessionLabel} onStart={onStart} done={badge === "Completed"} /></div>
-
       {evaluated ? (<>
       {/* ---------- left: score + trend ---------- */}
       <div className="space-y-4 land:sticky land:top-[72px]">
+        {/* today's session: first thing under the exercise name (top of the left pane on open foldables, not across the hinge) */}
+        <TodayCard label={sessionLabel} onStart={onStart} done={badge === "Completed"} />
         <section className="relative overflow-hidden rounded-[22px] border border-white/[0.06] bg-card p-5">
           <div aria-hidden className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full opacity-60"
             style={{ background: `radial-gradient(closest-side, color-mix(in oklab, ${band.ring} 22%, transparent), transparent)` }} />
@@ -301,6 +300,8 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
       </>) : (<>
       {/* ---------- not evaluated yet: today's session + why there's no score (left), how to do it (right) ---------- */}
       <div className="space-y-4 land:sticky land:top-[72px]">
+        {/* today's session: first thing under the exercise name (top of the left pane on open foldables, not across the hinge) */}
+        <TodayCard label={sessionLabel} onStart={onStart} done={badge === "Completed"} />
         <section className="relative overflow-hidden rounded-[22px] border border-dashed border-white/[0.1] bg-gradient-to-br from-primary/[0.07] via-transparent to-secondary/[0.05] p-5">
           <div className="flex items-start gap-3.5">
             <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-gradient-to-br from-primary/25 to-secondary/20 ring-1 ring-inset ring-white/10">
