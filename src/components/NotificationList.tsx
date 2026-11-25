@@ -75,10 +75,9 @@ function NotiRow({ n, onOpen, compact }: { n: Noti; onOpen?: () => void; compact
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } }}
       className={cn(
         "group relative flex cursor-pointer gap-3 overflow-hidden rounded-xl px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
-        // unread: tinted row + accent bar on the left; read rows stay quiet
+        // unread: tinted row; read rows stay quiet
         n.unread ? "bg-primary/[0.08] hover:bg-primary/[0.12]" : "hover:bg-white/[0.04]",
       )}>
-      {n.unread && <span aria-hidden className="absolute inset-y-2 left-0 w-[3px] rounded-r-full bg-gradient-to-b from-primary to-secondary" />}
       <span className={cn("flex shrink-0 items-center justify-center rounded-full ring-1 ring-inset", k.tone, compact ? "h-9 w-9" : "h-10 w-10", !n.unread && "opacity-60 saturate-50")}>
         <Icon className="h-4 w-4" />
       </span>
