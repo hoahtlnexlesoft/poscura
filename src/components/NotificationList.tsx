@@ -1,6 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
-import { BellOff, Check } from "lucide-react";
-import { toast } from "sonner";
+import { BellOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { KIND, stamp, useNotifications, type Noti } from "@/lib/notifications";
 
@@ -62,7 +61,7 @@ export function NotiList({ tab, onOpen, compact }: { tab: NotiTab; onOpen?: () =
 
 function NotiRow({ n, onOpen, compact }: { n: Noti; onOpen?: () => void; compact?: boolean }) {
   const navigate = useNavigate();
-  const { markRead, answerInvite } = useNotifications();
+  const { markRead } = useNotifications();
   const k = KIND[n.kind];
   const Icon = k.icon;
   const open = () => {
@@ -86,25 +85,6 @@ function NotiRow({ n, onOpen, compact }: { n: Noti; onOpen?: () => void; compact
         </div>
         <p className={cn("mt-0.5 text-[13.5px] leading-snug", compact && "line-clamp-2", n.unread ? "text-foreground" : "text-muted-foreground")}>{n.text}</p>
 
-        {n.kind === "invite" && (
-          n.invite === "pending" ? (
-            <div className="mt-2.5 flex gap-2" onClick={(e) => e.stopPropagation()}>
-              <button onClick={() => { answerInvite(n.id, "accepted"); toast.success("You joined Uyen 86's team"); }}
-                className="h-8 rounded-full bg-gradient-to-r from-primary to-secondary px-4 text-[12.5px] font-semibold text-white transition hover:brightness-110 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
-                Accept
-              </button>
-              <button onClick={() => { answerInvite(n.id, "declined"); toast("Invitation declined"); }}
-                className="h-8 rounded-full border border-white/10 px-4 text-[12.5px] font-medium text-muted-foreground transition hover:border-white/20 hover:bg-white/[0.06] hover:text-foreground active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
-                Decline
-              </button>
-            </div>
-          ) : (
-            <div className={cn("mt-2 inline-flex items-center gap-1 text-[12px] font-medium", n.invite === "accepted" ? "text-success" : "text-muted-foreground")}>
-              {n.invite === "accepted" && <Check className="h-3.5 w-3.5" />}
-              {n.invite === "accepted" ? "Joined the team" : "Declined"}
-            </div>
-          )
-        )}
       </div>
       {n.unread && <span aria-label="Unread" className="absolute right-3 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]" />}
     </div>
