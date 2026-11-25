@@ -219,6 +219,9 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
         </div>
       )}
 
+      {/* today's session sits right under the exercise name, across the full width */}
+      <div className="land:col-span-2"><TodayCard label={sessionLabel} onStart={onStart} done={badge === "Completed"} /></div>
+
       {evaluated ? (<>
       {/* ---------- left: score + trend ---------- */}
       <div className="space-y-4 land:sticky land:top-[72px]">
@@ -266,7 +269,6 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
 
       {/* ---------- right: today + evaluation + details ---------- */}
       <div className="space-y-4">
-        <TodayCard name={exerciseName} label={sessionLabel} onStart={onStart} />
 
         <section className="overflow-hidden rounded-[22px] border border-white/[0.06] bg-card">
           <h2 className="px-5 pb-1 pt-4 text-[14px] font-semibold">Evaluation</h2>
@@ -299,7 +301,6 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
       </>) : (<>
       {/* ---------- not evaluated yet: today's session + why there's no score (left), how to do it (right) ---------- */}
       <div className="space-y-4 land:sticky land:top-[72px]">
-        <TodayCard name={exerciseName} label={sessionLabel} onStart={onStart} />
         <section className="relative overflow-hidden rounded-[22px] border border-dashed border-white/[0.1] bg-gradient-to-br from-primary/[0.07] via-transparent to-secondary/[0.05] p-5">
           <div className="flex items-start gap-3.5">
             <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-gradient-to-br from-primary/25 to-secondary/20 ring-1 ring-inset ring-white/10">
@@ -330,27 +331,25 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
   );
 }
 
-function TodayCard({ name, label, onStart }: { name: string; label?: string; onStart?: () => void }) {
+function TodayCard({ label, onStart, done }: { label?: string; onStart?: () => void; done?: boolean }) {
+  // sits right under the exercise name, so it shows when and how far along, not the name again
   return (
-    <section className="rounded-[22px] border border-white/[0.06] bg-card p-4">
-      <div className="flex items-center justify-between px-1">
-        <span className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Today's session</span>
-        {label && <span className="rounded-full bg-white/[0.05] px-2 py-0.5 text-[11px] tabular-nums text-muted-foreground">Session {label}</span>}
+    <section className="flex items-center gap-3 rounded-[20px] border border-white/[0.06] bg-card px-4 py-3.5">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-gradient-to-br from-emerald-400/25 to-sky-500/20 ring-1 ring-inset ring-white/[0.08]">
+        <Clock className="h-5 w-5 text-emerald-300" />
       </div>
-      <div className="mt-3 flex items-center gap-3">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-gradient-to-br from-emerald-400/25 to-sky-500/20 ring-1 ring-inset ring-white/[0.08]">
-          <Clock className="h-5 w-5 text-emerald-300" />
+      <div className="min-w-0 flex-1">
+        <div className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Today's session</div>
+        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[14.5px] font-semibold">
+          05:15 AM
+          <span className="inline-flex items-center gap-1.5 text-[12px] font-normal text-muted-foreground">
+            <span className={cn("h-1.5 w-1.5 rounded-full", done ? "bg-success" : "bg-warning")} /> {done ? "Completed" : "Not started"}{label ? ` · Session ${label}` : ""}
+          </span>
         </div>
-        <div className="min-w-0 flex-1">
-          <div className="truncate text-[15px] font-semibold">{name}</div>
-          <div className="mt-0.5 flex items-center gap-1.5 whitespace-nowrap text-[12px] text-muted-foreground">
-            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-warning" /> Not started · 05:15 AM
-          </div>
-        </div>
-        <button onClick={onStart} className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-r from-primary to-secondary px-4 text-[13px] font-semibold text-white shadow-[0_10px_26px_-14px] shadow-primary transition hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
-          <Play className="h-3.5 w-3.5 fill-current" /> Start
-        </button>
       </div>
+      <button onClick={onStart} className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-r from-primary to-secondary px-4 text-[13px] font-semibold text-white shadow-[0_10px_26px_-14px] shadow-primary transition hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+        <Play className="h-3.5 w-3.5 fill-current" /> {done ? "Again" : "Start"}
+      </button>
     </section>
   );
 }
