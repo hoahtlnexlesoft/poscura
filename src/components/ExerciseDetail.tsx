@@ -126,10 +126,13 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
           <ChevronLeft className="h-[18px] w-[18px]" />
         </button>
         <div className="min-w-0 flex-1">
-          <div className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Exercise</div>
-          <h1 className="truncate text-[19px] font-semibold leading-tight tracking-tight">{exerciseName}</h1>
+          <div className="flex items-center gap-2">
+            <span className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Exercise</span>
+            {/* status / phase tag sits with the title, so the action buttons on the right stay one even row */}
+            <span className={cn("rounded-full px-2 py-px text-[10.5px] font-semibold ring-1 ring-inset", badge === "Completed" ? "bg-success/12 text-success ring-success/25" : "bg-primary/12 text-primary ring-primary/25")}>{badge}</span>
+          </div>
+          <h1 className="mt-0.5 truncate text-[19px] font-semibold leading-tight tracking-tight">{exerciseName}</h1>
         </div>
-        <span className={cn("shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset", badge === "Completed" ? "bg-success/12 text-success ring-success/25" : "bg-primary/12 text-primary ring-primary/25")}>{badge}</span>
         {(onPrev || onNext) && (
           <div className="flex shrink-0 overflow-hidden rounded-full border border-white/[0.08]">
             <button onClick={onPrev} disabled={!onPrev} aria-label="Previous exercise" className="flex h-9 w-9 items-center justify-center text-foreground/80 transition enabled:hover:bg-white/[0.06] disabled:opacity-30"><ChevronLeft className="h-4 w-4" /></button>
