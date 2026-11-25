@@ -1,5 +1,5 @@
 import { useImmersive } from "@/hooks/useImmersive";
-import { ChevronLeft, ChevronDown, ChevronRight, Play, Volume2, Maximize2, TrendingUp, Sparkles, AlertCircle, Lightbulb, Share2, Clock, Target, Package, Lock, Facebook, Twitter, Linkedin, MessageCircle, Send, Users, X } from "lucide-react";
+import { ChevronLeft, ChevronDown, ChevronRight, Play, Volume2, Maximize2, TrendingUp, Sparkles, AlertCircle, Lightbulb, Share2, Clock, CircleCheck, Target, Package, Lock, Facebook, Twitter, Linkedin, MessageCircle, Send, Users, X } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { ScoreRing, scoreBand } from "@/components/SessionResult";
@@ -269,22 +269,7 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
       {/* ---------- right: today + evaluation + details ---------- */}
       <div className="space-y-4">
 
-        <section className="overflow-hidden rounded-[22px] border border-white/[0.06] bg-card">
-          <h2 className="px-5 pb-1 pt-4 text-[14px] font-semibold">Evaluation</h2>
-          {[
-            { icon: TrendingUp, label: "Overall", text: EVAL_OVERALL, tone: "text-primary", bg: "bg-primary/12" },
-            { icon: Sparkles, label: "Improvement", text: EVAL_IMPROVEMENT, tone: "text-success", bg: "bg-success/12" },
-            { icon: Lightbulb, label: "Advice", text: EVAL_ADVICE, tone: "text-warning", bg: "bg-warning/12" },
-          ].map((r, i) => (
-            <div key={r.label} className={cn("flex gap-3 px-5 py-3.5", i > 0 && "border-t border-white/[0.05]")}>
-              <span className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px]", r.bg)}><r.icon className={cn("h-4 w-4", r.tone)} /></span>
-              <div className="min-w-0">
-                <div className={cn("text-[12px] font-semibold", r.tone)}>{r.label}</div>
-                <p className="mt-0.5 text-[13px] leading-relaxed text-foreground/85">{r.text}</p>
-              </div>
-            </div>
-          ))}
-        </section>
+        <StepAccuracy exerciseName={exerciseName} />
 
         <section className="overflow-hidden rounded-[22px] border border-white/[0.06] bg-card">
           <button onClick={() => setDetailsOpen((v) => !v)} className="flex w-full items-center gap-2 px-5 py-4 text-left transition hover:bg-white/[0.03]">
@@ -342,15 +327,89 @@ function TodayCard({ label, onStart, done }: { label?: string; onStart?: () => v
       <div className="min-w-0 flex-1">
         <div className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Today's session</div>
         <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[14.5px] font-semibold">
-          05:15 AM
-          <span className="inline-flex items-center gap-1.5 text-[12px] font-normal text-muted-foreground">
-            <span className={cn("h-1.5 w-1.5 rounded-full", done ? "bg-success" : "bg-warning")} /> {done ? "Completed" : "Not started"}{label ? ` · Session ${label}` : ""}
+          {done ? "All done" : "05:15 AM"}
+          <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-[12px] font-normal text-muted-foreground">
+            <span className={cn("h-1.5 w-1.5 rounded-full", done ? "bg-success" : "bg-warning")} /> {done ? (label ? `Session ${label}` : "Completed") : `Not started${label ? ` · Session ${label}` : ""}`}
           </span>
         </div>
       </div>
-      <button onClick={onStart} className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-r from-primary to-secondary px-4 text-[13px] font-semibold text-white shadow-[0_10px_26px_-14px] shadow-primary transition hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
-        <Play className="h-3.5 w-3.5 fill-current" /> {done ? "Again" : "Start"}
-      </button>
+      {done ? (
+        // every session for today is finished: a calm status, not another call to action
+        <span className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-success/12 px-4 text-[13px] font-semibold text-success ring-1 ring-inset ring-success/25">
+          <CircleCheck className="h-4 w-4" /> Done
+        </span>
+      ) : (
+        <button onClick={onStart} className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-r from-primary to-secondary px-4 text-[13px] font-semibold text-white shadow-[0_10px_26px_-14px] shadow-primary transition hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+          <Play className="h-3.5 w-3.5 fill-current" /> Start
+        </button>
+      )}
+    </section>
+  );
+}
+
+/* ---------- AI evaluation, per step of the exercise ---------- */
+const STEP_SCORES: Record<string, { title: string; score: number }[]> = {
+  "Cat Cow": [
+    { title: "Start on hands and knees", score: 78 },
+    { title: "Arch your back (cow)", score: 74 },
+    { title: "Round your spine (cat)", score: 91 },
+  ],
+  "Squeeze Blades": [
+    { title: "Sit tall, arms relaxed", score: 84 },
+    { title: "Squeeze your shoulder blades", score: 72 },
+    { title: "Hold, then release slowly", score: 88 },
+  ],
+};
+const DEFAULT_STEPS = [
+  { title: "Sit or stand upright", score: 78 },
+  { title: "Turn your head to one side", score: 74 },
+  { title: "Return to centre, then switch sides", score: 91 },
+];
+
+function stepBand(score: number) {
+  if (score >= 85) return { label: "Perfect form", msg: "You've mastered this step. Keep that feeling every rep.", text: "text-success", bar: "bg-success", dot: "bg-success/15 text-success ring-success/30" };
+  if (score >= 75) return { label: "Almost there", msg: "Great work. You're just a touch away from perfect.", text: "text-sky-400", bar: "bg-sky-400", dot: "bg-sky-400/15 text-sky-300 ring-sky-400/30" };
+  return { label: "Building up", msg: "Good start. Focus on this step next time and watch it improve.", text: "text-warning", bar: "bg-warning", dot: "bg-warning/15 text-warning ring-warning/30" };
+}
+
+function StepAccuracy({ exerciseName }: { exerciseName: string }) {
+  const items = STEP_SCORES[exerciseName] ?? DEFAULT_STEPS;
+  const weakest = items.reduce((w, it, i) => (it.score < items[w].score ? i : w), 0);
+  const wb = stepBand(items[weakest].score);
+  return (
+    <section className="rounded-[22px] border border-white/[0.06] bg-card p-5">
+      <h2 className="text-[14px] font-semibold">Accuracy, step by step</h2>
+      <p className="mt-0.5 text-[12px] text-muted-foreground">Last session · Today, 16:00</p>
+      <ol className="mt-4">
+        {items.map((it, i) => {
+          const b = stepBand(it.score);
+          const focus = i === weakest;
+          return (
+            <li key={it.title} className="relative flex gap-3.5 pb-5 last:pb-0">
+              {i < items.length - 1 && <span aria-hidden className="absolute bottom-0 left-[13px] top-7 w-px bg-white/[0.08]" />}
+              <span className={cn("relative z-[1] flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[12.5px] font-semibold tabular-nums ring-1 ring-inset",
+                focus ? "bg-warning text-[#1b1406] ring-warning shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-warning)_18%,transparent)]" : b.dot)}>{i + 1}</span>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="text-[14px] font-semibold leading-snug">{it.title}</span>
+                  <span className={cn("shrink-0 text-[13px] font-semibold tabular-nums", b.text)}>{it.score}</span>
+                </div>
+                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/[0.07]">
+                  <div className={cn("h-full rounded-full transition-[width] duration-700", b.bar)} style={{ width: `${it.score}%` }} />
+                </div>
+                <div className={cn("mt-2 text-[12.5px] font-semibold", b.text)}>{b.label}</div>
+                <p className="mt-0.5 text-[12px] leading-relaxed text-muted-foreground">{b.msg}</p>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+      <div className="mt-5 rounded-[16px] bg-white/[0.04] p-4 ring-1 ring-inset ring-white/[0.05]">
+        <div className="flex items-center gap-1.5 text-[12px] font-semibold text-muted-foreground"><Lightbulb className="h-3.5 w-3.5 text-warning" /> What to improve</div>
+        <p className="mt-1.5 text-[13px] leading-relaxed text-foreground/90">
+          <span className={cn("font-semibold", wb.text)}>{wb.label}</span> · Step {weakest + 1}, “{items[weakest].title}”. This step matched the guide least, so follow its points closely in How to do it.
+        </p>
+      </div>
     </section>
   );
 }
