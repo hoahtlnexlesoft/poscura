@@ -287,23 +287,50 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
       <div className="space-y-4 land:sticky land:top-[72px]">
         {/* today's session: first thing under the exercise name (top of the left pane on open foldables, not across the hinge) */}
         <TodayCard label={sessionLabel} onStart={onStart} done={badge === "Completed"} />
-        <section className="relative overflow-hidden rounded-[22px] border border-dashed border-white/[0.1] bg-gradient-to-br from-primary/[0.07] via-transparent to-secondary/[0.05] p-5">
-          <div className="flex items-start gap-3.5">
-            <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-gradient-to-br from-primary/25 to-secondary/20 ring-1 ring-inset ring-white/10">
-              <Sparkles className="h-5 w-5 text-primary" />
-            </span>
-            <div className="min-w-0">
-              <h2 className="text-[14.5px] font-semibold">Your progress starts here</h2>
-              <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">Finish your first session and Poscura scores your accuracy, tracks your progress and gives you personal advice here.</p>
-            </div>
-          </div>
-          <div className="mt-4 grid grid-cols-3 divide-x divide-white/[0.06] rounded-[14px] border border-white/[0.06] bg-background/30">
-            {["Accuracy", "Best", "Trend"].map((l) => (
-              <div key={l} className="px-3 py-2.5 text-center">
-                <div className="text-[11px] text-muted-foreground">{l}</div>
-                <div className="mt-0.5 flex items-center justify-center gap-1 text-[15px] font-semibold text-muted-foreground/60"><Lock className="h-3 w-3" />—</div>
+        {/* empty state that explains what the first session unlocks, instead of a row of locked dashes */}
+        <section className="relative overflow-hidden rounded-[22px] border border-white/[0.07] bg-card">
+          <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-36 bg-[radial-gradient(70%_100%_at_0%_0%,color-mix(in_oklab,var(--primary)_18%,transparent),transparent_70%),radial-gradient(60%_90%_at_100%_0%,color-mix(in_oklab,var(--secondary)_14%,transparent),transparent_70%)]" />
+          <div className="relative p-5">
+            <div className="flex items-center gap-4">
+              {/* ghost of the score ring this card will become */}
+              <div className="relative h-[72px] w-[72px] shrink-0">
+                <svg viewBox="0 0 72 72" className="h-full w-full -rotate-90">
+                  <circle cx="36" cy="36" r="31" fill="none" stroke="currentColor" strokeWidth="5" className="text-white/[0.07]" />
+                  <circle cx="36" cy="36" r="31" fill="none" stroke="url(#ghostRing)" strokeWidth="5" strokeLinecap="round" strokeDasharray="2 9" />
+                  <defs><linearGradient id="ghostRing" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="var(--color-primary)" /><stop offset="1" stopColor="var(--color-secondary)" /></linearGradient></defs>
+                </svg>
+                <span className="absolute inset-0 flex items-center justify-center"><Sparkles className="h-6 w-6 text-primary" /></span>
               </div>
-            ))}
+              <div className="min-w-0">
+                <h2 className="text-[16px] font-semibold tracking-tight">Your progress starts here</h2>
+                <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">Do today's session and Poscura's AI checks how closely you follow each step.</p>
+              </div>
+            </div>
+
+            <div className="mt-5 text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">After your first session</div>
+            <ul className="mt-2.5 space-y-2.5">
+              {[
+                { icon: Target, tone: "bg-primary/12 text-primary", t: "Accuracy for every step", d: "See which part of the move you nail and which needs work." },
+                { icon: TrendingUp, tone: "bg-success/12 text-success", t: "Progress over time", d: "Your score after each session, so you can watch it climb." },
+                { icon: Lightbulb, tone: "bg-warning/12 text-warning", t: "One tip to improve", d: "A personal pointer on the step to focus on next time." },
+              ].map((r) => (
+                <li key={r.t} className="flex gap-3">
+                  <span className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px]", r.tone)}><r.icon className="h-4 w-4" /></span>
+                  <div className="min-w-0">
+                    <div className="text-[13.5px] font-semibold">{r.t}</div>
+                    <p className="text-[12px] leading-relaxed text-muted-foreground">{r.d}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-5 rounded-[14px] bg-white/[0.03] p-3 ring-1 ring-inset ring-white/[0.05]">
+              <div className="flex items-center justify-between text-[12px]">
+                <span className="text-muted-foreground">Unlocks after 1 session</span>
+                <span className="font-semibold tabular-nums">0 / 1</span>
+              </div>
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/[0.07]"><div className="h-full w-[4%] rounded-full bg-gradient-to-r from-primary to-secondary" /></div>
+            </div>
           </div>
         </section>
       </div>
