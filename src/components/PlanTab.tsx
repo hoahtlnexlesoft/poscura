@@ -277,8 +277,8 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
   return (
     <>
       {/* ---------- two columns on wide screens, sized to end close together; one column on phones ---------- */}
-      <div className="space-y-4 fold:grid fold:grid-cols-2 fold:items-stretch fold:gap-4 fold:space-y-0 land:gap-x-6 hinge-split land:items-stretch">
-        <div className="space-y-4 fold:flex fold:flex-col fold:gap-4 fold:space-y-0 fold:[&>*:last-child]:flex-1">
+      <div className="space-y-4 fold:grid fold:grid-cols-2 fold:items-start fold:gap-4 fold:space-y-0 land:gap-x-6 hinge-split land:items-start">
+        <div className="space-y-4 fold:flex fold:flex-col fold:gap-4 fold:space-y-0">
         {/* current plan */}
         {plan === "business" ? <BusinessPlanCard /> : (
         <Card>
@@ -319,6 +319,21 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
         </Card>
         )}
 
+        {plan === "business" ? (
+          <>
+          <Card id="member-benefits" title="Professional benefits" className="scroll-mt-20">
+            <ul className="grid gap-x-4 gap-y-2.5 sm:grid-cols-2">
+              {BENEFITS.map((b) => (
+                <li key={b} className="flex items-center gap-2.5 text-[13.5px]">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-success/15"><Check className="h-3 w-3 text-success" /></span>
+                  {b}
+                </li>
+              ))}
+            </ul>
+          </Card>
+          </>
+        ) : (
+          <>
         {/* usage */}
         <Card title="Usage this month">
           <div className="grid grid-cols-3 divide-x divide-white/[0.06] rounded-[16px] border border-white/[0.06] bg-white/[0.02]">
@@ -338,17 +353,7 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
           <p className="mt-3 text-[12px] text-muted-foreground">Resets on {plan === "free" ? "Dec 17, 2026" : "Nov 26, 2026"}.</p>
         </Card>
 
-        {plan === "business" && (
-          <Card id="member-benefits" title="Professional benefits" className="scroll-mt-20">
-            <ul className="grid gap-x-4 gap-y-2.5 sm:grid-cols-2">
-              {BENEFITS.map((b) => (
-                <li key={b} className="flex items-center gap-2.5 text-[13.5px]">
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-success/15"><Check className="h-3 w-3 text-success" /></span>
-                  {b}
-                </li>
-              ))}
-            </ul>
-          </Card>
+          </>
         )}
         <Card title="Add-ons" action={<button onClick={() => setBrowse(true)} className={outlineBtn}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button>}>
           {addons.length ? (
@@ -370,7 +375,28 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
         </Card>
 
         </div>
-        <div className="space-y-4 fold:flex fold:flex-col fold:gap-4 fold:space-y-0 fold:[&>*:last-child]:flex-1">
+        <div className="space-y-4 fold:flex fold:flex-col fold:gap-4 fold:space-y-0">
+        {plan === "business" && (<>
+        {/* usage */}
+        <Card title="Usage this month">
+          <div className="grid grid-cols-3 divide-x divide-white/[0.06] rounded-[16px] border border-white/[0.06] bg-white/[0.02]">
+            {[
+              { l: "Hours", v: unlimited ? "∞" : "0.8", of: unlimited ? "unlimited" : "of 20.2 h", pct: unlimited ? null : 4 },
+              { l: "Sessions", v: "10", of: unlimited ? "unlimited" : "of 112", pct: unlimited ? null : 9 },
+              { l: "Reports", v: "6", of: "this month", pct: null },
+            ].map((u) => (
+              <div key={u.l} className="px-3 py-3">
+                <div className="text-[11.5px] text-muted-foreground">{u.l}</div>
+                <div className="mt-1 text-[19px] font-semibold leading-none tabular-nums">{u.v}</div>
+                <div className="mt-1 text-[11px] text-muted-foreground">{u.of}</div>
+                {u.pct !== null && <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/[0.07]"><div className="h-full rounded-full bg-primary" style={{ width: `${u.pct}%` }} /></div>}
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-[12px] text-muted-foreground">Resets on Nov 26, 2026.</p>
+        </Card>
+
+        </>)}
         <Card title="Subscription history">
           <ul className="space-y-2">
             {hist.slice(0, 2).map((h, i) => <HistRow key={i} h={h} />)}
