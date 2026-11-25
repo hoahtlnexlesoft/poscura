@@ -100,6 +100,48 @@ function Confirm({ trigger, title, body, action, onConfirm }: { trigger: React.R
 
 const toUpgrade = () => document.getElementById("upgrade-your-plan")?.scrollIntoView({ behavior: "smooth", block: "start" });
 
+/* ---------- voucher as a ticket: discount stub, perforation, details ---------- */
+function VoucherTicket({ v }: { v: Voucher }) {
+  const [copied, setCopied] = useState(false);
+  const [mm, dd, rest] = v.until.split("/");
+  const end = new Date(`${rest.slice(0, 4)}-${mm}-${dd}T${rest.slice(5) || "23:59"}`);
+  const days = Math.ceil((end.getTime() - Date.now()) / 86400000);
+  const soon = days >= 0 && days <= 7;
+  const pct = v.off.replace(/\s*OFF/i, "");
+  const copy = () => {
+    navigator.clipboard?.writeText(v.code);
+    setCopied(true); toast.success(`Copied ${v.code}`);
+    setTimeout(() => setCopied(false), 1600);
+  };
+  return (
+    <li className="group relative flex overflow-hidden rounded-[18px] bg-gradient-to-r from-white/[0.05] to-white/[0.02] ring-1 ring-inset ring-white/[0.07] transition hover:ring-primary/30">
+      {/* stub */}
+      <div className="relative flex w-[92px] shrink-0 flex-col items-center justify-center bg-gradient-to-br from-primary/30 via-primary/15 to-secondary/25 py-4">
+        <span className="text-[26px] font-bold leading-none tracking-tight">{pct}</span>
+        <span className="mt-1 text-[10.5px] font-semibold uppercase tracking-[0.18em] text-foreground/75">Off</span>
+      </div>
+      {/* perforation with notches */}
+      <div aria-hidden className="relative w-0 border-l-[1.5px] border-dashed border-white/15">
+        <span className="absolute -left-[9px] -top-[9px] h-[18px] w-[18px] rounded-full bg-card" />
+        <span className="absolute -bottom-[9px] -left-[9px] h-[18px] w-[18px] rounded-full bg-card" />
+      </div>
+      {/* details */}
+      <div className="min-w-0 flex-1 p-3.5 pl-4">
+        <div className="line-clamp-2 text-[14px] font-semibold leading-snug">{v.name}</div>
+        <button onClick={copy} aria-label={`Copy code ${v.code}`}
+          className="mt-2 inline-flex h-8 items-center gap-2 rounded-lg border border-dashed border-primary/40 bg-primary/[0.08] px-2.5 font-mono text-[12.5px] font-semibold tracking-[0.08em] text-foreground transition hover:border-primary/70 hover:bg-primary/15 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+          {v.code}
+          {copied ? <Check className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5 text-primary" />}
+        </button>
+        <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11.5px] text-muted-foreground">
+          <span>Valid until {end.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+          {soon && <span className="rounded-full bg-warning/12 px-2 py-px font-semibold text-warning ring-1 ring-inset ring-warning/25">{days <= 1 ? "Ends today" : `${days} days left`}</span>}
+        </div>
+      </div>
+    </li>
+  );
+}
+
 /* ---------- the tab ---------- */
 export function PlanTab({ plan }: { plan: PlanKind }) {
   const [addons, setAddons] = useState<AddOn[]>([
@@ -248,29 +290,9 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
           ) : <p className="text-[13px] text-muted-foreground">No add-ons yet.</p>}
         </Card>
 
-        <Card title="Vouchers">
-          <ul className="space-y-2">
-            {(vouOpen ? VOUCHERS : VOUCHERS.slice(0, 3)).map((v) => (
-              <li key={v.code} className="relative overflow-hidden rounded-[16px] border border-dashed border-white/[0.1] bg-white/[0.02] p-3.5">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <Ticket className="h-4 w-4 shrink-0 text-primary" />
-                      <span className="truncate text-[14px] font-semibold">{v.name}</span>
-                    </div>
-                    <button onClick={() => { navigator.clipboard?.writeText(v.code); toast.success(`Copied ${v.code}`); }}
-                      className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-white/[0.06] px-2.5 py-1 font-mono text-[12.5px] font-semibold tracking-wide text-foreground/90 transition hover:bg-white/[0.1]">
-                      {v.code} <Copy className="h-3 w-3 text-muted-foreground" />
-                    </button>
-                    <div className="mt-2 text-[11.5px] text-muted-foreground">Valid until {v.until}</div>
-                  </div>
-                  <div className="shrink-0 text-right">
-                    <span className={cn("rounded-full px-2 py-px text-[10.5px] font-semibold ring-1 ring-inset", statusTone.Active)}>Active</span>
-                    <div className="mt-2 text-[16px] font-bold text-success">{v.off}</div>
-                  </div>
-                </div>
-              </li>
-            ))}
+        <Card title="Vouchers" action={<span className="text-[12px] text-muted-foreground">{VOUCHERS.length} active · tap a code to copy</span>}>
+          <ul className="space-y-3">
+            {(vouOpen ? VOUCHERS : VOUCHERS.slice(0, 3)).map((v) => <VoucherTicket key={v.code} v={v} />)}
           </ul>
           {VOUCHERS.length > 3 && <MoreButton open={vouOpen} onClick={() => setVouOpen((v) => !v)} />}
         </Card>
