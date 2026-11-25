@@ -4,6 +4,10 @@ import { cn } from "@/lib/utils";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { ExerciseDetail } from "@/components/ExerciseDetail";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface ExerciseListItem {
   name: string;
@@ -106,6 +110,27 @@ export function WorkoutProgramDetail({ onClose, onStartSession }: Props) {
           <ChevronLeft className="h-[18px] w-[18px]" />
         </button>
         <span className="flex-1 text-[15px] font-semibold">Program</span>
+        {/* Cancel ends the whole program, so it asks first */}
+        <AlertDialog>
+          <AlertDialogTrigger className="inline-flex h-9 items-center gap-1.5 rounded-full border border-white/[0.08] px-3.5 text-[12.5px] font-medium text-destructive/90 transition hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/50">
+            <X className="h-4 w-4" /> Cancel
+          </AlertDialogTrigger>
+          <AlertDialogContent className="max-w-[360px] rounded-[22px]">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Cancel this program?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Shoulder &amp; Neck Relief and its upcoming sessions will be removed from your schedule. Your completed sessions and scores stay in your history.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="gap-2">
+              <AlertDialogCancel className="rounded-full">Keep program</AlertDialogCancel>
+              <AlertDialogAction className="rounded-full bg-destructive text-white hover:bg-destructive/90"
+                onClick={() => { toast.success("Program cancelled"); onClose(); }}>
+                Cancel program
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
         <button onClick={() => setRescheduleOpen(true)} className="inline-flex h-9 items-center gap-1.5 rounded-full border border-white/[0.08] px-3.5 text-[12.5px] font-medium text-foreground/85 transition hover:border-primary/40 hover:text-foreground">
           <CalendarClock className="h-4 w-4" /> Reschedule
         </button>
