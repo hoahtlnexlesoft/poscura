@@ -258,7 +258,7 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
         <BusinessPlanCard />
         <div className="fold:hidden">
           <Card title="Professional benefits" className="scroll-mt-20">
-            <ul className="grid gap-x-4 gap-y-2.5 sm:grid-cols-2">
+            <ul className="grid gap-y-3">
               {BENEFITS.map((b) => (
                 <li key={b} className="flex items-center gap-2.5 text-[13.5px]">
                   <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-success/15"><Check className="h-3 w-3 text-success" /></span>
@@ -321,7 +321,7 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
         {/* wide screens: benefits alone on the right */}
         <div className="hidden fold:flex fold:flex-col fold:gap-4 fold:sticky fold:top-4">
           <Card id="member-benefits" title="Professional benefits" className="scroll-mt-20">
-            <ul className="grid gap-x-4 gap-y-2.5 sm:grid-cols-2">
+            <ul className="grid gap-y-3">
               {BENEFITS.map((b) => (
                 <li key={b} className="flex items-center gap-2.5 text-[13.5px]">
                   <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-success/15"><Check className="h-3 w-3 text-success" /></span>
