@@ -3,9 +3,10 @@
 @source "../src";
 @import "tw-animate-css";
 
-/* Navigation rail on the right: wide screens (foldables open, tablets) or when forced with <html data-layout="rail"> */
+/* Navigation rail on the right: wide screens (tablets) or when forced with <html data-layout="rail">.
+   Galaxy Z Fold keeps the bottom tab bar (data-layout="bottom"), like its own apps above the taskbar. */
 @custom-variant rail {
-  @media (min-width: 600px) { @slot; }
+  @media (min-width: 600px) { &:not(:where([data-layout="bottom"], [data-layout="bottom"] *)) { @slot; } }
   &:where([data-layout="rail"], [data-layout="rail"] *) { @slot; }
 }
 /* Unfolded foldables & tablets (≥600px wide): dedicated two-pane layouts */
