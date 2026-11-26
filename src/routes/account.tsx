@@ -9,6 +9,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { PlanPicker } from "@/components/PlanPicker";
 import { PlanTab } from "@/components/PlanTab";
+import { GoogleMark } from "@/components/GoogleMark";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
 
@@ -39,7 +40,7 @@ type Connection = { id: string; name: string; icon: React.ReactNode; status: Con
 function UnifiedAccountSection() {
   const [connections, setConnections] = useState<Connection[]>([
     { id: "facebook", name: "Facebook", icon: <span className="h-7 w-7 rounded-full bg-[#1877F2] text-white flex items-center justify-center"><Facebook className="h-4 w-4" /></span>, status: "connected" },
-    { id: "google", name: "Google", icon: <span className="h-7 w-7 rounded-full bg-white flex items-center justify-center text-[15px] font-bold leading-none text-[#4285F4]">G</span>, status: "connected" },
+    { id: "google", name: "Google", icon: <span className="h-7 w-7 rounded-full bg-white flex items-center justify-center"><GoogleMark className="h-4 w-4" /></span>, status: "connected" },
     { id: "apple", name: "Apple ID", icon: <span className="h-7 w-7 rounded-full bg-black text-white flex items-center justify-center"><Apple className="h-4 w-4" /></span>, status: "disconnected" },
   ]);
   const [email, setEmail] = useState("marc.john@example.com");
@@ -72,7 +73,7 @@ function UnifiedAccountSection() {
                 label="Sign up"
                 value={
                   <span className="inline-flex items-center gap-1.5">
-                    <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white border border-border text-[10px] font-bold">G</span>
+                    <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white"><GoogleMark className="h-3 w-3" /></span>
                     Google
                   </span>
                 }
