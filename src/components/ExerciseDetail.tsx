@@ -1,5 +1,5 @@
 import { useImmersive } from "@/hooks/useImmersive";
-import { ChevronLeft, ChevronDown, ChevronRight, Play, Volume2, Maximize2, TrendingUp, Sparkles, AlertCircle, Lightbulb, Share2, Clock, CircleCheck, Target, Package, Lock, Facebook, Twitter, Linkedin, MessageCircle, Send, Users, X } from "lucide-react";
+import { ChevronLeft, ChevronDown, ChevronRight, Play, Volume2, Maximize2, TrendingUp, Sparkles, AlertCircle, Lightbulb, Share2, Clock, CircleCheck, Target, Package, Lock, Facebook, Twitter, Linkedin, MessageCircle, Send, Users, X, CalendarClock } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { ScoreRing, scoreBand } from "@/components/SessionResult";
@@ -8,6 +8,7 @@ import { StepTimeline } from "@/components/StepTimeline";
 import { SessionEvaluationDetail } from "@/components/SessionEvaluationDetail";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { ScheduleDialog } from "@/desktop/DeskDashboard";
 
 const shareTargets = [
   { name: "Facebook", icon: Facebook, color: "text-[#1877F2]", url: (u: string) => `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(u)}` },
@@ -34,6 +35,8 @@ interface Props {
   evaluated?: boolean;
   /** e.g. "0/2" for today's session counter */
   sessionLabel?: string;
+  /** false when the exercise isn't on the user's schedule yet: the session card asks to schedule it */
+  scheduled?: boolean;
 }
 
 /** Exercises the demo user has already done, so they have accuracy data and an AI evaluation */
@@ -77,7 +80,10 @@ function ShareToggle({ label, checked, onChange }: { label: string; checked: boo
   );
 }
 
-export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, onStart, evaluated = hasEvaluation(exerciseName), sessionLabel = "0/2" }: Props) {
+export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, onStart, evaluated = hasEvaluation(exerciseName), sessionLabel = "0/2", scheduled = true }: Props) {
+  const [sched, setSched] = useState(scheduled);
+  const [schedTime, setSchedTime] = useState<string | null>(null);
+  const [schedOpen, setSchedOpen] = useState(false);
   useImmersive();
   const [phase, setPhase] = useState<Phase>("main");
   const [chartOpen, setChartOpen] = useState(true);
@@ -223,7 +229,7 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
       {/* ---------- left: score + trend ---------- */}
       <div className="space-y-4 land:sticky land:top-[72px]">
         {/* today's session: first thing under the exercise name (top of the left pane on open foldables, not across the hinge) */}
-        <TodayCard label={sessionLabel} onStart={onStart} done={badge === "Completed"} />
+        {sched ? <TodayCard label={sessionLabel} onStart={onStart} done={badge === "Completed"} time={schedTime} /> : <><ScheduleCard onSchedule={() => setSchedOpen(true)} /><ScheduleDialog open={schedOpen} onOpenChange={setSchedOpen} onSaved={(t) => { setSchedTime(t); setSched(true); }} /></>}
         <section className="relative overflow-hidden rounded-[22px] border border-white/[0.06] bg-card p-5">
           <div aria-hidden className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full opacity-60"
             style={{ background: `radial-gradient(closest-side, color-mix(in oklab, ${band.ring} 22%, transparent), transparent)` }} />
@@ -286,7 +292,7 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
       {/* ---------- not evaluated yet: today's session + why there's no score (left), how to do it (right) ---------- */}
       <div className="space-y-4 land:sticky land:top-[72px]">
         {/* today's session: first thing under the exercise name (top of the left pane on open foldables, not across the hinge) */}
-        <TodayCard label={sessionLabel} onStart={onStart} done={badge === "Completed"} />
+        {sched ? <TodayCard label={sessionLabel} onStart={onStart} done={badge === "Completed"} time={schedTime} /> : <><ScheduleCard onSchedule={() => setSchedOpen(true)} /><ScheduleDialog open={schedOpen} onOpenChange={setSchedOpen} onSaved={(t) => { setSchedTime(t); setSched(true); }} /></>}
         <section className="relative overflow-hidden rounded-[22px] border border-dashed border-white/[0.1] bg-gradient-to-br from-primary/[0.07] via-transparent to-secondary/[0.05] p-5">
           <div className="flex items-start gap-3.5">
             {/* ghost of the score ring this card will become */}
@@ -323,7 +329,31 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
   );
 }
 
-function TodayCard({ label, onStart, done }: { label?: string; onStart?: () => void; done?: boolean }) {
+/* "HH:MM" from the schedule dialog → "05:15 AM" */
+function fmt12(t: string) {
+  const [h, m] = t.split(":").map(Number);
+  return `${String(h % 12 || 12).padStart(2, "0")}:${String(m).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`;
+}
+
+/* the exercise isn't on the schedule yet: same slot as today's session, one clear call to action */
+function ScheduleCard({ onSchedule }: { onSchedule: () => void }) {
+  return (
+    <section className="flex items-center gap-3 rounded-[20px] border border-white/[0.06] bg-card px-4 py-3.5">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-white/[0.04] ring-1 ring-inset ring-white/[0.08]">
+        <CalendarClock className="h-5 w-5 text-muted-foreground" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Schedule</div>
+        <div className="mt-0.5 text-[14.5px] font-semibold">Not scheduled yet</div>
+      </div>
+      <button onClick={onSchedule} className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-r from-primary to-secondary px-4 text-[13px] font-semibold text-white shadow-[0_10px_26px_-14px] shadow-primary transition hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+        <CalendarClock className="h-3.5 w-3.5" /> Schedule
+      </button>
+    </section>
+  );
+}
+
+function TodayCard({ label, onStart, done, time }: { label?: string; onStart?: () => void; done?: boolean; time?: string | null }) {
   // sits right under the exercise name, so it shows when and how far along, not the name again
   return (
     <section className="flex items-center gap-3 rounded-[20px] border border-white/[0.06] bg-card px-4 py-3.5">
@@ -333,7 +363,7 @@ function TodayCard({ label, onStart, done }: { label?: string; onStart?: () => v
       <div className="min-w-0 flex-1">
         <div className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Today's session</div>
         <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[14.5px] font-semibold">
-          {done ? "All done" : "05:15 AM"}
+          {done ? "All done" : time ? fmt12(time) : "05:15 AM"}
           <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-[12px] font-normal text-muted-foreground">
             <span className={cn("h-1.5 w-1.5 rounded-full", done ? "bg-success" : "bg-warning")} /> {done ? (label ? `Session ${label}` : "Completed") : `Not started${label ? ` · Session ${label}` : ""}`}
           </span>

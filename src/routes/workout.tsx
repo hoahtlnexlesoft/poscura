@@ -13,7 +13,7 @@ import { ExerciseDetail } from "@/components/ExerciseDetail";
 import { NEXT_WORKOUT, TODAYS_WORKOUTS, TODAY_TIME } from "@/lib/todays-workouts";
 
 export const Route = createFileRoute("/workout")({
-  validateSearch: z.object({ session: z.string().optional(), exercise: z.string().optional() }),
+  validateSearch: z.object({ session: z.string().optional(), exercise: z.string().optional(), schedule: z.enum(["none"]).optional() }),
   component: WorkoutPage,
 });
 
@@ -41,7 +41,7 @@ type View =
   | { kind: "program" };
 
 function WorkoutPage() {
-  const { session, exercise } = Route.useSearch();
+  const { session, exercise, schedule } = Route.useSearch();
   const desk = useDesk();
   const [view, setView] = useState<View>(session ? { kind: "intro", name: session } : exercise ? { kind: "exercise", name: exercise } : { kind: "list" });
   // deep links (?exercise= / ?session=) also work when the page is already open
@@ -93,7 +93,7 @@ function WorkoutPage() {
   if (view.kind === "exercise") {
     const w = TODAYS_WORKOUTS.find((x) => x.name === view.name);
     const done = w ? w.done >= w.sessions : true;
-    return <ExerciseDetail exerciseName={view.name} badge={done ? "Completed" : "Main"} sessionLabel={w ? `${w.done}/${w.sessions}` : "2/2"} onClose={toList} onStart={() => setView({ kind: "intro", name: view.name })} />;
+    return <ExerciseDetail exerciseName={view.name} badge={done ? "Completed" : "Main"} sessionLabel={w ? `${w.done}/${w.sessions}` : "2/2"} onClose={toList} onStart={() => setView({ kind: "intro", name: view.name })} scheduled={schedule !== "none"} />;
   }
   if (view.kind === "program") return <WorkoutProgramDetail onClose={() => setView({ kind: "list" })} onStartSession={(name) => setView({ kind: "intro", name })} />;
   if (desk) return <DeskWorkoutHome onProgram={() => setView({ kind: "program" })} onExercise={(name) => setView({ kind: "exercise", name })} onStart={(name) => setView({ kind: "intro", name })} />;

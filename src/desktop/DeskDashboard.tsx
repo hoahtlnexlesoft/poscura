@@ -157,7 +157,7 @@ function NoWorkouts() {
   );
 }
 
-export function ScheduleDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
+export function ScheduleDialog({ open, onOpenChange, onSaved }: { open: boolean; onOpenChange: (v: boolean) => void; onSaved?: (time: string) => void }) {
   const now = new Date();
   const [date, setDate] = useState(now.toISOString().slice(0, 10));
   const [time, setTime] = useState(now.toTimeString().slice(0, 5));
@@ -175,7 +175,7 @@ export function ScheduleDialog({ open, onOpenChange }: { open: boolean; onOpenCh
         <label className="block text-[12.5px] font-medium text-muted-foreground">Start time
           <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className={field} />
         </label>
-        <button className={cn(btn.primary, "mt-2 w-full")} onClick={() => { onOpenChange(false); toast.success("Schedule saved"); }}>Save</button>
+        <button className={cn(btn.primary, "mt-2 w-full")} onClick={() => { onOpenChange(false); onSaved?.(time); toast.success("Schedule saved"); }}>Save</button>
       </DialogContent>
     </Dialog>
   );
