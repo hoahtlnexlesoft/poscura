@@ -326,9 +326,9 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, p
       {/* ---------- move through the exercises in order: Back / Next, as on the session screen ---------- */}
       {(onPrev || onNext) && (
         /* floating capsule at the bottom centre: always in reach, covers almost nothing */
-        <nav aria-label="Exercises" className="sticky bottom-4 z-30 mx-auto flex w-max items-center rounded-full border border-white/[0.1] bg-[#121a2a]/90 p-1 shadow-[0_18px_40px_-12px_rgba(0,0,0,.75)] backdrop-blur-xl land:col-start-2">
+        <nav aria-label="Exercises" className="sticky bottom-4 z-30 mx-auto grid w-[min(380px,100%)] grid-cols-[1fr_auto_1fr] items-center rounded-full border border-white/[0.1] bg-[#121a2a]/90 p-1 shadow-[0_18px_40px_-12px_rgba(0,0,0,.75)] backdrop-blur-xl land:col-start-2">
           <button onClick={onPrev ?? onClose} title={onPrev ? `Previous: ${prevName ?? ""}` : "Back to the list"}
-            className="inline-flex h-12 max-w-[200px] items-center gap-1.5 rounded-full pl-2.5 pr-4 text-left transition hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+            className="inline-flex h-12 min-w-0 items-center gap-1.5 rounded-full pl-2.5 pr-4 text-left transition hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
             <ChevronLeft className="h-[18px] w-[18px] shrink-0 text-foreground/70" />
             <span className="min-w-0">
               <span className="block text-[10.5px] font-medium uppercase tracking-[0.12em] text-muted-foreground">{onPrev ? "Previous" : "Back"}</span>
@@ -337,7 +337,7 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, p
           </button>
           <span aria-hidden className="mx-0.5 h-7 w-px bg-white/[0.12]" />
           <button onClick={onNext} disabled={!onNext} title={nextName ? `Next: ${nextName}` : undefined}
-            className="inline-flex h-12 max-w-[200px] items-center gap-1.5 rounded-full pl-4 pr-2.5 text-right transition enabled:hover:bg-primary/10 disabled:opacity-45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+            className="inline-flex h-12 min-w-0 items-center justify-end gap-1.5 rounded-full pl-4 pr-2.5 text-right transition enabled:hover:bg-primary/10 disabled:opacity-45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
             <span className="min-w-0">
               <span className="block text-[10.5px] font-medium uppercase tracking-[0.12em] text-muted-foreground">Next</span>
               <span className="block truncate text-[13px] font-semibold text-primary">{nextName ?? "Last exercise"}</span>
