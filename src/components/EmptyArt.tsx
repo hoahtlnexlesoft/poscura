@@ -175,9 +175,9 @@ export function FirstScanArt({ className }: { className?: string }) {
       <rect x="40" y="108.5" width="150" height="3" rx="1.5" fill={`url(#${id}-beam)`} />
 
       {/* scan corners */}
-      <g stroke="#22d3ee" strokeWidth="3.4" strokeLinecap="round" fill="none">
-        <path d="M44 34V18h16" /><path d="M146 18h16v16" />
-        <path d="M162 132v16h-16" /><path d="M60 148H44v-16" />
+      <g stroke={`url(#${id}-brand)`} strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" fill="none">
+        <path d="M44 38V28a10 10 0 0 1 10-10h8" /><path d="M144 18h8a10 10 0 0 1 10 10v10" />
+        <path d="M162 128v10a10 10 0 0 1-10 10h-8" /><path d="M62 148h-8a10 10 0 0 1-10-10v-10" />
       </g>
     </svg>
   );
