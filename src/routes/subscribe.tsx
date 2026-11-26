@@ -22,9 +22,10 @@ const ICONS = { freemium: Zap, individual: User, family: Users } as const;
 const vnd = (n: number) => `${n.toLocaleString("vi-VN")}đ`;
 
 /* the bar at the bottom: actions stay in reach while the details scroll */
-function Actions({ children }: { children: React.ReactNode }) {
+function Actions({ children, note }: { children: React.ReactNode; note?: React.ReactNode }) {
   return (
     <div className="sticky bottom-0 z-20 -mx-4 mt-auto border-t border-white/[0.06] bg-background/90 px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3 backdrop-blur-xl land:static land:mx-0 land:mt-2 land:border-0 land:bg-transparent land:p-0 land:backdrop-blur-0">
+      {note}
       <div className="flex gap-3">{children}</div>
     </div>
   );
@@ -43,7 +44,7 @@ function Header({ title, onBack }: { title: string; onBack: () => void }) {
   );
 }
 
-/** Subscribe: plan summary, optional voucher, what will be charged. */
+/** Subscribe: the plan on one side (what you get), the order on the other (voucher, total, confirm). */
 function SubscribePage() {
   const { plan: planId, cycle, novouchers } = Route.useSearch();
   const navigate = useNavigate();
@@ -55,6 +56,7 @@ function SubscribePage() {
   const [picking, setPicking] = useState(false);
   const discount = voucher ? Math.round(price * voucherRate(voucher)) : 0;
   const charged = price - discount;
+  const per = cycle === "annual" ? "year" : "month";
   useEffect(() => { window.scrollTo(0, 0); }, [picking]);
 
   if (picking) {
@@ -62,69 +64,95 @@ function SubscribePage() {
       onBack={() => setPicking(false)} onDone={(v) => { setVoucher(v); setPicking(false); }} />;
   }
 
+  const confirm = () => {
+    toast.success(`Subscribed to ${plan.name}`, { description: "Redirecting to secure payment…" });
+    navigate({ to: "/account", search: { tab: "plan" } });
+  };
+
   return (
     <div className="flex min-h-[calc(100dvh-40px)] flex-col desk:min-h-[calc(100dvh-80px)]">
       <Header title="Subscribe" onBack={goBack} />
       <div className="mx-auto flex w-full max-w-[640px] flex-1 flex-col gap-4 pt-3 land:grid land:max-w-none land:grid-cols-2 land:items-start land:gap-x-6 hinge-split">
-        {/* plan */}
-        <section className="relative overflow-hidden rounded-[24px] border border-white/[0.06] bg-card px-5 pb-6 pt-7 text-center">
-          <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[radial-gradient(60%_100%_at_50%_0%,color-mix(in_oklab,var(--color-primary)_22%,transparent),transparent_72%)]" />
-          <span className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary text-white shadow-[0_14px_34px_-12px] shadow-primary">
-            <Icon className="h-7 w-7" />
-          </span>
-          <h2 className="relative mt-4 text-[20px] font-semibold tracking-tight">Subscribe to {plan.name}</h2>
-          <div className="relative mt-1.5 text-[13px] text-muted-foreground">
-            <span className="font-semibold text-foreground">{formatVND(price)}</span> / {cycle === "annual" ? "year" : "month"} · {cycle === "annual" ? "Annual" : "Monthly"}
+
+        {/* ---------- the plan: what you're getting ---------- */}
+        <section className="relative overflow-hidden rounded-[26px] border border-white/[0.07] bg-gradient-to-b from-[#0f1c33] to-card p-6">
+          <div aria-hidden className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-primary/25 blur-3xl" />
+          <div aria-hidden className="pointer-events-none absolute -bottom-24 -left-10 h-48 w-48 rounded-full bg-secondary/15 blur-3xl" />
+          <div className="relative flex items-center gap-3">
+            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-secondary text-white shadow-[0_12px_30px_-12px] shadow-primary"><Icon className="h-6 w-6" /></span>
+            <div className="min-w-0">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Subscribe to</div>
+              <h2 className="text-[22px] font-semibold leading-tight tracking-tight">{plan.name}</h2>
+            </div>
+            <span className="ml-auto rounded-full bg-white/[0.06] px-2.5 py-1 text-[11.5px] font-semibold text-foreground/80 ring-1 ring-inset ring-white/10">{cycle === "annual" ? "Annual" : "Monthly"}</span>
           </div>
+          <div className="relative mt-6 flex items-baseline gap-1.5">
+            <span className="text-[34px] font-bold leading-none tracking-tight">{formatVND(price)}</span>
+            <span className="text-[14px] text-muted-foreground">/ {per}</span>
+          </div>
+          {plan.note && <p className="relative mt-1.5 text-[12.5px] text-muted-foreground">{plan.note}</p>}
+          <ul className="relative mt-6 space-y-3 border-t border-white/[0.07] pt-5">
+            {plan.features.map((f) => (
+              <li key={f} className="flex items-center gap-3 text-[14px]">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-success/15"><Check className="h-3 w-3 text-success" strokeWidth={3} /></span>{f}
+              </li>
+            ))}
+          </ul>
         </section>
 
-        <div className="flex flex-1 flex-col gap-4">
-        {/* voucher */}
-        <button onClick={() => setPicking(true)}
-          className="group flex w-full items-center gap-3 rounded-[20px] border border-white/[0.06] bg-card px-4 py-3.5 text-left transition hover:border-primary/30 hover:bg-white/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/12 text-primary ring-1 ring-inset ring-primary/20"><Ticket className="h-[18px] w-[18px]" /></span>
-          {voucher ? (
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-[14px] font-semibold">{voucher.name}</span>
-              <span className="mt-0.5 block text-[12px] text-success"><span className="font-mono font-semibold tracking-wider">{voucher.code}</span> · {voucher.off} applied</span>
-            </span>
-          ) : (
-            <span className="flex-1 text-[14px] font-medium">Select voucher</span>
-          )}
-          {voucher ? (
-            <span role="button" tabIndex={0} aria-label="Remove voucher" onClick={(e) => { e.stopPropagation(); setVoucher(null); }}
-              className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white/[0.08] hover:text-foreground"><X className="h-4 w-4" /></span>
-          ) : <ChevronRight className="h-5 w-5 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground" />}
-        </button>
+        {/* ---------- the order: voucher, payment details, confirm ---------- */}
+        <div className="flex flex-1 flex-col">
+          <section className="rounded-[26px] border border-white/[0.07] bg-card p-5">
+            <button onClick={() => setPicking(true)}
+              className={cn("group flex w-full items-center gap-3 rounded-[16px] border border-dashed px-3.5 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
+                voucher ? "border-success/40 bg-success/[0.06]" : "border-white/15 hover:border-primary/50 hover:bg-primary/[0.05]")}>
+              <Ticket className={cn("h-5 w-5 shrink-0", voucher ? "text-success" : "text-primary")} />
+              {voucher ? (
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[14px] font-semibold">{voucher.name}</span>
+                  <span className="mt-0.5 block text-[12px] text-success"><span className="font-mono font-semibold tracking-wider">{voucher.code}</span> · {voucher.off} applied</span>
+                </span>
+              ) : (
+                <span className="flex-1 text-[14px] font-medium">Select voucher</span>
+              )}
+              {voucher ? (
+                <span role="button" tabIndex={0} aria-label="Remove voucher" onClick={(e) => { e.stopPropagation(); setVoucher(null); }}
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white/[0.08] hover:text-foreground"><X className="h-4 w-4" /></span>
+              ) : <ChevronRight className="h-5 w-5 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground" />}
+            </button>
 
-        {/* payment details */}
-        <section>
-          <h3 className="mb-2 px-1 text-[13px] font-semibold text-muted-foreground">Payment Details</h3>
-          <div className="overflow-hidden rounded-[20px] border border-white/[0.06] bg-card">
-            <div className="flex items-center justify-between px-4 py-3.5 text-[14px]">
-              <span className="text-muted-foreground">Subscription</span>
-              <span className="font-medium tabular-nums">{vnd(price)}</span>
-            </div>
-            {voucher && (
-              <div className="flex items-center justify-between border-t border-white/[0.05] px-4 py-3.5 text-[14px] animate-in fade-in duration-300">
-                <span className="text-muted-foreground">Voucher ({voucher.off.replace(/\s*OFF/i, "")})</span>
-                <span className="font-medium tabular-nums text-success">−{vnd(discount)}</span>
+            <h3 className="mt-6 text-[13px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Payment Details</h3>
+            <dl className="mt-3 space-y-3 text-[14px]">
+              <div className="flex items-center justify-between">
+                <dt className="text-muted-foreground">Subscription</dt>
+                <dd className="font-medium tabular-nums">{vnd(price)}</dd>
               </div>
-            )}
-            <div className="flex items-center justify-between bg-gradient-to-r from-primary/25 via-primary/10 to-secondary/20 px-4 py-4">
+              {voucher && (
+                <div className="flex items-center justify-between animate-in fade-in duration-300">
+                  <dt className="text-muted-foreground">Voucher ({voucher.off.replace(/\s*OFF/i, "")})</dt>
+                  <dd className="font-medium tabular-nums text-success">−{vnd(discount)}</dd>
+                </div>
+              )}
+            </dl>
+            <div className="mt-4 flex items-end justify-between border-t border-white/[0.07] pt-4">
               <span className="text-[14px] font-semibold">Charged amount</span>
-              <span key={charged} className="text-[18px] font-bold tabular-nums animate-in fade-in slide-in-from-bottom-1 duration-300">{vnd(charged)}</span>
+              <span key={charged} className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-[26px] font-bold leading-none tracking-tight text-transparent tabular-nums animate-in fade-in slide-in-from-bottom-1 duration-300">{vnd(charged)}</span>
             </div>
-          </div>
-        </section>
 
-      <Actions>
-        <button onClick={goBack} className={outlineBtn}>Cancel</button>
-        <button className={primaryBtn} onClick={() => {
-          toast.success(`Subscribed to ${plan.name}`, { description: "Redirecting to secure payment…" });
-          navigate({ to: "/account", search: { tab: "plan" } });
-        }}>Confirm</button>
-      </Actions>
+            {/* wide screens: the actions finish the order card */}
+            <div className="mt-6 hidden flex-col gap-2 land:flex">
+              <button className={cn(primaryBtn, "flex-none")} onClick={confirm}>Confirm</button>
+              <button onClick={goBack} className="h-11 rounded-2xl text-[14px] font-semibold text-muted-foreground transition hover:bg-white/[0.05] hover:text-foreground">Cancel</button>
+            </div>
+          </section>
+
+          {/* phones: actions stay at the bottom of the screen */}
+          <div className="sticky bottom-0 z-20 mt-auto pt-4 land:hidden">
+            <Actions>
+              <button onClick={goBack} className={outlineBtn}>Cancel</button>
+              <button className={primaryBtn} onClick={confirm}>Confirm</button>
+            </Actions>
+          </div>
         </div>
       </div>
     </div>
@@ -139,11 +167,12 @@ function VoucherPicker({ planId, empty, selected, onBack, onDone }: {
   const [pick, setPick] = useState<Voucher | null>(selected);
   const [code, setCode] = useState("");
   const [err, setErr] = useState("");
+  const [flash, setFlash] = useState<string | null>(null);
   const apply = () => {
     const v = VOUCHERS.find((x) => x.code.toLowerCase() === code.trim().toLowerCase());
     if (!v || v.status !== "Active") return setErr("This code isn't valid or has expired.");
     if (!voucherFits(v, planId)) return setErr("This code can't be used with this plan.");
-    setErr(""); setPick(v); setCode(""); toast.success(`${v.code} applied`);
+    setErr(""); setPick(v); setCode(""); setFlash(v.code); window.setTimeout(() => setFlash(null), 1200);
   };
 
   return (
@@ -162,6 +191,7 @@ function VoucherPicker({ planId, empty, selected, onBack, onDone }: {
                     <button role="radio" aria-checked={on} disabled={!ok} onClick={() => setPick(on ? null : v)}
                       className={cn("flex w-full items-stretch overflow-hidden rounded-[16px] text-left ring-1 ring-inset transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
                         on ? "bg-primary/[0.08] ring-primary/60" : "bg-white/[0.03] ring-white/[0.07] enabled:hover:ring-white/20",
+                        flash === v.code && "plan-flash",
                         !ok && "cursor-not-allowed opacity-50")}>
                       <span className="flex w-[76px] shrink-0 flex-col items-center justify-center bg-gradient-to-br from-primary/30 via-primary/15 to-secondary/25 py-3">
                         <span className="text-[20px] font-bold leading-none">{v.off.replace(/\s*OFF/i, "")}</span>
@@ -209,8 +239,13 @@ function VoucherPicker({ planId, empty, selected, onBack, onDone }: {
             {err || "Voucher codes are case-insensitive. Contact support if your code isn't working"}
           </p>
         </section>
-      <Actions>
-        <button className={primaryBtn} onClick={() => onDone(pick)}>OK</button>
+      {/* the line above the button says what it will do, so choosing a card reads as applied */}
+      <Actions note={pick && (
+        <p key={pick.code} className="flex items-center justify-center gap-1.5 text-[13px] text-success mb-3 animate-in fade-in slide-in-from-bottom-1 duration-300 land:justify-start land:px-1">
+          <Check className="h-4 w-4" strokeWidth={3} /><span className="font-mono font-semibold tracking-wider">{pick.code}</span> · {pick.off.replace(/\s*OFF/i, "")} off applied
+        </p>
+      )}>
+        <button className={primaryBtn} onClick={() => onDone(pick)}>{pick ? "Use voucher" : "OK"}</button>
       </Actions>
         </div>
       </div>
