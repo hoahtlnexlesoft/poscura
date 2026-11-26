@@ -353,7 +353,7 @@ export function PlanTab({ plan, noAddons = false }: { plan: PlanKind; noAddons?:
               </div>
               <div className="mt-0.5 text-[13px] text-muted-foreground">
                 {plan === "free" && "Free forever. No billing."}
-                {plan === "individual" && <><span className="font-semibold text-foreground">{vnd(299000)}</span> / month · Visa •••• 4417</>}
+                {plan === "individual" && <><span className="font-semibold text-foreground">{vnd(299000)}</span> / month</>}
               </div>
             </div>
             {plan === "individual" ? (
