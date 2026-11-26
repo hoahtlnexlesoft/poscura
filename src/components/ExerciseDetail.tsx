@@ -321,9 +321,10 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
       </section>
       </>)}
 
-      {/* ---------- move through the exercises in order, like the session screen's Back / Next ---------- */}
+      {/* ---------- move through the exercises in order: Back / Next, as on the session screen ---------- */}
       {(onPrev || onNext) && (
-        <nav className="flex items-center justify-between rounded-[18px] border border-white/[0.06] bg-card px-2 py-1.5 land:col-start-2">
+        /* a bar along the bottom of the screen, like the session screen; stays in view while scrolling */
+        <nav className="sticky bottom-0 z-30 -mx-4 -mb-6 flex items-center justify-between border-t border-white/10 bg-[#0b1220]/95 px-2 py-2 pb-[max(8px,env(safe-area-inset-bottom))] backdrop-blur-xl land:col-span-2 desk:-mx-8 max-[699px]:desk:-mx-4">
           <button onClick={onPrev ?? onClose} className="inline-flex h-10 items-center gap-1 rounded-full px-3 text-[14.5px] font-medium text-primary transition hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
             <ChevronLeft className="h-5 w-5" /> Back
           </button>
