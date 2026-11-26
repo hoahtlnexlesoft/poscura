@@ -305,7 +305,7 @@ export function PlanTab({ plan, noAddons = false }: { plan: PlanKind; noAddons?:
             </ul>
           ) : (
             /* nothing bought yet: one clear way in, instead of an empty list */
-            <div className="flex flex-col items-center rounded-[16px] border border-dashed border-white/[0.1] bg-white/[0.015] px-5 py-6 text-center">
+            <div className="flex flex-col items-center px-5 pb-2 pt-3 text-center">
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/12 text-primary ring-1 ring-inset ring-primary/25"><PackagePlus className="h-5 w-5" /></span>
               <div className="mt-3 text-[14px] font-semibold">No add-ons yet</div>
               <p className="mt-1 max-w-[260px] text-[12.5px] leading-relaxed text-muted-foreground">Need more monitoring time? Add extra hours to your plan anytime.</p>
@@ -412,7 +412,7 @@ export function PlanTab({ plan, noAddons = false }: { plan: PlanKind; noAddons?:
             </ul>
           ) : (
             /* nothing bought yet: one clear way in, instead of an empty list */
-            <div className="flex flex-col items-center rounded-[16px] border border-dashed border-white/[0.1] bg-white/[0.015] px-5 py-6 text-center">
+            <div className="flex flex-col items-center px-5 pb-2 pt-3 text-center">
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/12 text-primary ring-1 ring-inset ring-primary/25"><PackagePlus className="h-5 w-5" /></span>
               <div className="mt-3 text-[14px] font-semibold">No add-ons yet</div>
               <p className="mt-1 max-w-[260px] text-[12.5px] leading-relaxed text-muted-foreground">Need more monitoring time? Add extra hours to your plan anytime.</p>
