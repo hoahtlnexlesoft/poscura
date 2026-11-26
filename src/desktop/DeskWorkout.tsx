@@ -99,8 +99,9 @@ function TodaysSessions({ onExercise, onStart }: { onExercise: (n: string) => vo
                 </div>
               </button>
               <button onClick={() => (done ? onExercise(w.name) : onStart(w.name))} aria-label={done ? `View ${w.name}` : `Start ${w.name}`}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/12 text-primary ring-1 ring-inset ring-primary/30 transition hover:bg-primary hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
-                {done ? <Eye className="h-4 w-4" /> : <Play className="ml-0.5 h-3.5 w-3.5 fill-current" />}
+                className="inline-flex h-10 shrink-0 items-center gap-2 rounded-xl border border-white/[0.1] bg-background px-4 text-[13px] font-semibold transition hover:border-primary/50 hover:text-primary active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+                {done ? <Eye className="h-4 w-4" /> : <Play className="h-3.5 w-3.5 fill-current" />}
+                {done ? "View" : "Start"}
               </button>
             </li>
           );
