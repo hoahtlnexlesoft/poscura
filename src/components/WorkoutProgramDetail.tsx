@@ -102,7 +102,7 @@ export function WorkoutProgramDetail({ onClose, onStartSession }: Props) {
     const i = exerciseList.findIndex((x) => x.name === selectedExercise.name);
     const prev = exerciseList[i - 1], nxt = exerciseList[i + 1];
     return <ExerciseDetail key={selectedExercise.name} exerciseName={selectedExercise.name} badge={selectedExercise.badge} onClose={() => setSelectedExercise(null)}
-      onPrev={prev ? () => setSelectedExercise(prev) : undefined} onNext={nxt ? () => setSelectedExercise(nxt) : undefined} />;
+      onPrev={prev ? () => setSelectedExercise(prev) : undefined} onNext={nxt ? () => setSelectedExercise(nxt) : undefined} prevName={prev?.name} nextName={nxt?.name} />;
   }
 
   const next = todaySessions[0];

@@ -102,7 +102,7 @@ function WorkoutPage() {
     const done = w ? w.done >= w.sessions : true;
     const pw = wi > 0 ? TODAYS_WORKOUTS[wi - 1] : undefined, nw = wi >= 0 ? TODAYS_WORKOUTS[wi + 1] : undefined;
     return <ExerciseDetail key={`${view.name}|${schedule ?? ""}`} exerciseName={view.name} badge={done ? "Completed" : "Main"} sessionLabel={w ? `${w.done}/${w.sessions}` : "2/2"} onClose={toList} onStart={() => setView({ kind: "intro", name: view.name })} scheduled={schedule !== "none"}
-      onPrev={pw ? () => setView({ kind: "exercise", name: pw.name }) : undefined} onNext={nw ? () => setView({ kind: "exercise", name: nw.name }) : undefined} />;
+      onPrev={pw ? () => setView({ kind: "exercise", name: pw.name }) : undefined} onNext={nw ? () => setView({ kind: "exercise", name: nw.name }) : undefined} prevName={pw?.name} nextName={nw?.name} />;
   }
   if (view.kind === "program") return <WorkoutProgramDetail onClose={() => setView({ kind: "list" })} onStartSession={(name) => setView({ kind: "intro", name })} />;
   if (desk) return <DeskWorkoutHome onProgram={() => setView({ kind: "program" })} onExercise={(name) => setView({ kind: "exercise", name })} onStart={(name) => setView({ kind: "intro", name })} />;

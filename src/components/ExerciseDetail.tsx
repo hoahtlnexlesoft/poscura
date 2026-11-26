@@ -31,6 +31,9 @@ interface Props {
   onClose: () => void;
   onPrev?: () => void;
   onNext?: () => void;
+  /** names of the neighbouring exercises, shown on Back / Next so it's clear where they go */
+  prevName?: string;
+  nextName?: string;
   /** start today's session of this exercise */
   onStart?: () => void;
   /** false when the exercise has no AI evaluation yet (never done): shows the plain detail layout */
@@ -82,7 +85,7 @@ function ShareToggle({ label, checked, onChange }: { label: string; checked: boo
   );
 }
 
-export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, onStart, evaluated = hasEvaluation(exerciseName), sessionLabel = "0/2", scheduled = true }: Props) {
+export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, prevName, nextName, onStart, evaluated = hasEvaluation(exerciseName), sessionLabel = "0/2", scheduled = true }: Props) {
   const [sched, setSched] = useState(scheduled);
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => { window.scrollTo(0, 0); }, []);
@@ -324,12 +327,22 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
       {(onPrev || onNext) && (
         /* floating capsule at the bottom centre: always in reach, covers almost nothing */
         <nav aria-label="Exercises" className="sticky bottom-4 z-30 mx-auto flex w-max items-center rounded-full border border-white/[0.1] bg-[#121a2a]/90 p-1 shadow-[0_18px_40px_-12px_rgba(0,0,0,.75)] backdrop-blur-xl land:col-start-2">
-          <button onClick={onPrev ?? onClose} className="inline-flex h-10 items-center gap-1 rounded-full pl-3 pr-4 text-[14px] font-semibold text-foreground/85 transition hover:bg-white/[0.07] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
-            <ChevronLeft className="h-[18px] w-[18px]" /> Back
+          <button onClick={onPrev ?? onClose} title={onPrev ? `Previous: ${prevName ?? ""}` : "Back to the list"}
+            className="inline-flex h-12 max-w-[200px] items-center gap-1.5 rounded-full pl-2.5 pr-4 text-left transition hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+            <ChevronLeft className="h-[18px] w-[18px] shrink-0 text-foreground/70" />
+            <span className="min-w-0">
+              <span className="block text-[10.5px] font-medium uppercase tracking-[0.12em] text-muted-foreground">{onPrev ? "Previous" : "Back"}</span>
+              <span className="block truncate text-[13px] font-semibold text-foreground/90">{onPrev ? prevName : "All exercises"}</span>
+            </span>
           </button>
-          <span aria-hidden className="mx-0.5 h-5 w-px bg-white/[0.12]" />
-          <button onClick={onNext} disabled={!onNext} className="inline-flex h-10 items-center gap-1 rounded-full pl-4 pr-3 text-[14px] font-semibold text-primary transition enabled:hover:bg-primary/10 disabled:text-muted-foreground disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
-            Next <ChevronRight className="h-[18px] w-[18px]" />
+          <span aria-hidden className="mx-0.5 h-7 w-px bg-white/[0.12]" />
+          <button onClick={onNext} disabled={!onNext} title={nextName ? `Next: ${nextName}` : undefined}
+            className="inline-flex h-12 max-w-[200px] items-center gap-1.5 rounded-full pl-4 pr-2.5 text-right transition enabled:hover:bg-primary/10 disabled:opacity-45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+            <span className="min-w-0">
+              <span className="block text-[10.5px] font-medium uppercase tracking-[0.12em] text-muted-foreground">Next</span>
+              <span className="block truncate text-[13px] font-semibold text-primary">{nextName ?? "Last exercise"}</span>
+            </span>
+            <ChevronRight className="h-[18px] w-[18px] shrink-0 text-primary" />
           </button>
         </nav>
       )}
