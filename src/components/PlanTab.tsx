@@ -327,7 +327,7 @@ export function PlanTab({ plan, noAddons = false }: { plan: PlanKind; noAddons?:
         </Card>
         </div>
         {/* wide screens: benefits alone on the right */}
-        <div className="hidden fold:flex fold:flex-col fold:gap-4 fold:sticky fold:top-4">
+        <div className="hidden fold:flex fold:flex-col fold:gap-4">
           <Card id="member-benefits" title="Professional benefits" className="scroll-mt-20">
             <ul className="grid gap-y-3">
               {BENEFITS.map((b) => (
@@ -433,7 +433,7 @@ export function PlanTab({ plan, noAddons = false }: { plan: PlanKind; noAddons?:
           {VOUCHERS.length > 2 && <MoreButton count={VOUCHERS.length} onClick={() => setVouOpen(true)} />}
         </Card>
         </div>
-      <section id="upgrade-your-plan" className="mt-4 scroll-mt-20 fold:mt-0 fold:sticky fold:top-4 rounded-[22px] border border-white/[0.06] bg-card p-5">
+      <section id="upgrade-your-plan" className="mt-4 scroll-mt-20 fold:mt-0 rounded-[22px] border border-white/[0.06] bg-card p-5">
         <h2 className="mb-4 text-center text-[17px] font-semibold tracking-tight">Upgrade your plan</h2>
         <PlanPicker currentId={plan === "free" ? "freemium" : plan === "individual" ? "individual" : "none"} />
       </section>
