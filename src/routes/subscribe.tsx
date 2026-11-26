@@ -208,8 +208,8 @@ function VoucherPicker({ open, planId, price, empty, selected, onClose, onDone }
                   <li key={v.code}>
                     <button role="radio" aria-checked={on} disabled={!ok} onClick={() => setPick(on ? null : v)}
                       className={cn("group relative flex w-full items-stretch overflow-hidden rounded-[18px] text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
-                        on ? "bg-gradient-to-r from-primary/[0.16] to-secondary/[0.06] ring-[1.5px] ring-inset ring-primary shadow-[0_12px_30px_-16px] shadow-primary"
-                          : "bg-white/[0.035] ring-1 ring-inset ring-white/[0.07] enabled:hover:bg-white/[0.05] enabled:hover:ring-white/20",
+                        on ? "bg-gradient-to-r from-primary/[0.16] to-secondary/[0.06] shadow-[0_12px_30px_-16px] shadow-primary"
+                          : "bg-white/[0.035] enabled:hover:bg-white/[0.05]",
                         flash === v.code && "plan-flash",
                         !ok && "cursor-not-allowed opacity-45 saturate-50")}>
                       {/* ticket stub */}
@@ -219,10 +219,7 @@ function VoucherPicker({ open, planId, price, empty, selected, onClose, onDone }
                         <span className="mt-1 text-[9.5px] font-semibold uppercase tracking-[0.2em] opacity-80">Off</span>
                       </span>
                       {/* perforation with notches */}
-                      <span aria-hidden className="relative w-0 border-l-[1.5px] border-dashed border-white/15">
-                        <span className="absolute -left-[8px] -top-[8px] h-4 w-4 rounded-full bg-[#0e1524]" />
-                        <span className="absolute -bottom-[8px] -left-[8px] h-4 w-4 rounded-full bg-[#0e1524]" />
-                      </span>
+                      <span aria-hidden className="relative w-0 border-l-[1.5px] border-dashed border-white/15" />
                       <span className="min-w-0 flex-1 px-4 py-3">
                         <span className="block truncate text-[14px] font-semibold">{v.name}</span>
                         <span className="mt-1 inline-block rounded-md bg-white/[0.06] px-1.5 py-0.5 font-mono text-[11.5px] font-semibold tracking-wider text-foreground/80">{v.code}</span>
@@ -233,6 +230,9 @@ function VoucherPicker({ open, planId, price, empty, selected, onClose, onDone }
                           {on && <Check className="h-3.5 w-3.5 text-white" strokeWidth={3} />}
                         </span>
                       </span>
+                      {/* outline drawn above the stub so it runs unbroken round the whole ticket */}
+                      <span aria-hidden className={cn("pointer-events-none absolute inset-0 z-10 rounded-[18px] transition",
+                        on ? "ring-[1.5px] ring-inset ring-primary" : "ring-1 ring-inset ring-white/[0.07] group-enabled:group-hover:ring-white/20")} />
                     </button>
                   </li>
                 );
