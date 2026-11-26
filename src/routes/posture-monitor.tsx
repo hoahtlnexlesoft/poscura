@@ -7,6 +7,8 @@ import { SessionReport } from "@/components/SessionReport";
 import { MonitoringTimeLeft } from "@/components/MonitoringTimeLeft";
 import { CameraSettingDialog } from "@/components/CameraSettingDialog";
 import { LivePostureView } from "@/components/LivePostureView";
+import { useDesk } from "@/desktop/useDesk";
+import { DeskPostureMonitor } from "@/desktop/DeskPostureMonitor";
 import { useFitFrame } from "@/hooks/useFitFrame";
 
 export const Route = createFileRoute("/posture-monitor")({
@@ -19,6 +21,13 @@ export const Route = createFileRoute("/posture-monitor")({
 const SESSION_SECONDS = 40 * 60;
 
 function PostureMonitor() {
+  const search = Route.useSearch() as { report?: string };
+  const desk = useDesk();
+  if (desk) return <DeskPostureMonitor initialReport={search.report === "1"} />;
+  return <MobilePostureMonitor />;
+}
+
+function MobilePostureMonitor() {
   const search = Route.useSearch() as { report?: string };
   const [running, setRunning] = useState(false);
   const startFooter = useRef<HTMLDivElement>(null);

@@ -1,5 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
+import { useDesk } from "@/desktop/useDesk";
+import { DeskWorkoutHome, DeskProgram } from "@/desktop/DeskWorkout";
 import { useEffect, useState } from "react";
 import { Play, Calendar, Dumbbell, Clock, CheckCircle2, XCircle, AlertTriangle, Eye, ChevronRight } from "lucide-react";
 import { WorkoutSession } from "@/components/WorkoutSession";
@@ -40,6 +42,7 @@ type View =
 
 function WorkoutPage() {
   const { session, exercise } = Route.useSearch();
+  const desk = useDesk();
   const [view, setView] = useState<View>(session ? { kind: "intro", name: session } : exercise ? { kind: "exercise", name: exercise } : { kind: "list" });
   // deep links (?exercise= / ?session=) also work when the page is already open
   useEffect(() => {
@@ -92,6 +95,8 @@ function WorkoutPage() {
     const done = w ? w.done >= w.sessions : true;
     return <ExerciseDetail exerciseName={view.name} badge={done ? "Completed" : "Main"} sessionLabel={w ? `${w.done}/${w.sessions}` : "2/2"} onClose={toList} onStart={() => setView({ kind: "intro", name: view.name })} />;
   }
+  if (desk && view.kind === "program") return <DeskProgram onBack={() => setView({ kind: "list" })} />;
+  if (desk) return <DeskWorkoutHome onProgram={() => setView({ kind: "program" })} />;
   if (view.kind === "program") return <WorkoutProgramDetail onClose={() => setView({ kind: "list" })} onStartSession={(name) => setView({ kind: "intro", name })} />;
 
   return (
