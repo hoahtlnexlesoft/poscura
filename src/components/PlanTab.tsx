@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import {
-  ChevronRight, Star, CircleCheck, Check, Ticket, Plus, Copy, X,
+  ChevronRight, Star, CircleCheck, Check, Ticket, Plus, Copy, X, Clock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PlanPicker } from "@/components/PlanPicker";
@@ -236,8 +236,8 @@ function BusinessPlanCard() {
 }
 
 /* ---------- the tab ---------- */
-export function PlanTab({ plan }: { plan: PlanKind }) {
-  const [addons, setAddons] = useState<AddOn[]>([
+export function PlanTab({ plan, noAddons = false }: { plan: PlanKind; noAddons?: boolean }) {
+  const [addons, setAddons] = useState<AddOn[]>(noAddons ? [] : [
     { id: "h1", name: "Heavy Monitoring", hours: "+40 hours / month", price: 299000, date: "Jun 24, 2026" },
     { id: "l1", name: "Light Monitoring", hours: "+10 hours / month", price: 119000, date: "May 25, 2026" },
   ]);
@@ -287,7 +287,7 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
           </div>
           <p className="mt-3 text-[12px] text-muted-foreground">Resets on Nov 26, 2026.</p>
         </Card>
-        <Card title="Add-ons" action={<button onClick={() => setBrowse(true)} className={outlineBtn}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button>}>
+        <Card title="Add-ons" action={addons.length ? <button onClick={() => setBrowse(true)} className={outlineBtn}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button> : undefined}>
           {addons.length ? (
             <ul className="space-y-2">
               {addons.map((a) => (
@@ -303,7 +303,15 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
                 </li>
               ))}
             </ul>
-          ) : <p className="text-[13px] text-muted-foreground">No add-ons yet.</p>}
+          ) : (
+            /* nothing bought yet: one clear way in, instead of an empty list */
+            <div className="flex flex-col items-center rounded-[16px] border border-dashed border-white/[0.1] bg-white/[0.015] px-5 py-6 text-center">
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/12 text-primary ring-1 ring-inset ring-primary/25"><Clock className="h-5 w-5" /></span>
+              <div className="mt-3 text-[14px] font-semibold">No add-ons yet</div>
+              <p className="mt-1 max-w-[260px] text-[12.5px] leading-relaxed text-muted-foreground">Need more monitoring time? Add extra hours to your plan anytime.</p>
+              <button onClick={() => setBrowse(true)} className={cn(outlineBtn, "mt-4")}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button>
+            </div>
+          )}
         </Card>
         <Card title="Subscription history">
           <ul className="space-y-2">
@@ -386,7 +394,7 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
           </div>
           <p className="mt-3 text-[12px] text-muted-foreground">Resets on {plan === "free" ? "Dec 17, 2026" : "Nov 26, 2026"}.</p>
         </Card>
-        <Card title="Add-ons" action={<button onClick={() => setBrowse(true)} className={outlineBtn}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button>}>
+        <Card title="Add-ons" action={addons.length ? <button onClick={() => setBrowse(true)} className={outlineBtn}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button> : undefined}>
           {addons.length ? (
             <ul className="space-y-2">
               {addons.map((a) => (
@@ -402,7 +410,15 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
                 </li>
               ))}
             </ul>
-          ) : <p className="text-[13px] text-muted-foreground">No add-ons yet.</p>}
+          ) : (
+            /* nothing bought yet: one clear way in, instead of an empty list */
+            <div className="flex flex-col items-center rounded-[16px] border border-dashed border-white/[0.1] bg-white/[0.015] px-5 py-6 text-center">
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/12 text-primary ring-1 ring-inset ring-primary/25"><Clock className="h-5 w-5" /></span>
+              <div className="mt-3 text-[14px] font-semibold">No add-ons yet</div>
+              <p className="mt-1 max-w-[260px] text-[12.5px] leading-relaxed text-muted-foreground">Need more monitoring time? Add extra hours to your plan anytime.</p>
+              <button onClick={() => setBrowse(true)} className={cn(outlineBtn, "mt-4")}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button>
+            </div>
+          )}
         </Card>
         <Card title="Subscription history">
           <ul className="space-y-2">
