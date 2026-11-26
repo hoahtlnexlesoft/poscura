@@ -169,8 +169,25 @@
     set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
   };
   var state = store.get("pv.v2", { dev:"ip16pm", path:"/" });
+  // a shared link opens that screen on that device: /?device=zfold#/account?tab=plan
+  (function () {
+    var q = new URLSearchParams(location.search).get("device");
+    if (q) state.dev = q;
+    if (location.hash.length > 1) state.path = decodeURIComponent(location.hash.slice(1));
+  })();
   if (!DEVICES.some(function (d) { return d.id === state.dev; })) state.dev = "ip16pm";
-  function save() { store.set("pv.v2", state); }
+  function save() { store.set("pv.v2", state); syncUrl(); }
+  // address bar + tab title follow the screen being viewed (replaceState: no history spam, no hashchange)
+  var NAMES = { "/login":"Sign in", "/onboarding":"Onboarding", "/":"Dashboard", "/posture-monitor":"Posture Monitor", "/workout":"Workout", "/community":"Community", "/notifications":"Notifications", "/discomfort":"Log Discomfort", "/account":"My Account", "/checkout":"Checkout", "/settings":"Settings", "/support":"FAQs", "/support/report":"Report a problem", "/support/tickets":"My tickets", "/how-it-works":"How Poscura Works" };
+  function syncUrl() {
+    var p = state.path || "/";
+    var sc = SCREENS.filter(function (x) { return x.path === p; })[0];
+    var base = p.split("?")[0];
+    var name = sc ? sc.label : (NAMES[base] || (base.indexOf("/body-part") === 0 ? "Body part" : base.indexOf("/support/tickets/") === 0 ? "Ticket" : base));
+    var url = location.pathname + "?device=" + encodeURIComponent(state.dev) + "#" + p;
+    if (location.pathname + location.search + location.hash !== url) { try { history.replaceState(null, "", url); } catch (e) {} }
+    document.title = name + " · Poscura";
+  }
   // device as currently shown (landscape swaps width/height and turns the fold line)
   function view() {
     var d = dev();
@@ -456,6 +473,11 @@
     state.orient = b.dataset.o; save(); renderDevices(); buildPhone(); go(state.path, true);
   });
   document.getElementById("reload").addEventListener("click", function () { go(state.path, true); });
+  // typing a route into the address bar opens it
+  window.addEventListener("hashchange", function () {
+    var p = decodeURIComponent(location.hash.slice(1) || "/");
+    if (norm(p) !== norm(state.path)) go(p);
+  });
   window.addEventListener("resize", layout);
 
   renderDevices();
