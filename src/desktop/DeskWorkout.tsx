@@ -37,7 +37,7 @@ export function DeskWorkoutHome({ empty, noHistory, onProgram, onExercise, onSta
     <Page>
       <PageHead title="Workout" subtitle="Personalized workout plans" />
       <div className="grid grid-cols-[minmax(0,1fr)_400px] items-start gap-6 max-[1099px]:grid-cols-1">
-      {empty ? <NoWorkoutsToday className="rounded-[24px] py-14" /> : <TodaysSessions onExercise={onExercise} onStart={onStart} />}
+      {empty ? <NoWorkoutsToday className="rounded-[24px] min-h-[320px]" /> : <TodaysSessions onExercise={onExercise} onStart={onStart} />}
       <div className="space-y-6">
         <Panel title="Current Program" icon={<CalendarDays className="h-4 w-4 text-primary" />}
           action={<button onClick={onProgram} className={btn.ghost}>Details <ChevronRight className="h-4 w-4" /></button>}>

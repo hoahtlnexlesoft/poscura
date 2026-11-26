@@ -129,7 +129,7 @@ function WorkoutPage() {
         <p className="text-xs text-muted-foreground mt-0.5">Personalized routines from your posture data.</p>
       </div>
 
-      {empty ? <NoWorkoutsToday className="fold:col-start-1 fold:row-start-2" /> : (
+      {empty ? <NoWorkoutsToday className="fold:col-start-1 fold:row-start-2 fold:min-h-[340px]" /> : (
       <section className="glass-card p-4 space-y-3 fold:col-start-1 fold:row-start-2">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           <div className="flex items-center gap-2">
