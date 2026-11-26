@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
   ChevronRight, Star, CircleCheck, Check, Ticket, Plus, Copy, X, PackagePlus,
@@ -241,7 +242,7 @@ export function PlanTab({ plan, noAddons = false }: { plan: PlanKind; noAddons?:
     { id: "h1", name: "Heavy Monitoring", hours: "+40 hours / month", price: 299000, date: "Jun 24, 2026" },
     { id: "l1", name: "Light Monitoring", hours: "+10 hours / month", price: 119000, date: "May 25, 2026" },
   ]);
-  const [browse, setBrowse] = useState(false);
+  const navigate = useNavigate();
   const [histOpen, setHistOpen] = useState(false);
   const [vouOpen, setVouOpen] = useState(false);
   const [vf, setVf] = useState<VFilter>("All");
@@ -287,7 +288,7 @@ export function PlanTab({ plan, noAddons = false }: { plan: PlanKind; noAddons?:
           </div>
           <p className="mt-3 text-[12px] text-muted-foreground">Resets on Nov 26, 2026.</p>
         </Card>
-        <Card title="Add-ons" action={<button onClick={() => setBrowse(true)} className={outlineBtn}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button>}>
+        <Card title="Add-ons" action={<button onClick={() => navigate({ to: "/addons" })} className={outlineBtn}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button>}>
           {addons.length ? (
             <ul className="space-y-2">
               {addons.map((a) => (
@@ -395,7 +396,7 @@ export function PlanTab({ plan, noAddons = false }: { plan: PlanKind; noAddons?:
           </div>
           <p className="mt-3 text-[12px] text-muted-foreground">Resets on {plan === "free" ? "Dec 17, 2026" : "Nov 26, 2026"}.</p>
         </Card>
-        <Card title="Add-ons" action={<button onClick={() => setBrowse(true)} className={outlineBtn}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button>}>
+        <Card title="Add-ons" action={<button onClick={() => navigate({ to: "/addons" })} className={outlineBtn}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button>}>
           {addons.length ? (
             <ul className="space-y-2">
               {addons.map((a) => (
@@ -453,31 +454,6 @@ export function PlanTab({ plan, noAddons = false }: { plan: PlanKind; noAddons?:
           : <p className="py-10 text-center text-[13px] text-muted-foreground">No {vf.toLowerCase()} vouchers.</p>}
       </ListModal>
 
-      <Dialog open={browse} onOpenChange={setBrowse}>
-        <DialogContent className="max-w-sm rounded-[22px]">
-          <DialogHeader>
-            <DialogTitle>Browse add-ons</DialogTitle>
-            <DialogDescription>Extra monitoring hours on top of your plan, renewed monthly.</DialogDescription>
-          </DialogHeader>
-          <ul className="space-y-2">
-            {ADDON_SHOP.map((a) => (
-              <li key={a.id} className="flex items-center justify-between gap-3 rounded-[16px] border border-white/[0.08] p-3.5">
-                <div>
-                  <div className="text-[14px] font-semibold">{a.name}</div>
-                  <div className="text-[12px] text-muted-foreground">{a.hours} · {vnd(a.price)}</div>
-                </div>
-                <button className={gradBtn} onClick={() => {
-                  setAddons((xs) => [{ id: `${a.id}${Date.now()}`, name: a.name, hours: a.hours, price: a.price, date: "Nov 25, 2026" }, ...xs]);
-                  setBrowse(false); toast.success(`${a.name} added`);
-                }}>Add</button>
-              </li>
-            ))}
-          </ul>
-          <DialogFooter>
-            <button onClick={() => setBrowse(false)} className={outlineBtn}><X className="h-3.5 w-3.5" /> Close</button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }

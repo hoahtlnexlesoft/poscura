@@ -6,13 +6,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@
 import { TODAYS_WORKOUTS, TODAY_TIME, PROGRESS_ORDER } from "@/lib/todays-workouts";
 import { cn } from "@/lib/utils";
 import { Panel, Eyebrow, btn, Page } from "./ui";
+import { FirstScan } from "@/components/FirstScan";
 import { SegGauge } from "./SegGauge";
 import { Bust, BustLegend } from "./Bust";
 
 const progressDone = TODAYS_WORKOUTS.reduce((a, w) => a + w.programDone, 0);
 const progressTotal = TODAYS_WORKOUTS.reduce((a, w) => a + w.programTotal, 0);
 
-export function DeskDashboard({ empty }: { empty?: boolean }) {
+export function DeskDashboard({ empty, fresh }: { empty?: boolean; fresh?: boolean }) {
+  if (fresh) return <Page><FirstScan /></Page>;
   return (
     <Page className="grid grid-cols-[minmax(0,1fr)_380px] items-start gap-6 max-[1099px]:grid-cols-1">
       <div className="space-y-6">

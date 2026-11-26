@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccountRouteImport } from './routes/account'
+import { Route as AddonsRouteImport } from './routes/addons'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CommunityRouteImport } from './routes/community'
 import { Route as DiscomfortRouteImport } from './routes/discomfort'
@@ -38,6 +39,11 @@ const IndexRoute = IndexRouteImport.update({
 const AccountRoute = AccountRouteImport.update({
   id: '/account',
   path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AddonsRoute = AddonsRouteImport.update({
+  id: '/addons',
+  path: '/addons',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -134,6 +140,7 @@ const SupportTicketsIdRoute = SupportTicketsIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/addons': typeof AddonsRoute
   '/checkout': typeof CheckoutRoute
   '/community': typeof CommunityRoute
   '/discomfort': typeof DiscomfortRoute
@@ -156,6 +163,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/addons': typeof AddonsRoute
   '/checkout': typeof CheckoutRoute
   '/community': typeof CommunityRoute
   '/discomfort': typeof DiscomfortRoute
@@ -177,6 +185,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/addons': typeof AddonsRoute
   '/checkout': typeof CheckoutRoute
   '/community': typeof CommunityRoute
   '/discomfort': typeof DiscomfortRoute
@@ -201,6 +210,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/account'
+    | '/addons'
     | '/checkout'
     | '/community'
     | '/discomfort'
@@ -223,6 +233,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/account'
+    | '/addons'
     | '/checkout'
     | '/community'
     | '/discomfort'
@@ -243,6 +254,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/account'
+    | '/addons'
     | '/checkout'
     | '/community'
     | '/discomfort'
@@ -266,6 +278,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountRoute: typeof AccountRoute
+  AddonsRoute: typeof AddonsRoute
   CheckoutRoute: typeof CheckoutRoute
   CommunityRoute: typeof CommunityRoute
   DiscomfortRoute: typeof DiscomfortRoute
@@ -295,6 +308,13 @@ declare module '@tanstack/react-router' {
       path: '/account'
       fullPath: '/account'
       preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/addons': {
+      id: '/addons'
+      path: '/addons'
+      fullPath: '/addons'
+      preLoaderRoute: typeof AddonsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout': {
@@ -458,6 +478,7 @@ const SupportRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRoute: AccountRoute,
+  AddonsRoute: AddonsRoute,
   CheckoutRoute: CheckoutRoute,
   CommunityRoute: CommunityRoute,
   DiscomfortRoute: DiscomfortRoute,
