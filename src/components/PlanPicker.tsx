@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Check, User, Users, Zap } from "lucide-react";
-import { toast } from "sonner";
+import { useNavigate } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { PLANS, formatVND, priceFor, ANNUAL_DISCOUNT, type BillingCycle, type Plan } from "@/lib/plans";
 
@@ -26,6 +26,7 @@ export function BillingToggle({ cycle, onChange }: { cycle: BillingCycle; onChan
 }
 
 function PlanCard({ plan, cycle }: { plan: Plan; cycle: BillingCycle }) {
+  const navigate = useNavigate();
   const Icon = ICONS[plan.id];
   const price = priceFor(plan, cycle);
   const free = plan.monthly === 0;
@@ -81,7 +82,7 @@ function PlanCard({ plan, cycle }: { plan: Plan; cycle: BillingCycle }) {
       ) : (
         <button
           type="button"
-          onClick={() => toast.success(`${plan.name} plan · ${cycle === "annual" ? "Annual" : "Monthly"}`, { description: "Redirecting to secure payment…" })}
+          onClick={() => navigate({ to: "/subscribe", search: { plan: plan.id as "individual" | "family", cycle } })}
           className={cn(
             "mt-5 h-11 w-full rounded-xl text-sm font-semibold transition hover:opacity-90 active:scale-[0.98]",
             plan.highlighted
