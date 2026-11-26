@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { MobileTopBar } from "@/components/MobileTopBar";
 import { BottomNav } from "@/components/BottomNav";
-import { DesktopSidebar, DesktopTopBar } from "@/components/DesktopChrome";
+import { DesktopSidebar } from "@/components/DesktopChrome";
 import { useAuth } from "@/lib/auth-store";
 
 import appCss from "../styles.css?url";
@@ -127,7 +127,6 @@ function AuthGate() {
   return (
     <div data-app-shell className={`flex flex-col min-h-screen w-full bg-background text-foreground ${isOnboarding ? "" : "rail:pr-[92px] desk:pr-0"}`}>
       {!isOnboarding && <DesktopSidebar />}
-      {!isOnboarding && <DesktopTopBar />}
       {!hideTopBar && <MobileTopBar />}
       <main className={`flex-1 p-4 ${isOnboarding ? "pb-6" : "pb-24 rail:pb-6 desk:px-8 desk:pt-7 desk:pb-10 max-[699px]:desk:px-4 max-[699px]:desk:pt-5"}`}>
         <div className="fold:max-w-[1040px] fold:mx-auto desk:max-w-[1180px]">

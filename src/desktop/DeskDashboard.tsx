@@ -19,7 +19,7 @@ export function DeskDashboard({ empty }: { empty?: boolean }) {
         <Highlights />
         <Summary />
       </div>
-      <div className="sticky top-[88px] space-y-6">
+      <div className="sticky top-6 space-y-6">
         {empty ? <NoWorkouts /> : <><TodaysWorkouts /><WorkoutProgress /></>}
       </div>
     </Page>

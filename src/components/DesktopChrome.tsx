@@ -2,7 +2,7 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   Bell, ClipboardList, Crown, Home, Activity, Dumbbell, Users, Settings, HelpCircle, LifeBuoy, CheckCheck,
-  ArrowRight, User as UserIcon, LogOut, PanelLeftClose, PanelLeftOpen,
+  ArrowRight, User as UserIcon, LogOut, PanelLeftClose, PanelLeftOpen, ChevronsUpDown,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
@@ -77,32 +77,50 @@ export function DesktopSidebar() {
           );
         })}
       </nav>
+
+      {/* bottom-left: plan, alerts and the account, like Slack / Linear, so pages get the full height */}
+      <SidebarFooter collapsed={collapsed} />
     </aside>
   );
 }
 
-const iconBtn = "relative flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.02] text-foreground/80 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 data-[state=open]:border-primary/50 data-[state=open]:bg-primary/10 data-[state=open]:text-primary";
+const iconBtn = "relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.02] text-foreground/80 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 data-[state=open]:border-primary/50 data-[state=open]:bg-primary/10 data-[state=open]:text-primary";
 
-export function DesktopTopBar() {
+function SidebarFooter({ collapsed }: { collapsed: boolean }) {
   const navigate = useNavigate();
   const user = useAuth();
+  const name = user ? `${user.firstName} ${user.lastName}` : "Guest";
+  const avatar = (
+    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary text-[12.5px] font-bold text-white ring-2 ring-white/10">{user?.initials ?? "?"}</span>
+  );
+  const upgrade = "inline-flex h-10 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-secondary text-[14px] font-semibold text-white shadow-[0_10px_24px_-14px] shadow-primary transition hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60";
   return (
-    <header className="sticky top-0 z-30 hidden h-16 items-center justify-end gap-2.5 border-b border-white/[0.06] bg-background/80 px-8 backdrop-blur-xl desk:flex max-[699px]:px-4">
-      <Link to="/checkout"
-        className="mr-1 inline-flex h-10 items-center gap-2 rounded-full bg-gradient-to-r from-primary to-secondary px-4 text-[14px] font-semibold text-white shadow-[0_10px_24px_-14px] shadow-primary transition hover:brightness-110 active:scale-[0.98]">
-        <Crown className="h-4 w-4" /> Upgrade
-      </Link>
-      <NotificationBell />
-      <button onClick={() => navigate({ to: "/discomfort" })} aria-label="Log discomfort" title="Log discomfort" className={iconBtn}>
-        <ClipboardList className="h-[18px] w-[18px]" />
-      </button>
+    <div className={cn("mt-auto flex flex-col gap-3 border-t border-white/[0.06] pt-4", collapsed && "items-center")}>
+      <div className={cn("flex gap-2", collapsed ? "flex-col items-center" : "items-center")}>
+        <Link to="/checkout" title={collapsed ? "Upgrade" : undefined} aria-label="Upgrade" className={cn(upgrade, collapsed ? "w-10" : "flex-1 px-4")}>
+          <Crown className="h-4 w-4" />{!collapsed && "Upgrade"}
+        </Link>
+        <NotificationBell collapsed={collapsed} />
+        <button onClick={() => navigate({ to: "/discomfort" })} aria-label="Log discomfort" title="Log discomfort" className={iconBtn}>
+          <ClipboardList className="h-[18px] w-[18px]" />
+        </button>
+      </div>
       <DropdownMenu>
-        <DropdownMenuTrigger aria-label="Account" className="ml-1 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary text-[13px] font-bold text-white ring-2 ring-white/10 transition hover:ring-primary/50 focus-visible:outline-none focus-visible:ring-primary/70">
-          {user?.initials ?? "?"}
+        <DropdownMenuTrigger aria-label="Account"
+          className={cn("group flex items-center rounded-2xl text-left transition hover:bg-white/[0.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 data-[state=open]:bg-white/[0.06]",
+            collapsed ? "justify-center p-1" : "gap-3 p-2")}>
+          {avatar}
+          {!collapsed && (<>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-[13.5px] font-semibold">{name}</span>
+              <span className="block truncate text-[11.5px] text-muted-foreground">{user?.email}</span>
+            </span>
+            <ChevronsUpDown className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-foreground" />
+          </>)}
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuContent side="right" align="end" sideOffset={14} className="w-56">
           <DropdownMenuLabel>
-            <div className="text-[13px] font-semibold">{user ? `${user.firstName} ${user.lastName}` : "Guest"}</div>
+            <div className="text-[13px] font-semibold">{name}</div>
             <div className="text-[11.5px] font-normal text-muted-foreground">{user?.email}</div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
@@ -115,12 +133,12 @@ export function DesktopTopBar() {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    </header>
+    </div>
   );
 }
 
 /** Bell + notification panel. Desktop keeps the panel (users stay on their page); phones open the full screen instead. */
-function NotificationBell() {
+function NotificationBell({ collapsed = false }: { collapsed?: boolean }) {
   const { unread, markAll } = useNotifications();
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<NotiTab>("all");
@@ -132,7 +150,7 @@ function NotificationBell() {
           <span className="absolute -right-1 -top-1 min-w-[18px] rounded-full bg-destructive px-1 text-center text-[10px] font-semibold leading-[18px] text-white ring-2 ring-background">{badge(unread)}</span>
         )}
       </PopoverTrigger>
-      <PopoverContent align="end" sideOffset={10}
+      <PopoverContent side="right" align="end" sideOffset={collapsed ? 30 : 78} collisionPadding={16}
         className="flex w-[400px] flex-col overflow-hidden rounded-2xl border border-white/[0.1] bg-[#121a2a] p-0 shadow-[0_24px_64px_-12px_rgba(0,0,0,.8),0_0_0_1px_rgba(0,0,0,.4)]">
         <div className="border-b border-white/[0.06] px-4 pb-3 pt-4">
           <div className="flex items-center justify-between gap-3 pl-1">
