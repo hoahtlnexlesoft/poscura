@@ -84,6 +84,7 @@ export function DesktopSidebar() {
   );
 }
 
+const rowBtn = "group relative flex h-10 w-full items-center gap-3 rounded-xl px-3.5 text-[14px] font-medium text-foreground/65 transition hover:bg-white/[0.05] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 data-[state=open]:bg-white/[0.06] data-[state=open]:text-foreground";
 const iconBtn = "relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.02] text-foreground/80 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 data-[state=open]:border-primary/50 data-[state=open]:bg-primary/10 data-[state=open]:text-primary";
 
 function SidebarFooter({ collapsed }: { collapsed: boolean }) {
@@ -95,18 +96,19 @@ function SidebarFooter({ collapsed }: { collapsed: boolean }) {
   );
   const upgrade = "inline-flex h-10 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-secondary text-[14px] font-semibold text-white shadow-[0_10px_24px_-14px] shadow-primary transition hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60";
   return (
-    <div className={cn("mt-auto flex flex-col gap-3 border-t border-white/[0.06] pt-4", collapsed && "items-center")}>
-      <div className={cn("flex gap-2", collapsed ? "flex-col items-center" : "items-center")}>
-        <Link to="/checkout" title={collapsed ? "Upgrade" : undefined} aria-label="Upgrade" className={cn(upgrade, collapsed ? "w-10" : "flex-1 px-4")}>
-          <Crown className="h-4 w-4" />{!collapsed && "Upgrade"}
-        </Link>
-        <NotificationBell collapsed={collapsed} />
-        <button onClick={() => navigate({ to: "/discomfort" })} aria-label="Log discomfort" title="Log discomfort" className={iconBtn}>
-          <ClipboardList className="h-[18px] w-[18px]" />
-        </button>
-      </div>
+    <div className={cn("mt-auto flex flex-col gap-1 border-t border-white/[0.06] pt-3", collapsed && "items-center")}>
+      {/* alerts read like the nav above: icon + label rows (icons only when collapsed) */}
+      <NotificationBell collapsed={collapsed} />
+      <button onClick={() => navigate({ to: "/discomfort" })} aria-label="Log discomfort" title={collapsed ? "Log discomfort" : undefined}
+        className={collapsed ? iconBtn : rowBtn}>
+        <ClipboardList className={cn("h-[18px] w-[18px] shrink-0", !collapsed && "text-muted-foreground group-hover:text-foreground")} />
+        {!collapsed && "Log discomfort"}
+      </button>
+      <Link to="/checkout" title={collapsed ? "Upgrade" : undefined} aria-label="Upgrade" className={cn(upgrade, "mt-2", collapsed ? "w-10" : "w-full px-4")}>
+        <Crown className="h-4 w-4" />{!collapsed && "Upgrade"}
+      </Link>
       <DropdownMenu>
-        <DropdownMenuTrigger aria-label="Account"
+        <DropdownMenuTrigger aria-label="Account" style={{ marginTop: 8 }}
           className={cn("group flex items-center rounded-2xl text-left transition hover:bg-white/[0.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 data-[state=open]:bg-white/[0.06]",
             collapsed ? "justify-center p-1" : "gap-3 p-2")}>
           {avatar}
@@ -144,13 +146,14 @@ function NotificationBell({ collapsed = false }: { collapsed?: boolean }) {
   const [tab, setTab] = useState<NotiTab>("all");
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger aria-label={`Notifications${unread ? `, ${unread} unread` : ""}`} className={iconBtn}>
-        <Bell className="h-[18px] w-[18px]" />
-        {unread > 0 && (
-          <span className="absolute -right-1 -top-1 min-w-[18px] rounded-full bg-destructive px-1 text-center text-[10px] font-semibold leading-[18px] text-white ring-2 ring-background">{badge(unread)}</span>
-        )}
+      <PopoverTrigger aria-label={`Notifications${unread ? `, ${unread} unread` : ""}`} className={collapsed ? iconBtn : rowBtn}>
+        <Bell className={cn("h-[18px] w-[18px] shrink-0", !collapsed && "text-muted-foreground group-hover:text-foreground")} />
+        {!collapsed && <span className="flex-1 text-left">Notifications</span>}
+        {unread > 0 && (collapsed
+          ? <span className="absolute -right-1 -top-1 min-w-[18px] rounded-full bg-destructive px-1 text-center text-[10px] font-semibold leading-[18px] text-white ring-2 ring-background">{badge(unread)}</span>
+          : <span className="min-w-[20px] rounded-full bg-destructive px-1.5 text-center text-[11px] font-semibold leading-[20px] text-white">{badge(unread)}</span>)}
       </PopoverTrigger>
-      <PopoverContent side="right" align="end" sideOffset={collapsed ? 30 : 78} collisionPadding={16}
+      <PopoverContent side="right" align="end" sideOffset={collapsed ? 30 : 28} collisionPadding={16}
         className="flex w-[400px] flex-col overflow-hidden rounded-2xl border border-white/[0.1] bg-[#121a2a] p-0 shadow-[0_24px_64px_-12px_rgba(0,0,0,.8),0_0_0_1px_rgba(0,0,0,.4)]">
         <div className="border-b border-white/[0.06] px-4 pb-3 pt-4">
           <div className="flex items-center justify-between gap-3 pl-1">
