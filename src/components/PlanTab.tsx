@@ -237,6 +237,21 @@ function BusinessPlanCard() {
   );
 }
 
+function AddOnRow({ a }: { a: AddOn }) {
+  return (
+    <li className="rounded-[16px] border border-white/[0.06] bg-white/[0.02] p-3.5">
+      <div className="flex items-baseline justify-between gap-3">
+        <span className="text-[14px] font-semibold">{a.name}</span>
+        <span className="shrink-0 text-[14px] font-semibold tabular-nums">{vnd(a.price)}</span>
+      </div>
+      <div className="mt-1.5 flex items-center justify-between gap-3 text-[11.5px] text-muted-foreground">
+        <span className={cn("rounded-full px-2 py-px text-[10.5px] font-semibold ring-1 ring-inset", statusTone.Active)}>Active</span>
+        <span>{a.date}</span>
+      </div>
+    </li>
+  );
+}
+
 /* ---------- the tab ---------- */
 export function PlanTab({ plan, noAddons = false, buyAddon = false }: { plan: PlanKind; noAddons?: boolean; buyAddon?: boolean }) {
   const [buy, setBuy] = useState(buyAddon);
@@ -246,6 +261,7 @@ export function PlanTab({ plan, noAddons = false, buyAddon = false }: { plan: Pl
   ]);
   const navigate = useNavigate();
   const [histOpen, setHistOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
   const [vouOpen, setVouOpen] = useState(false);
   const [vf, setVf] = useState<VFilter>("All");
   const vList = vf === "All" ? VOUCHERS : VOUCHERS.filter((v) => v.status === vf);
@@ -292,20 +308,10 @@ export function PlanTab({ plan, noAddons = false, buyAddon = false }: { plan: Pl
         </Card>
         <Card title="Add-ons" action={<button onClick={() => setBuy(true)} className={outlineBtn}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button>}>
           {addons.length ? (
-            <ul className="space-y-2">
-              {addons.map((a) => (
-                <li key={a.id} className="rounded-[16px] border border-white/[0.06] bg-white/[0.02] p-3.5">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <span className="text-[14px] font-semibold">{a.name}</span>
-                    <span className="shrink-0 text-[14px] font-semibold tabular-nums">{vnd(a.price)}</span>
-                  </div>
-                  <div className="mt-1.5 flex items-center justify-between gap-3 text-[11.5px] text-muted-foreground">
-                    <span className={cn("rounded-full px-2 py-px text-[10.5px] font-semibold ring-1 ring-inset", statusTone.Active)}>Active</span>
-                    <span>{a.date}</span>
-                  </div>
-                </li>
-              ))}
+            <><ul className="space-y-2">
+              {addons.slice(0, 2).map((a) => <AddOnRow key={a.id} a={a} />)}
             </ul>
+              {addons.length > 2 && <MoreButton count={addons.length} onClick={() => setAddOpen(true)} />}</>
           ) : (
             /* nothing bought yet: one compact line, the header button is the way in */
             <div className="flex items-center gap-3">
@@ -400,20 +406,10 @@ export function PlanTab({ plan, noAddons = false, buyAddon = false }: { plan: Pl
         </Card>
         <Card title="Add-ons" action={<button onClick={() => setBuy(true)} className={outlineBtn}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button>}>
           {addons.length ? (
-            <ul className="space-y-2">
-              {addons.map((a) => (
-                <li key={a.id} className="rounded-[16px] border border-white/[0.06] bg-white/[0.02] p-3.5">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <span className="text-[14px] font-semibold">{a.name}</span>
-                    <span className="shrink-0 text-[14px] font-semibold tabular-nums">{vnd(a.price)}</span>
-                  </div>
-                  <div className="mt-1.5 flex items-center justify-between gap-3 text-[11.5px] text-muted-foreground">
-                    <span className={cn("rounded-full px-2 py-px text-[10.5px] font-semibold ring-1 ring-inset", statusTone.Active)}>Active</span>
-                    <span>{a.date}</span>
-                  </div>
-                </li>
-              ))}
+            <><ul className="space-y-2">
+              {addons.slice(0, 2).map((a) => <AddOnRow key={a.id} a={a} />)}
             </ul>
+              {addons.length > 2 && <MoreButton count={addons.length} onClick={() => setAddOpen(true)} />}</>
           ) : (
             /* nothing bought yet: one compact line, the header button is the way in */
             <div className="flex items-center gap-3">
@@ -447,6 +443,9 @@ export function PlanTab({ plan, noAddons = false, buyAddon = false }: { plan: Pl
 
       <AddOnDialog open={buy} onOpenChange={setBuy}
         onPurchased={(p) => setAddons((xs) => [{ id: `${p.id}${Date.now()}`, name: `${p.hours} hours`, hours: `+${p.hours} hours`, price: p.price, date: "Nov 26, 2026" }, ...xs])} />
+      <ListModal open={addOpen} onOpenChange={setAddOpen} title="Add-ons" subtitle={`${addons.length} add-ons, newest first`}>
+        <ul className="space-y-2">{addons.map((a) => <AddOnRow key={a.id} a={a} />)}</ul>
+      </ListModal>
       <ListModal open={histOpen} onOpenChange={setHistOpen} title="Subscription history" subtitle={`${hist.length} periods, newest first`}>
         <ul className="space-y-2">{hist.map((h, i) => <HistRow key={i} h={h} />)}</ul>
       </ListModal>
