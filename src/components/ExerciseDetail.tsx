@@ -309,14 +309,6 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
               <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">Finish your first session and Poscura scores your accuracy, tracks your progress and gives you personal advice here.</p>
             </div>
           </div>
-          <div className="mt-4 grid grid-cols-3 divide-x divide-white/[0.06] rounded-[14px] border border-white/[0.06] bg-background/30">
-            {["Accuracy", "Best", "Trend"].map((l) => (
-              <div key={l} className="px-3 py-2.5 text-center">
-                <div className="text-[11px] text-muted-foreground">{l}</div>
-                <div className="mt-0.5 flex items-center justify-center gap-1 text-[15px] font-semibold text-muted-foreground/60"><Lock className="h-3 w-3" />—</div>
-              </div>
-            ))}
-          </div>
         </section>
       </div>
 
