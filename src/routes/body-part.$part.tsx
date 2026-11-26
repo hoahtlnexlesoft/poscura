@@ -34,7 +34,7 @@ function BodyPartDetail() {
 
   return (
     <div className="space-y-4 fold:grid fold:grid-cols-2 fold:gap-4 land:gap-x-6 hinge-split fold:space-y-0 fold:items-start">
-      <div className="flex items-center justify-between fold:col-span-2">
+      <div className="page-head flex items-center justify-between fold:col-span-2">
         <div className="flex items-center gap-3"><BackButton onClick={goBackHome} /><h1 className="text-[19px] font-semibold tracking-tight">{data.name}</h1></div>
         <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusCls}`}>{data.status}</span>
       </div>

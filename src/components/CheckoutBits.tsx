@@ -17,7 +17,7 @@ export const outlineBtn = "h-12 flex-1 rounded-2xl border border-white/[0.12] te
 
 export function Header({ title, onBack }: { title: string; onBack: () => void }) {
   return (
-    <header className="flex h-12 items-center gap-3">
+    <header className="page-head flex items-center gap-3">
       <BackButton onClick={onBack} />
       <h1 className="text-[17px] font-semibold">{title}</h1>
     </header>

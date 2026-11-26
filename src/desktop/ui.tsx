@@ -21,7 +21,7 @@ export function Panel({ title, icon, action, children, className, bodyClass }: {
 
 export function PageHead({ title, subtitle, back, actions }: { title: ReactNode; subtitle?: ReactNode; back?: () => void; actions?: ReactNode }) {
   return (
-    <div className="mb-6 flex items-end justify-between gap-4">
+    <div className="page-head mb-6 flex items-end justify-between gap-4">
       <div className="flex items-center gap-3">
         {back && (
           <button onClick={back} aria-label="Back" className={btn.icon}>

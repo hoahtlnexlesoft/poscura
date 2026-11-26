@@ -40,11 +40,12 @@ function DiscomfortPage() {
 
   return (
     <div className="space-y-4 fold:grid fold:grid-cols-2 fold:gap-x-5 land:gap-x-6 hinge-split fold:gap-y-4 fold:space-y-0 fold:items-start">
-      <BackButton onClick={goBackHome} className="fold:col-span-2 fold:justify-self-start" />
-
-      <div className="fold:col-span-2">
-        <h1 className="text-xl font-bold">Log Discomfort</h1>
-        <p className="text-xs text-muted-foreground mt-0.5">Tap areas where you feel pain. Multiple allowed.</p>
+      <div className="page-head flex items-center gap-3 fold:col-span-2">
+        <BackButton onClick={goBackHome} />
+        <div className="min-w-0">
+          <h1 className="text-[19px] font-semibold leading-tight tracking-tight">Log Discomfort</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">Tap areas where you feel pain. Multiple allowed.</p>
+        </div>
       </div>
 
       <div className="glass-card p-4 flex flex-col items-center fold:col-start-1 fold:row-start-3 fold:justify-center fold:min-h-[calc(100dvh-194px)]">

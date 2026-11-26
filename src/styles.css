@@ -310,3 +310,22 @@ html[data-layout="bottom"] [data-app-nav] a[data-active]:hover { background: col
   25% { box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-primary) 35%, transparent), 0 0 40px -6px var(--color-primary); border-color: var(--color-primary); }
   100% { box-shadow: 0 0 0 0 transparent; border-color: rgba(255,255,255,.06); } }
 .plan-flash { animation: plan-flash 1.5s ease-out; }
+
+@layer components {
+/* Page headers stay pinned while the page scrolls (back + title, and any sub header inside them).
+   They bleed to the content edges so the blurred backdrop covers what slides under them. */
+.page-head, .page-head-phone {
+  position: sticky; top: 0; z-index: 30;
+  margin: -1rem -1rem 0; padding: 1rem 1rem .75rem;
+  background: color-mix(in oklab, var(--color-background) 96%, transparent);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+@media (min-width: 1200px) { .page-head { margin: -1.75rem -2rem 0; padding: 1.75rem 2rem .75rem; } }
+html[data-desktop] .page-head { margin: -1.75rem -2rem 0; padding: 1.75rem 2rem .75rem; }
+@media (max-width: 699px) { html[data-desktop] .page-head { margin: -1.25rem -1rem 0; padding: 1.25rem 1rem .75rem; } }
+/* the notifications header is a whole pane on open foldables, so it only pins on phones */
+@media (min-width: 800px) and (min-height: 600px) and (orientation: landscape) {
+  .page-head-phone { position: static; margin: 0; padding: 0; background: none; backdrop-filter: none; border: 0; }
+}
+}

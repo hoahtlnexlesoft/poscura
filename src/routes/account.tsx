@@ -239,13 +239,13 @@ function FamilyMembersSection() {
 
 export const Route = createFileRoute("/account")({
   component: AccountPage,
-  validateSearch: z.object({ tab: z.enum(["info", "plan", "invite"]).optional(), plan: z.enum(["free", "individual", "business"]).optional(), addons: z.enum(["none"]).optional() }),
+  validateSearch: z.object({ tab: z.enum(["info", "plan", "invite"]).optional(), plan: z.enum(["free", "individual", "business"]).optional(), addons: z.enum(["none"]).optional(), buy: z.enum(["addon"]).optional() }),
 });
 
 function AccountPage() {
   const router = useRouter();
   const goBack = useGoBack("/");
-  const { tab, plan, addons } = Route.useSearch();
+  const { tab, plan, addons, buy } = Route.useSearch();
   return (
     <div className="-mx-4 -mt-4">
       <header className="h-14 sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border flex items-center px-4 gap-2">
@@ -272,7 +272,7 @@ function AccountPage() {
             </TabsList>
           </div>
           <TabsContent data-screen="Information tab" value="info" className="flex flex-col gap-4 mt-4 fold:block fold:columns-2 fold:gap-4 land:gap-6 fold:[&>*>*]:break-inside-avoid fold:[&>*>*]:mb-4 hinge-split land:items-start land:gap-y-4"><AccountInfo /></TabsContent>
-          <TabsContent data-screen="Plan tab" value="subscription" className="mt-4 space-y-4 fold:space-y-0"><PlanTab plan={plan ?? "free"} noAddons={addons === "none"} /></TabsContent>
+          <TabsContent data-screen="Plan tab" value="subscription" className="mt-4 space-y-4 fold:space-y-0"><PlanTab plan={plan ?? "free"} noAddons={addons === "none"} buyAddon={buy === "addon"} /></TabsContent>
           <TabsContent data-screen="Invite & Rewards tab" value="invite" className="space-y-4 mt-4 fold:space-y-0 fold:columns-2 fold:gap-4 land:gap-6 fold:[&>*]:break-inside-avoid fold:[&>*]:mb-4 hinge-split land:items-start land:gap-y-4"><InviteTab /></TabsContent>
         </Tabs>
       </div>

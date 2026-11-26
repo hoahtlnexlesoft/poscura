@@ -120,7 +120,7 @@ export function SessionReport({ onClose }: Props) {
   return (
     <div className="space-y-4 land:grid land:grid-cols-2 hinge-split land:items-start land:gap-x-6 land:gap-y-4 land:space-y-0">
       {/* ---------- header ---------- */}
-      <div className="flex items-center gap-3 land:col-span-2">
+      <div className="page-head flex items-center gap-3 land:col-span-2">
         <BackButton onClick={onClose} />
         <div className="min-w-0 flex-1">
           <div className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Session report</div>

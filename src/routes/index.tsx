@@ -26,6 +26,8 @@ function Dashboard() {
   return (
     <div className="space-y-4 fold:grid fold:grid-cols-[1.25fr_1fr] land:grid-cols-2 hinge-split fold:gap-4 land:gap-x-6 fold:space-y-0 fold:items-start">
       <div className="space-y-4">
+      {/* phones: with nothing scheduled, setting a schedule is the first thing to do */}
+      {empty && <div className="fold:hidden"><NoWorkouts /></div>}
       <section className="glass-card p-4">
         <h2 className="text-base font-semibold mb-3">Posture Insights</h2>
         <div className="rounded-xl bg-primary/5 border border-primary/20 p-3 text-xs leading-relaxed">
@@ -82,7 +84,7 @@ function Dashboard() {
       </div>
 
       <div className="space-y-4">
-      {empty ? <NoWorkouts /> : (<>
+      {empty ? <div className="hidden fold:block"><NoWorkouts /></div> : (<>
       <section className="glass-card p-4">
         <h2 className="text-base font-semibold mb-3">Today's Workouts</h2>
         <div className="rounded-xl bg-primary/10 border border-primary/30 p-3 mb-3">

@@ -80,7 +80,7 @@ export function WorkoutAssessment({ workoutName, recordedVideoUrl, onClose }: Pr
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="page-head flex items-center justify-between">
         <div className="flex items-center gap-3"><BackButton onClick={onClose} /><h1 className="text-[17px] font-semibold">Assessment</h1></div>
         <button onClick={() => setShareOpen(true)} aria-label="Share" className="h-9 w-9 rounded-lg border border-border bg-card flex items-center justify-center text-primary">
           <Share2 className="h-4 w-4" />

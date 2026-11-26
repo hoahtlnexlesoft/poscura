@@ -516,7 +516,7 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
       {/* ---------- post ---------- */}
       {/* open foldables: the post stays put while the conversation scrolls; a tall post scrolls inside its own pane */}
       <section className="land:sticky land:top-[72px] land:row-span-2 land:flex land:max-h-[calc(100dvh-84px)] land:flex-col land:self-start">
-        <div className="mb-3 flex items-center gap-2">
+        <div className="page-head mb-3 flex items-center gap-2 land:static land:m-0 land:border-0 land:bg-transparent land:p-0 land:backdrop-blur-0">
           <BackButton onClick={onBack} />
           <h1 className="text-[17px] font-semibold tracking-tight">Post</h1>
         </div>

@@ -24,7 +24,7 @@ export function ExerciseIntro({
 
   return (
     <div data-screen="Exercise intro" className="pb-4 desk:mx-auto desk:max-w-[1180px] desk:pb-2">
-      <div className="flex items-center gap-2">
+      <div className="page-head flex items-center gap-2">
         <BackButton onClick={onBack} />
         <span className="flex-1" />
         <button

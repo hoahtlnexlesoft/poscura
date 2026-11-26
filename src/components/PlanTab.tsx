@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PlanPicker } from "@/components/PlanPicker";
+import { AddOnDialog } from "@/components/AddOnDialog";
 import { VOUCHERS, type Voucher } from "@/lib/vouchers";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -237,7 +238,8 @@ function BusinessPlanCard() {
 }
 
 /* ---------- the tab ---------- */
-export function PlanTab({ plan, noAddons = false }: { plan: PlanKind; noAddons?: boolean }) {
+export function PlanTab({ plan, noAddons = false, buyAddon = false }: { plan: PlanKind; noAddons?: boolean; buyAddon?: boolean }) {
+  const [buy, setBuy] = useState(buyAddon);
   const [addons, setAddons] = useState<AddOn[]>(noAddons ? [] : [
     { id: "h1", name: "Heavy Monitoring", hours: "+40 hours / month", price: 299000, date: "Jun 24, 2026" },
     { id: "l1", name: "Light Monitoring", hours: "+10 hours / month", price: 119000, date: "May 25, 2026" },
@@ -288,7 +290,7 @@ export function PlanTab({ plan, noAddons = false }: { plan: PlanKind; noAddons?:
           </div>
           <p className="mt-3 text-[12px] text-muted-foreground">Resets on Nov 26, 2026.</p>
         </Card>
-        <Card title="Add-ons" action={<button onClick={() => navigate({ to: "/addons" })} className={outlineBtn}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button>}>
+        <Card title="Add-ons" action={<button onClick={() => setBuy(true)} className={outlineBtn}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button>}>
           {addons.length ? (
             <ul className="space-y-2">
               {addons.map((a) => (
@@ -396,7 +398,7 @@ export function PlanTab({ plan, noAddons = false }: { plan: PlanKind; noAddons?:
           </div>
           <p className="mt-3 text-[12px] text-muted-foreground">Resets on {plan === "free" ? "Dec 17, 2026" : "Nov 26, 2026"}.</p>
         </Card>
-        <Card title="Add-ons" action={<button onClick={() => navigate({ to: "/addons" })} className={outlineBtn}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button>}>
+        <Card title="Add-ons" action={<button onClick={() => setBuy(true)} className={outlineBtn}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button>}>
           {addons.length ? (
             <ul className="space-y-2">
               {addons.map((a) => (
@@ -443,6 +445,8 @@ export function PlanTab({ plan, noAddons = false }: { plan: PlanKind; noAddons?:
       </div>
       )}
 
+      <AddOnDialog open={buy} onOpenChange={setBuy}
+        onPurchased={(p) => setAddons((xs) => [{ id: `${p.id}${Date.now()}`, name: `${p.hours} hours`, hours: `+${p.hours} hours`, price: p.price, date: "Nov 26, 2026" }, ...xs])} />
       <ListModal open={histOpen} onOpenChange={setHistOpen} title="Subscription history" subtitle={`${hist.length} periods, newest first`}>
         <ul className="space-y-2">{hist.map((h, i) => <HistRow key={i} h={h} />)}</ul>
       </ListModal>

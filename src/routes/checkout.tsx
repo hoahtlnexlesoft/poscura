@@ -18,7 +18,7 @@ function ChoosePlanPage() {
   const goBack = useGoBack("/account");
   return (
     <div className="pb-4">
-      <header className="flex h-12 items-center gap-3">
+      <header className="page-head flex items-center gap-3">
         <BackButton onClick={goBack} />
         <h1 className="text-[17px] font-semibold">Choose Your Plan</h1>
       </header>

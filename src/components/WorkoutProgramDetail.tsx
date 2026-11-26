@@ -109,7 +109,7 @@ export function WorkoutProgramDetail({ onClose, onStartSession }: Props) {
   return (
     <div className="space-y-4 land:grid land:grid-cols-2 hinge-split land:items-start land:gap-x-6 land:gap-y-4 land:space-y-0">
       {/* ---------- header ---------- */}
-      <div className="flex items-center gap-3 land:col-span-2">
+      <div className="page-head flex items-center gap-3 land:col-span-2">
         <BackButton onClick={onClose} />
         <span className="flex-1 text-[15px] font-semibold">Program</span>
         {/* Cancel ends the whole program, so it asks first */}
