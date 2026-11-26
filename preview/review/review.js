@@ -58,7 +58,7 @@
     return { view: v.name, size: v.size, os: os, browser: br, screen: sc };
   }
   // device names changed over time; show older comments under today's names
-  var DEV_RENAME = { 'iPhone Duo · unfolded': 'iPhone Duo · Open', 'iPhone Duo · Unfolded': 'iPhone Duo · Open', 'iPhone Duo · Closed': 'iPhone Duo · Folded', 'iPhone Duo · closed': 'iPhone Duo · Folded', 'iPhone Duo · folded': 'iPhone Duo · Folded', 'iPhone 16 Pro Max': 'iPhone 18 Pro Max', 'Galaxy Z Fold · Folded': 'Galaxy Z Fold8 · Folded', 'Galaxy Z Fold · Open': 'Galaxy Z Fold8 · Open', 'Galaxy Z Fold · Unfolded': 'Galaxy Z Fold8 · Open' };
+  var DEV_RENAME = { 'iPhone Duo · unfolded': 'iPhone Duo · Open', 'iPhone Duo · Unfolded': 'iPhone Duo · Open', 'iPhone Duo · Closed': 'iPhone Duo · Folded', 'iPhone Duo · closed': 'iPhone Duo · Folded', 'iPhone Duo · folded': 'iPhone Duo · Folded', 'iPhone 16 Pro Max': 'iPhone 18 Pro Max', 'Galaxy Z Fold · Folded': 'Galaxy Z Fold8 · Folded', 'Galaxy Z Fold · Open': 'Galaxy Z Fold8 · Open', 'Galaxy Z Fold · Unfolded': 'Galaxy Z Fold8 · Open', 'Desktop browser': 'Web · Desktop browser', 'Desktop · Web app': 'Web · Desktop browser' };
   function devName(n) { return DEV_RENAME[n] || n; }
   function whereLine(t, cls) {
     var w = labelFor(t.page) + (t.device && t.device.screen ? ' › ' + t.device.screen : '');

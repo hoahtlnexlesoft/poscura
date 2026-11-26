@@ -157,7 +157,7 @@
     { id:"duo-o",  name:"iPhone Duo · Open", w:626, h:890, kind:"fold",   unit:"pt", color:"#8d8577", crease:"v", rotate:true, side:true },
     { id:"zfold-c", name:"Galaxy Z Fold8 · Folded", w:467, h:737, kind:"punch", unit:"dp", color:"#3c3f45", tone:"#141619", radius:10, scr:10, layout:"rail", stack:true },
     { id:"zfold",  name:"Galaxy Z Fold8 · Open",         w:734, h:972, kind:"fold",   unit:"dp", color:"#3c3f45", tone:"#141619", android:true, silver:true, crease:"v", rotate:true },
-    { id:"desk",   name:"Desktop · Web app",    w:1440, h:900, kind:"desktop", unit:"px" }
+    { id:"desk",   name:"Web · Desktop browser",    w:1440, h:900, kind:"desktop", unit:"px" }
   ];
 
   var store = {
@@ -353,7 +353,7 @@
   }
   window.poscuraGo = function (path) { go(path); };
   // which simulated device the reviewer is looking at (read by the comment kit)
-  window.poscuraDevice = function () { var d = view(); if (d.kind === "desktop" && frame) return { name: "Desktop browser", size: frame.clientWidth + "×" + frame.clientHeight + " px" }; return { name: d.name, size: d.w + "×" + d.h + " " + d.unit }; };
+  window.poscuraDevice = function () { var d = view(); if (d.kind === "desktop" && frame) return { name: "Web · Desktop browser", size: frame.clientWidth + "×" + frame.clientHeight + " px" }; return { name: d.name, size: d.w + "×" + d.h + " " + d.unit }; };
   // routes may come back with the query encoded differently ("+" vs "%20"), so compare decoded
   function norm(p) { try { return decodeURIComponent(String(p || "").replace(/\+/g, " ")); } catch (e) { return String(p || ""); } }
   function markActive(path) {
@@ -407,6 +407,6 @@
   go(state.path || "/", true);
 })();
 </script>
-<script src="review/config.js?v=1"></script><script src="review/review.js?v=12" defer></script>
+<script src="review/config.js?v=1"></script><script src="review/review.js?v=13" defer></script>
 </body>
 </html>
