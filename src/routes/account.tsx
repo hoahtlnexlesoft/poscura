@@ -12,6 +12,7 @@ import { PlanTab } from "@/components/PlanTab";
 import { GoogleMark } from "@/components/GoogleMark";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
+import { BackButton } from "@/components/BackButton";
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -248,13 +249,7 @@ function AccountPage() {
   return (
     <div className="-mx-4 -mt-4">
       <header className="h-14 sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border flex items-center px-4 gap-2">
-        <button
-          onClick={goBack}
-          aria-label="Back"
-          className="h-9 w-9 -ml-2 rounded-full flex items-center justify-center hover:bg-white/[0.08] hover:text-foreground"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </button>
+        <BackButton onClick={goBack} />
         <h1 className="text-base font-semibold">My Account</h1>
       </header>
       <div className="p-4 space-y-4">

@@ -10,6 +10,7 @@ import { stepsFor, stepBand } from "@/lib/stepEval";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { ScheduleDialog } from "@/desktop/DeskDashboard";
+import { BackButton } from "@/components/BackButton";
 
 const shareTargets = [
   { name: "Facebook", icon: Facebook, color: "text-[#1877F2]", url: (u: string) => `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(u)}` },
@@ -137,9 +138,7 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
       {/* ---------- header: stays pinned while the page scrolls; gets its backdrop once content passes under it ---------- */}
       <div className={cn("sticky top-0 z-30 -mx-4 -mt-4 flex items-center gap-3 border-b px-4 pb-3 pt-4 transition-[background-color,border-color,backdrop-filter] duration-200 land:col-span-2 desk:-mx-8 desk:-mt-7 desk:px-8 desk:pt-7 max-[699px]:desk:-mx-4 max-[699px]:desk:-mt-5 max-[699px]:desk:px-4 max-[699px]:desk:pt-5",
         scrolled ? "border-white/[0.06] bg-background/85 backdrop-blur-xl" : "border-transparent")}>
-        <button onClick={onClose} aria-label="Back" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/[0.08] text-foreground/80 transition hover:border-primary/40 hover:text-foreground">
-          <ChevronLeft className="h-[18px] w-[18px]" />
-        </button>
+        <BackButton onClick={onClose} />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Exercise</span>

@@ -7,6 +7,7 @@ import { useDesk } from "@/desktop/useDesk";
 import { PageHead } from "@/desktop/ui";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { BackButton } from "@/components/BackButton";
 
 export const Route = createFileRoute("/settings")({ component: SettingsPage });
 
@@ -38,13 +39,7 @@ function SettingsPage() {
     <div className="-mx-4 -mt-4 desk:mx-auto desk:mt-0 desk:max-w-[760px]">
       {desk && <PageHead title="Settings" subtitle="Language, monitoring, voice and notifications" />}
       <header className="desk:hidden h-14 sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border flex items-center px-4 gap-2">
-        <button
-          onClick={goBack}
-          aria-label="Back"
-          className="h-9 w-9 -ml-2 rounded-full flex items-center justify-center hover:bg-white/[0.08] hover:text-foreground"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </button>
+        <BackButton onClick={goBack} />
         <h1 className="text-base font-semibold">Settings</h1>
       </header>
       <div className="p-4 flex flex-col gap-4 desk:p-0 desk:!flex desk:!columns-auto desk:gap-5 desk:[&>div]:!contents desk:[&_section]:w-full desk:[&_section]:!mb-0 fold:block fold:columns-2 fold:gap-4 fold:[&_section]:break-inside-avoid fold:[&_section]:mb-4 hinge-split land:items-start">

@@ -4,6 +4,7 @@ import { Armchair, ChevronLeft, Lightbulb, Play, ShieldCheck, SkipForward, Targe
 import { cn } from "@/lib/utils";
 import { StepTimeline } from "@/components/StepTimeline";
 import { guideFor, type Motion } from "@/lib/exercise-guides";
+import { BackButton } from "@/components/BackButton";
 
 type Tab = "warmUp" | "steps" | "coolDown";
 const TABS: { id: Tab; label: string }[] = [
@@ -24,9 +25,7 @@ export function ExerciseIntro({
   return (
     <div data-screen="Exercise intro" className="pb-4 desk:mx-auto desk:max-w-[1180px] desk:pb-2">
       <div className="flex items-center gap-2">
-        <button onClick={onBack} aria-label="Back" className="flex h-9 w-9 -ml-1.5 items-center justify-center rounded-full hover:bg-white/[0.08] hover:text-foreground desk:ml-0 desk:h-10 desk:w-10 desk:border desk:border-white/[0.08] desk:hover:border-white/20">
-          <ChevronLeft className="h-5 w-5" />
-        </button>
+        <BackButton onClick={onBack} />
         <span className="flex-1" />
         <button
           onClick={onStart}

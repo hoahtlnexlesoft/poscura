@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { SUPPORT_TYPES, addTicket } from "@/lib/tickets-store";
+import { BackButton } from "@/components/BackButton";
 
 export const Route = createFileRoute("/support/report")({ component: ReportPage });
 
@@ -80,13 +81,7 @@ function ReportPage() {
   return (
     <div className="-mx-4 -mt-4 min-h-full flex flex-col">
       <header className="h-14 sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border flex items-center px-4 gap-2">
-        <button
-          onClick={goBack}
-          aria-label="Back"
-          className="h-9 w-9 -ml-2 rounded-full flex items-center justify-center hover:bg-white/[0.08] hover:text-foreground"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </button>
+        <BackButton onClick={goBack} />
         <h1 className="text-base font-semibold flex-1">Report an Issue</h1>
         <Link
           to="/support/tickets"

@@ -20,6 +20,7 @@ const FILTERS = ["All Feeds", "Expert Advice", "Milestone", "Question", "Posture
 const POPULAR_TAGS = ["#poscura", "#progress", "#desklife", "#wellness", "#mobility", "#posture", "#stretch", "#neckpain"];
 type SortKey = "recent" | "popular";
 import { toast } from "sonner";
+import { BackButton } from "@/components/BackButton";
 
 export const Route = createFileRoute("/community")({ component: CommunityPage });
 
@@ -516,9 +517,7 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
       {/* open foldables: the post stays put while the conversation scrolls; a tall post scrolls inside its own pane */}
       <section className="land:sticky land:top-[72px] land:row-span-2 land:flex land:max-h-[calc(100dvh-84px)] land:flex-col land:self-start">
         <div className="mb-3 flex items-center gap-2">
-          <button onClick={onBack} aria-label="Back" className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.08] text-foreground/80 transition hover:border-primary/40 hover:text-foreground">
-            <ChevronLeft className="h-[18px] w-[18px]" />
-          </button>
+          <BackButton onClick={onBack} />
           <h1 className="text-[17px] font-semibold tracking-tight">Post</h1>
         </div>
 

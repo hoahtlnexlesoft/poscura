@@ -1,3 +1,5 @@
+import { useGoBack } from "@/hooks/useGoBack";
+import { BackButton } from "@/components/BackButton";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ChevronLeft, CheckCheck } from "lucide-react";
@@ -7,6 +9,7 @@ import { NotiFilter, NotiList, type NotiTab } from "@/components/NotificationLis
 export const Route = createFileRoute("/notifications")({ component: NotificationsPage });
 
 function NotificationsPage() {
+  const goBackHome = useGoBack("/");
   const { unread, markAll } = useNotifications();
   const [tab, setTab] = useState<NotiTab>("all");
 
@@ -21,9 +24,7 @@ function NotificationsPage() {
     <div data-screen="Notifications" className="fold:mx-auto fold:max-w-[640px] land:max-w-none hinge-split land:items-start">
       {/* header (on open foldables it becomes the left pane, with the list across the hinge) */}
       <div className="land:sticky land:top-[72px]">
-        <Link to="/" className="inline-flex w-fit items-center gap-1 text-sm text-muted-foreground transition hover:text-foreground">
-          <ChevronLeft className="h-4 w-4" /> Back
-        </Link>
+        <BackButton onClick={goBackHome} />
         <div className="mt-3 flex items-end justify-between gap-3 land:block">
           <div>
             <h1 className="text-[22px] font-bold tracking-tight land:text-[26px]">Notifications</h1>

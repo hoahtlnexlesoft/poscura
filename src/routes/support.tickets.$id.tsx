@@ -21,6 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { BackButton } from "@/components/BackButton";
 
 export const Route = createFileRoute("/support/tickets/$id")({
   component: TicketDetailPage,
@@ -125,13 +126,7 @@ function TicketDetailPage() {
     return (
       <div className="-mx-4 -mt-4 min-h-full flex flex-col">
         <header className="h-14 sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border flex items-center px-4 gap-2">
-          <button
-            onClick={goBack}
-            aria-label="Back"
-            className="h-9 w-9 -ml-2 rounded-full flex items-center justify-center hover:bg-white/[0.08] hover:text-foreground"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
+          <BackButton onClick={goBack} />
           <h1 className="text-base font-semibold">Ticket not found</h1>
         </header>
         <div className="p-6 text-sm text-muted-foreground">
@@ -146,13 +141,7 @@ function TicketDetailPage() {
   return (
     <div className="-mx-4 -mt-4 min-h-full flex flex-col">
       <header className="h-14 sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border flex items-center px-4 gap-2">
-        <button
-          onClick={goBack}
-          aria-label="Back"
-          className="h-9 w-9 -ml-2 rounded-full flex items-center justify-center hover:bg-white/[0.08] hover:text-foreground"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </button>
+        <BackButton onClick={goBack} />
         <h1 className="text-base font-semibold flex-1 truncate">{ticket.id}</h1>
         <span
           className={cn(

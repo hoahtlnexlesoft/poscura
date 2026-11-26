@@ -1,3 +1,5 @@
+import { useGoBack } from "@/hooks/useGoBack";
+import { BackButton } from "@/components/BackButton";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { ChevronLeft, AlertTriangle, TrendingDown, TrendingUp } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
@@ -22,6 +24,7 @@ function StatusPill({ status }: { status: "Severe" | "Moderate" | "Balanced" }) 
 }
 
 function BodyPartDetail() {
+  const goBackHome = useGoBack("/");
   const { part } = useParams({ from: "/body-part/$part" });
   const data = bodyParts[part as BodyPartKey] ?? bodyParts.head;
   const statusCls =
@@ -32,9 +35,7 @@ function BodyPartDetail() {
   return (
     <div className="space-y-4 fold:grid fold:grid-cols-2 fold:gap-4 land:gap-x-6 hinge-split fold:space-y-0 fold:items-start">
       <div className="flex items-center justify-between fold:col-span-2">
-        <Link to="/" className="inline-flex items-center gap-1 text-base font-semibold">
-          <ChevronLeft className="h-5 w-5" /> {data.name}
-        </Link>
+        <div className="flex items-center gap-3"><BackButton onClick={goBackHome} /><h1 className="text-[19px] font-semibold tracking-tight">{data.name}</h1></div>
         <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusCls}`}>{data.status}</span>
       </div>
 

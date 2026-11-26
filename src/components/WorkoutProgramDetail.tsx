@@ -1,3 +1,4 @@
+import { BackButton } from "@/components/BackButton";
 import { useImmersive } from "@/hooks/useImmersive";
 import { ChevronLeft, ChevronRight, Play, Tag, Share2, X, CalendarClock, Check, Clock3 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -109,9 +110,7 @@ export function WorkoutProgramDetail({ onClose, onStartSession }: Props) {
     <div className="space-y-4 land:grid land:grid-cols-2 hinge-split land:items-start land:gap-x-6 land:gap-y-4 land:space-y-0">
       {/* ---------- header ---------- */}
       <div className="flex items-center gap-3 land:col-span-2">
-        <button onClick={onClose} aria-label="Back" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/[0.08] text-foreground/80 transition hover:border-primary/40 hover:text-foreground">
-          <ChevronLeft className="h-[18px] w-[18px]" />
-        </button>
+        <BackButton onClick={onClose} />
         <span className="flex-1 text-[15px] font-semibold">Program</span>
         {/* Cancel ends the whole program, so it asks first */}
         <AlertDialog>

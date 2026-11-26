@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import { ChevronLeft, ChevronRight, Ticket, Check, X, User, Users, Zap, TicketX } from "lucide-react";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { useGoBack } from "@/hooks/useGoBack";
 import { Actions, Header, primaryBtn, outlineBtn } from "@/components/CheckoutBits";
@@ -35,13 +36,6 @@ function SubscribePage() {
   const discount = voucher ? Math.round(price * voucherRate(voucher)) : 0;
   const charged = price - discount;
   const per = cycle === "annual" ? "year" : "month";
-  useEffect(() => { window.scrollTo(0, 0); }, [picking]);
-
-  if (picking) {
-    return <VoucherPicker planId={plan.id} empty={!!novouchers} selected={voucher}
-      onBack={() => setPicking(false)} onDone={(v) => { setVoucher(v); setPicking(false); }} />;
-  }
-
   const confirm = () => {
     toast.success(`Subscribed to ${plan.name}`, { description: "Redirecting to secure payment…" });
     navigate({ to: "/account", search: { tab: "plan" } });
@@ -133,19 +127,23 @@ function SubscribePage() {
           </div>
         </div>
       </div>
+      <VoucherPicker open={picking} planId={plan.id} empty={!!novouchers} selected={voucher}
+        onClose={() => setPicking(false)} onDone={(v) => { setVoucher(v); setPicking(false); }} />
     </div>
   );
 }
 
-/** Vouchers: the ones that fit this plan, or a code typed in. */
-function VoucherPicker({ planId, empty, selected, onBack, onDone }: {
-  planId: string; empty: boolean; selected: Voucher | null; onBack: () => void; onDone: (v: Voucher | null) => void;
+/** Vouchers, as a modal over the order (a bottom sheet on phones): pick one that fits this plan, or type a code. */
+function VoucherPicker({ open, planId, empty, selected, onClose, onDone }: {
+  open: boolean; planId: string; empty: boolean; selected: Voucher | null; onClose: () => void; onDone: (v: Voucher | null) => void;
 }) {
   const list = empty ? [] : VOUCHERS.filter((v) => v.status === "Active");
   const [pick, setPick] = useState<Voucher | null>(selected);
   const [code, setCode] = useState("");
   const [err, setErr] = useState("");
   const [flash, setFlash] = useState<string | null>(null);
+  // each time it opens, start from what the order already has
+  useEffect(() => { if (open) { setPick(selected); setCode(""); setErr(""); } }, [open, selected]);
   const apply = () => {
     const v = VOUCHERS.find((x) => x.code.toLowerCase() === code.trim().toLowerCase());
     if (!v || v.status !== "Active") return setErr("This code isn't valid or has expired.");
@@ -154,13 +152,18 @@ function VoucherPicker({ planId, empty, selected, onBack, onDone }: {
   };
 
   return (
-    <div className="flex min-h-[calc(100dvh-40px)] flex-col desk:min-h-[calc(100dvh-80px)]">
-      <Header title="Vouchers" onBack={onBack} />
-      <div className="mx-auto flex w-full max-w-[640px] flex-1 flex-col gap-4 pt-3 land:grid land:max-w-none land:grid-cols-2 land:items-start land:gap-x-6 hinge-split">
-        <section className="rounded-[22px] border border-white/[0.06] bg-card p-4">
-          <h2 className="px-1 text-[14px] font-semibold">Available Vouchers</h2>
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="flex max-h-[min(720px,calc(100dvh-32px))] max-w-[480px] flex-col gap-0 overflow-hidden rounded-[26px] border-white/[0.08] bg-[#0f1726] p-0 [&>button:last-child]:hidden max-[599px]:bottom-0 max-[599px]:top-auto max-[599px]:max-h-[88dvh] max-[599px]:translate-y-0 max-[599px]:rounded-b-none">
+        <div className="flex items-center justify-between px-5 pb-2 pt-5">
+          <DialogTitle className="text-[17px]">Vouchers</DialogTitle>
+          <button onClick={onClose} aria-label="Close" className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white/[0.08] hover:text-foreground"><X className="h-4 w-4" /></button>
+        </div>
+        <DialogDescription className="sr-only">Pick an available voucher or enter a code.</DialogDescription>
+
+        <div className="mac-scroll flex-1 overflow-y-auto px-5 pb-4">
+          <h3 className="mt-2 text-[13px] font-semibold text-muted-foreground">Available Vouchers</h3>
           {list.length ? (
-            <ul role="radiogroup" className="mt-3 space-y-2.5">
+            <ul role="radiogroup" className="mt-2.5 space-y-2.5">
               {list.map((v) => {
                 const ok = voucherFits(v, planId);
                 const on = pick?.code === v.code;
@@ -171,8 +174,8 @@ function VoucherPicker({ planId, empty, selected, onBack, onDone }: {
                         on ? "bg-primary/[0.08] ring-primary/60" : "bg-white/[0.03] ring-white/[0.07] enabled:hover:ring-white/20",
                         flash === v.code && "plan-flash",
                         !ok && "cursor-not-allowed opacity-50")}>
-                      <span className="flex w-[76px] shrink-0 flex-col items-center justify-center bg-gradient-to-br from-primary/30 via-primary/15 to-secondary/25 py-3">
-                        <span className="text-[20px] font-bold leading-none">{v.off.replace(/\s*OFF/i, "")}</span>
+                      <span className="flex w-[72px] shrink-0 flex-col items-center justify-center bg-gradient-to-br from-primary/30 via-primary/15 to-secondary/25 py-3">
+                        <span className="text-[19px] font-bold leading-none">{v.off.replace(/\s*OFF/i, "")}</span>
                         <span className="mt-1 text-[9.5px] font-semibold uppercase tracking-[0.18em] text-foreground/75">Off</span>
                       </span>
                       <span className="min-w-0 flex-1 px-3.5 py-3">
@@ -196,15 +199,11 @@ function VoucherPicker({ planId, empty, selected, onBack, onDone }: {
               <p className="mt-2.5 text-[13.5px] text-muted-foreground">No data</p>
             </div>
           )}
-        </section>
 
-        <div className="flex flex-1 flex-col gap-4">
-        <section className="rounded-[22px] border border-white/[0.06] bg-card p-4">
-          <div className="mb-4 flex items-center gap-3 text-[12px] text-muted-foreground">
+          <div className="my-5 flex items-center gap-3 text-[12px] text-muted-foreground">
             <span className="h-px flex-1 bg-white/[0.07]" /> Or Enter Manually <span className="h-px flex-1 bg-white/[0.07]" />
           </div>
-
-          <label htmlFor="vcode" className="px-1 text-[13px] font-semibold">Voucher code</label>
+          <label htmlFor="vcode" className="text-[13px] font-semibold">Voucher code</label>
           <div className="mt-2 flex gap-2">
             <input id="vcode" value={code} onChange={(e) => { setCode(e.target.value); setErr(""); }} onKeyDown={(e) => e.key === "Enter" && code.trim() && apply()}
               placeholder="EG: WELCOME50" autoCapitalize="characters"
@@ -213,20 +212,21 @@ function VoucherPicker({ planId, empty, selected, onBack, onDone }: {
             <button onClick={apply} disabled={!code.trim()}
               className="h-11 shrink-0 rounded-xl border border-white/[0.12] px-5 text-[14px] font-semibold transition enabled:hover:border-primary/50 enabled:hover:bg-primary/10 enabled:hover:text-primary disabled:opacity-40">Apply</button>
           </div>
-          <p className={cn("mt-2 px-1 text-[12px]", err ? "text-destructive" : "text-muted-foreground")}>
+          <p className={cn("mt-2 text-[12px]", err ? "text-destructive" : "text-muted-foreground")}>
             {err || "Voucher codes are case-insensitive. Contact support if your code isn't working"}
           </p>
-        </section>
-      {/* the line above the button says what it will do, so choosing a card reads as applied */}
-      <Actions note={pick && (
-        <p key={pick.code} className="flex items-center justify-center gap-1.5 text-[13px] text-success mb-3 animate-in fade-in slide-in-from-bottom-1 duration-300 land:justify-start land:px-1">
-          <Check className="h-4 w-4" strokeWidth={3} /><span className="font-mono font-semibold tracking-wider">{pick.code}</span> · {pick.off.replace(/\s*OFF/i, "")} off applied
-        </p>
-      )}>
-        <button className={primaryBtn} onClick={() => onDone(pick)}>{pick ? "Use voucher" : "OK"}</button>
-      </Actions>
         </div>
-      </div>
-    </div>
+
+        {/* what the button will do, so choosing a card reads as applied */}
+        <div className="border-t border-white/[0.06] px-5 pb-[max(20px,env(safe-area-inset-bottom))] pt-4">
+          {pick && (
+            <p key={pick.code} className="mb-3 flex items-center justify-center gap-1.5 text-[13px] text-success animate-in fade-in slide-in-from-bottom-1 duration-300">
+              <Check className="h-4 w-4" strokeWidth={3} /><span className="font-mono font-semibold tracking-wider">{pick.code}</span> · {pick.off.replace(/\s*OFF/i, "")} off applied
+            </p>
+          )}
+          <button className={cn(primaryBtn, "w-full flex-none")} onClick={() => onDone(pick)}>{pick ? "Use voucher" : "OK"}</button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

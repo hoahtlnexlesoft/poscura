@@ -1,3 +1,5 @@
+import { useGoBack } from "@/hooks/useGoBack";
+import { BackButton } from "@/components/BackButton";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { ChevronLeft, Clock } from "lucide-react";
@@ -15,6 +17,7 @@ const partLabels: Record<Part, string> = {
 };
 
 function DiscomfortPage() {
+  const goBackHome = useGoBack("/");
   const navigate = useNavigate();
   const [selected, setSelected] = useState<Set<Part>>(new Set());
   const [hours, setHours] = useState(0);
@@ -37,9 +40,7 @@ function DiscomfortPage() {
 
   return (
     <div className="space-y-4 fold:grid fold:grid-cols-2 fold:gap-x-5 land:gap-x-6 hinge-split fold:gap-y-4 fold:space-y-0 fold:items-start">
-      <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground fold:col-span-2 fold:justify-self-start">
-        <ChevronLeft className="h-4 w-4" /> Back
-      </Link>
+      <BackButton onClick={goBackHome} className="fold:col-span-2 fold:justify-self-start" />
 
       <div className="fold:col-span-2">
         <h1 className="text-xl font-bold">Log Discomfort</h1>

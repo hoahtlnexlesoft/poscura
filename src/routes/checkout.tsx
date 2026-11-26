@@ -4,6 +4,7 @@ import { z } from "zod";
 import { ChevronLeft } from "lucide-react";
 import { toast } from "sonner";
 import { PlanPicker } from "@/components/PlanPicker";
+import { BackButton } from "@/components/BackButton";
 
 const searchSchema = z.object({ plan: z.string().optional() });
 
@@ -17,15 +18,9 @@ function ChoosePlanPage() {
   const goBack = useGoBack("/account");
   return (
     <div className="pb-4">
-      <header className="relative flex h-11 items-center justify-center">
-        <button
-          onClick={goBack}
-          aria-label="Back"
-          className="absolute left-0 flex h-9 w-9 -ml-1.5 items-center justify-center rounded-full hover:bg-white/[0.08] hover:text-foreground"
-        >
-          <ChevronLeft className="h-6 w-6" />
-        </button>
-        <h1 className="text-base font-medium">Choose Your Plan</h1>
+      <header className="flex h-12 items-center gap-3">
+        <BackButton onClick={goBack} />
+        <h1 className="text-[17px] font-semibold">Choose Your Plan</h1>
       </header>
 
       <div className="mt-5 text-center">

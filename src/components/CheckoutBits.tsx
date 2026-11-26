@@ -1,4 +1,5 @@
 import { ChevronLeft } from "lucide-react";
+import { BackButton } from "@/components/BackButton";
 
 /* Shared by the checkout screens (Subscribe, Vouchers, Get Add-on). */
 
@@ -16,11 +17,9 @@ export const outlineBtn = "h-12 flex-1 rounded-2xl border border-white/[0.12] te
 
 export function Header({ title, onBack }: { title: string; onBack: () => void }) {
   return (
-    <header className="relative flex h-12 items-center justify-center">
-      <button onClick={onBack} aria-label="Back" className="absolute left-0 flex h-10 w-10 -ml-2 items-center justify-center rounded-full transition hover:bg-white/[0.08]">
-        <ChevronLeft className="h-6 w-6" />
-      </button>
-      <h1 className="text-[16px] font-semibold">{title}</h1>
+    <header className="flex h-12 items-center gap-3">
+      <BackButton onClick={onBack} />
+      <h1 className="text-[17px] font-semibold">{title}</h1>
     </header>
   );
 }

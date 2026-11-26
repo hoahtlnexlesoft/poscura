@@ -1,3 +1,5 @@
+import { useImmersive } from "@/hooks/useImmersive";
+import { BackButton } from "@/components/BackButton";
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, MessageSquareText, ScanLine, Video, Play, Pause, RotateCcw, AlertCircle, CircleCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -22,12 +24,17 @@ export function SessionEvaluation({ exerciseName, score, when, videoUrl, onBack 
   const focus = coachFocus(items);
   const [how, setHow] = useState(false);
   useEffect(() => { window.scrollTo(0, 0); }, []);
+  useImmersive();
 
   return (
     <div className="space-y-4 land:grid land:grid-cols-2 hinge-split land:items-start land:gap-x-6 land:gap-y-4 land:space-y-0">
-      <button onClick={onBack} className="inline-flex items-center gap-1 text-[13px] font-medium text-muted-foreground transition hover:text-foreground land:col-span-2">
-        <ChevronLeft className="h-4 w-4" /> {exerciseName}
-      </button>
+      <div className="flex items-center gap-3 land:col-span-2">
+        <BackButton onClick={onBack} />
+        <div className="min-w-0">
+          <div className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Session evaluation</div>
+          <h1 className="truncate text-[19px] font-semibold leading-tight tracking-tight">{exerciseName}</h1>
+        </div>
+      </div>
 
       <div className="space-y-4">
         <section className="flex items-center gap-4 rounded-[22px] border border-white/[0.06] bg-card p-4">

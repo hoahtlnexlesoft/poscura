@@ -1,3 +1,4 @@
+import { BackButton } from "@/components/BackButton";
 import { useImmersive } from "@/hooks/useImmersive";
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, Play, Pause, Sparkles, Target, TrendingUp, Lightbulb, RotateCcw, Share2, Facebook, Twitter, Linkedin, MessageCircle, Send, Users, X } from "lucide-react";
@@ -80,9 +81,7 @@ export function WorkoutAssessment({ workoutName, recordedVideoUrl, onClose }: Pr
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <button onClick={onClose} className="inline-flex items-center gap-1 text-sm text-muted-foreground transition hover:text-foreground">
-          <ChevronLeft className="h-4 w-4" /> Assessment
-        </button>
+        <div className="flex items-center gap-3"><BackButton onClick={onClose} /><h1 className="text-[17px] font-semibold">Assessment</h1></div>
         <button onClick={() => setShareOpen(true)} aria-label="Share" className="h-9 w-9 rounded-lg border border-border bg-card flex items-center justify-center text-primary">
           <Share2 className="h-4 w-4" />
         </button>
