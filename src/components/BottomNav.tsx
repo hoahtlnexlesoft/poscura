@@ -17,7 +17,7 @@ export function BottomNav() {
         {items.map((item) => {
           const active = currentPath === item.url;
           return (
-            <Link key={item.url} to={item.url}
+            <Link key={item.url} to={item.url} data-active={active || undefined}
               className={cn("flex flex-col items-center gap-1 py-2.5 text-[10px] font-medium transition",
                 active ? "text-primary" : "text-sidebar-foreground/70")}>
               <span className={cn("flex items-center justify-center rail:h-8 rail:w-14 rail:rounded-full rail:transition", active && "rail:bg-primary/15")}>
