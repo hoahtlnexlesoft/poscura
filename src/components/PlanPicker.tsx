@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { Check, User, Users, Zap } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { PLANS, formatVND, priceFor, ANNUAL_DISCOUNT, type BillingCycle, type Plan } from "@/lib/plans";
 
@@ -29,7 +27,6 @@ export function BillingToggle({ cycle, onChange }: { cycle: BillingCycle; onChan
 
 function PlanCard({ plan, cycle }: { plan: Plan; cycle: BillingCycle }) {
   const navigate = useNavigate();
-  const [down, setDown] = useState(false);
   const Icon = ICONS[plan.id];
   const price = priceFor(plan, cycle);
   const free = plan.monthly === 0;
@@ -83,26 +80,8 @@ function PlanCard({ plan, cycle }: { plan: Plan; cycle: BillingCycle }) {
           Current plan
         </button>
       ) : free ? (
-        // already on a paid plan: Freemium is a switch down, not a purchase
-        <>
-          <button type="button" onClick={() => setDown(true)}
-            className="mt-5 h-11 w-full rounded-xl border border-white/[0.12] text-sm font-semibold text-foreground/85 transition hover:border-white/25 hover:bg-white/[0.04] hover:text-foreground active:scale-[0.98]">
-            Switch to Freemium
-          </button>
-          <Dialog open={down} onOpenChange={setDown}>
-            <DialogContent className="max-w-[400px] rounded-[24px]">
-              <DialogHeader>
-                <DialogTitle>Switch to Freemium?</DialogTitle>
-                <DialogDescription className="leading-relaxed">You keep your current plan until Nov 26, 2026. After that you move to Freemium and your limits go back to 20 hours a month.</DialogDescription>
-              </DialogHeader>
-              <DialogFooter className="gap-2 sm:gap-2">
-                <button onClick={() => setDown(false)} className="h-11 flex-1 rounded-xl border border-white/[0.12] text-sm font-semibold transition hover:bg-white/[0.04]">Keep my plan</button>
-                <button onClick={() => { setDown(false); toast("Switch scheduled. Freemium starts on Nov 26, 2026."); }}
-                  className="h-11 flex-1 rounded-xl bg-destructive/90 text-sm font-semibold text-white transition hover:bg-destructive">Switch</button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </>
+        // already on a paid plan: nothing to buy here (downgrading is "Cancel plan" on the current plan)
+        null
       ) : (
         <button
           type="button"
