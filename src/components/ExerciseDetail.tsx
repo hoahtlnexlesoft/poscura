@@ -1,6 +1,6 @@
 import { useImmersive } from "@/hooks/useImmersive";
 import { ChevronLeft, ChevronDown, ChevronRight, Play, Volume2, Maximize2, TrendingUp, Sparkles, AlertCircle, Lightbulb, Share2, Clock, CircleCheck, Target, Package, Lock, Facebook, Twitter, Linkedin, MessageCircle, Send, Users, X, CalendarClock } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { ScoreRing, scoreBand } from "@/components/SessionResult";
 import { cn } from "@/lib/utils";
@@ -82,6 +82,12 @@ function ShareToggle({ label, checked, onChange }: { label: string; checked: boo
 
 export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, onStart, evaluated = hasEvaluation(exerciseName), sessionLabel = "0/2", scheduled = true }: Props) {
   const [sched, setSched] = useState(scheduled);
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const on = () => setScrolled(window.scrollY > 4);
+    on(); window.addEventListener("scroll", on, { passive: true });
+    return () => window.removeEventListener("scroll", on);
+  }, []);
   const [schedTime, setSchedTime] = useState<string | null>(null);
   const [schedOpen, setSchedOpen] = useState(false);
   useImmersive();
@@ -126,8 +132,9 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
 
   return (
     <div className="space-y-4 land:grid land:grid-cols-2 hinge-split land:items-start land:gap-x-6 land:gap-y-4 land:space-y-0">
-      {/* ---------- header ---------- */}
-      <div className="flex items-center gap-3 land:col-span-2">
+      {/* ---------- header: stays pinned while the page scrolls; gets its backdrop once content passes under it ---------- */}
+      <div className={cn("sticky top-0 z-30 -mx-4 -mt-4 flex items-center gap-3 border-b px-4 pb-3 pt-4 transition-[background-color,border-color,backdrop-filter] duration-200 land:col-span-2 desk:top-16 desk:-mx-8 desk:-mt-7 desk:px-8 desk:pt-7 max-[699px]:desk:-mx-4 max-[699px]:desk:-mt-5 max-[699px]:desk:px-4 max-[699px]:desk:pt-5",
+        scrolled ? "border-white/[0.06] bg-background/85 backdrop-blur-xl" : "border-transparent")}>
         <button onClick={onClose} aria-label="Back" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/[0.08] text-foreground/80 transition hover:border-primary/40 hover:text-foreground">
           <ChevronLeft className="h-[18px] w-[18px]" />
         </button>
