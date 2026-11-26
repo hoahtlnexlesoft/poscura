@@ -32,7 +32,9 @@ function SubscribePage() {
   const Icon = ICONS[plan.id];
   const price = priceFor(plan, cycle as BillingCycle);
   const [voucher, setVoucher] = useState<Voucher | null>(null);
-  const [picking, setPicking] = useState(false);
+  // the "no vouchers" preview opens straight on the (empty) voucher list, so it looks different from the plain screen
+  const [picking, setPicking] = useState(!!novouchers);
+  useEffect(() => { setPicking(!!novouchers); setVoucher(null); }, [novouchers, planId]);
   const discount = voucher ? Math.round(price * voucherRate(voucher)) : 0;
   const charged = price - discount;
   const per = cycle === "annual" ? "year" : "month";
