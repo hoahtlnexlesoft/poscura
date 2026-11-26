@@ -8,33 +8,17 @@ const ICONS = { freemium: Zap, individual: User, family: Users } as const;
 
 export function BillingToggle({ cycle, onChange }: { cycle: BillingCycle; onChange: (c: BillingCycle) => void }) {
   const annual = cycle === "annual";
+  const seg = (on: boolean) =>
+    cn("relative z-10 flex h-9 items-center justify-center gap-1.5 rounded-full px-5 text-[13px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
+      on ? "text-white" : "text-muted-foreground hover:text-foreground");
   return (
-    <div className="mx-auto flex w-max items-center gap-3 rounded-full border border-border bg-card/60 py-2 pl-5 pr-4">
-      <button
-        type="button"
-        onClick={() => onChange("monthly")}
-        className={cn("text-sm font-semibold transition-colors", annual ? "text-muted-foreground" : "text-primary")}
-      >
-        Monthly
-      </button>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={annual}
-        aria-label="Bill annually"
-        onClick={() => onChange(annual ? "monthly" : "annual")}
-        className="relative h-7 w-[52px] shrink-0 rounded-full border border-border bg-muted/70 transition-colors"
-      >
-        <span
-          className={cn(
-            "absolute top-1/2 h-5 w-5 -translate-y-1/2 rounded-full bg-primary shadow-[0_0_10px] shadow-primary/50 transition-[left]",
-            annual ? "left-[27px]" : "left-[3px]",
-          )}
-        />
-      </button>
-      <button type="button" onClick={() => onChange("annual")} className="text-left leading-tight">
-        <span className={cn("block text-sm font-semibold transition-colors", annual ? "text-primary" : "text-muted-foreground")}>Annual</span>
-        <span className="block text-[10px] font-semibold text-warning">Save up to 25%</span>
+    /* segmented control: the sliding pill shows the chosen cycle */
+    <div role="radiogroup" aria-label="Billing cycle" className="relative mx-auto grid w-max grid-cols-2 rounded-full border border-white/[0.08] bg-white/[0.03] p-1">
+      <span aria-hidden className={cn("absolute inset-y-1 left-1 w-[calc(50%-4px)] rounded-full bg-gradient-to-r from-primary to-secondary shadow-[0_6px_18px_-6px] shadow-primary/60 transition-transform duration-300", annual && "translate-x-full")} />
+      <button type="button" role="radio" aria-checked={!annual} onClick={() => onChange("monthly")} className={seg(!annual)}>Monthly</button>
+      <button type="button" role="radio" aria-checked={annual} onClick={() => onChange("annual")} className={seg(annual)}>
+        Annual
+        <span className={cn("whitespace-nowrap rounded-full px-1.5 py-px text-[10px] font-bold transition-colors", annual ? "bg-white/20 text-white" : "bg-warning/15 text-warning")}>Save up to 25%</span>
       </button>
     </div>
   );

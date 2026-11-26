@@ -28,12 +28,12 @@ function ChoosePlanPage() {
         <h1 className="text-base font-medium">Choose Your Plan</h1>
       </header>
 
-      <div className="mt-4 text-center">
-        <h2 className="inline-block border-b-2 border-primary px-6 pb-3 text-[15px] font-semibold">Unlock All Features</h2>
+      <div className="mt-5 text-center">
+        <h2 className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-[24px] font-bold tracking-tight text-transparent">Unlock All Features</h2>
       </div>
 
       {/* cards sit side by side when there is room (open foldables), stacked on phones */}
-      <PlanPicker className="mt-5" />
+      <PlanPicker className="mt-4" />
 
       <div className="mt-6 text-center text-sm leading-relaxed">
         <button onClick={() => toast("No previous purchases found")} className="font-medium text-primary hover:underline">
