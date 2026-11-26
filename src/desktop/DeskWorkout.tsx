@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Panel, PageHead, btn, Page, Eyebrow } from "./ui";
 import { ScheduleDialog } from "./DeskDashboard";
 import { NoWorkoutsToday } from "@/components/NoWorkoutsToday";
+import { NoHistory } from "@/components/NoHistory";
 import { TODAYS_WORKOUTS, TODAY_TIME, NEXT_WORKOUT } from "@/lib/todays-workouts";
 
 const PROGRAM = {
@@ -29,7 +30,7 @@ const PHASE = { "Warm up": "bg-sky-500/12 text-sky-300 ring-sky-400/25", Main: "
 // same program the Program screen shows, so Details opens what the card says
 const CURRENT = { name: "Shoulder & Neck Relief", sessions: 39, exercises: 4, start: "Nov 20, 2026", end: "Dec 18, 2026", done: 0 };
 
-export function DeskWorkoutHome({ empty, onProgram, onExercise, onStart }: { empty?: boolean; onProgram: () => void; onExercise: (n: string) => void; onStart: (n: string) => void }) {
+export function DeskWorkoutHome({ empty, noHistory, onProgram, onExercise, onStart }: { empty?: boolean; noHistory?: boolean; onProgram: () => void; onExercise: (n: string) => void; onStart: (n: string) => void }) {
   const [more, setMore] = useState(false);
   const pct = Math.round((CURRENT.done / CURRENT.sessions) * 100);
   return (
@@ -56,7 +57,7 @@ export function DeskWorkoutHome({ empty, onProgram, onExercise, onStart }: { emp
         </Panel>
 
         <Panel title="Workout History" icon={<History className="h-4 w-4 text-secondary" />} bodyClass="px-3 pb-3">
-          <ul className="space-y-1">
+          {noHistory ? <div className="px-3 pb-1"><NoHistory /></div> : <><ul className="space-y-1">
             {(more ? HISTORY : HISTORY.slice(0, 2)).map((h) => (
               <li key={h.name}>
                 <button onClick={onProgram} className="group flex w-full items-center gap-4 rounded-2xl px-4 py-3.5 text-left transition hover:bg-white/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
@@ -73,7 +74,7 @@ export function DeskWorkoutHome({ empty, onProgram, onExercise, onStart }: { emp
               </li>
             ))}
           </ul>
-          <button onClick={() => setMore((m) => !m)} className={cn(btn.ghost, "mx-auto mt-1 flex")}>{more ? "View less" : "View more"} <ChevronDown className={cn("h-4 w-4 transition", more && "rotate-180")} /></button>
+          <button onClick={() => setMore((m) => !m)} className={cn(btn.ghost, "mx-auto mt-1 flex")}>{more ? "View less" : "View more"} <ChevronDown className={cn("h-4 w-4 transition", more && "rotate-180")} /></button></>}
         </Panel>
       </div>
       </div>

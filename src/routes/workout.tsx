@@ -11,13 +11,14 @@ import { SessionResult } from "@/components/SessionResult";
 import { SessionEvaluation } from "@/components/SessionEvaluation";
 import { NoWorkoutsToday } from "@/components/NoWorkoutsToday";
 import { NoWorkoutPlan } from "@/components/NoWorkoutPlan";
+import { NoHistory } from "@/components/NoHistory";
 import { Page, PageHead } from "@/desktop/ui";
 import { WorkoutProgramDetail, exerciseList } from "@/components/WorkoutProgramDetail";
 import { ExerciseDetail } from "@/components/ExerciseDetail";
 import { NEXT_WORKOUT, TODAYS_WORKOUTS, TODAY_TIME } from "@/lib/todays-workouts";
 
 export const Route = createFileRoute("/workout")({
-  validateSearch: z.object({ session: z.string().optional(), exercise: z.string().optional(), schedule: z.enum(["none"]).optional(), evaluate: z.string().optional(), score: z.coerce.number().optional(), empty: z.coerce.string().optional(), new: z.coerce.string().optional() }),
+  validateSearch: z.object({ session: z.string().optional(), exercise: z.string().optional(), schedule: z.enum(["none"]).optional(), evaluate: z.string().optional(), score: z.coerce.number().optional(), empty: z.coerce.string().optional(), new: z.coerce.string().optional(), history: z.enum(["none"]).optional() }),
   component: WorkoutPage,
 });
 
@@ -46,7 +47,7 @@ type View =
   | { kind: "program" };
 
 function WorkoutPage() {
-  const { session, exercise, schedule, evaluate, score, empty, new: fresh } = Route.useSearch();
+  const { session, exercise, schedule, evaluate, score, empty, new: fresh, history } = Route.useSearch();
   const desk = useDesk();
   const [view, setView] = useState<View>(evaluate ? { kind: "evaluation", name: evaluate, score: score ?? 88, recordedUrl: null, when: "Today, 16:45" } : session ? { kind: "intro", name: session } : exercise ? { kind: "exercise", name: exercise } : { kind: "list" });
   // deep links (?exercise= / ?session=) also work when the page is already open
@@ -119,7 +120,7 @@ function WorkoutPage() {
       <NoWorkoutPlan />
     </div>
   );
-  if (desk) return <DeskWorkoutHome empty={!!empty} onProgram={() => setView({ kind: "program" })} onExercise={(name) => setView({ kind: "exercise", name })} onStart={(name) => setView({ kind: "intro", name })} />;
+  if (desk) return <DeskWorkoutHome empty={!!empty} noHistory={history === "none"} onProgram={() => setView({ kind: "program" })} onExercise={(name) => setView({ kind: "exercise", name })} onStart={(name) => setView({ kind: "intro", name })} />;
 
   return (
     <div className="space-y-4 fold:grid fold:grid-cols-2 fold:gap-4 land:gap-x-6 hinge-split fold:space-y-0 fold:items-start">
@@ -213,7 +214,7 @@ function WorkoutPage() {
           <Dumbbell className="h-4 w-4 text-secondary" />
           <h2 className="text-sm font-semibold">History</h2>
         </div>
-        <div className="space-y-2">
+        {history === "none" ? <NoHistory /> : <div className="space-y-2">
           {[1, 2].map((i) => (
             <button key={i} onClick={() => setView({ kind: "program" })}
               className="w-full rounded-xl border border-border bg-card p-3 text-left flex items-center justify-between">
@@ -224,7 +225,7 @@ function WorkoutPage() {
               <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
             </button>
           ))}
-        </div>
+        </div>}
       </section>
       </div>
     </div>
