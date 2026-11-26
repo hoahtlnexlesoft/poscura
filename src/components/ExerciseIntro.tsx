@@ -22,55 +22,55 @@ export function ExerciseIntro({
   const items = g[tab];
 
   return (
-    <div data-screen="Exercise intro" className="pb-4">
+    <div data-screen="Exercise intro" className="pb-4 desk:mx-auto desk:max-w-[1180px] desk:pb-2">
       <div className="flex items-center gap-2">
-        <button onClick={onBack} aria-label="Back" className="flex h-9 w-9 -ml-1.5 items-center justify-center rounded-full hover:bg-white/[0.08] hover:text-foreground">
+        <button onClick={onBack} aria-label="Back" className="flex h-9 w-9 -ml-1.5 items-center justify-center rounded-full hover:bg-white/[0.08] hover:text-foreground desk:ml-0 desk:h-10 desk:w-10 desk:border desk:border-white/[0.08] desk:hover:border-white/20">
           <ChevronLeft className="h-5 w-5" />
         </button>
         <span className="flex-1" />
         <button
           onClick={onStart}
-          className="inline-flex h-8 items-center gap-1.5 rounded-full border border-border px-3.5 text-xs font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-foreground"
+          className="inline-flex h-8 items-center gap-1.5 rounded-full border border-border px-3.5 text-xs font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-foreground desk:h-10 desk:px-4 desk:text-[13px]"
         >
           Skip intro <SkipForward className="h-3.5 w-3.5" />
         </button>
       </div>
 
-      <div className="mt-2 land:grid land:grid-cols-2 hinge-split land:items-start land:gap-x-6">
+      <div className="mt-2 land:grid land:grid-cols-2 hinge-split land:items-start land:gap-x-6 desk:mt-5 desk:!grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] desk:!gap-x-8 desk:items-stretch">
         {/* left: title, demo, numbers */}
         <div>
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <h1 className="text-2xl font-bold leading-tight tracking-tight">{name}</h1>
+              <h1 className="text-2xl font-bold leading-tight tracking-tight desk:text-[30px] desk:font-semibold">{name}</h1>
             </div>
-            <span className="mt-1 shrink-0 rounded-full bg-muted/60 px-3 py-1 text-xs font-medium">Session {session} of {sessions}</span>
+            <span className="mt-1 shrink-0 rounded-full bg-muted/60 px-3 py-1 text-xs font-medium desk:mt-2 desk:bg-primary/12 desk:text-primary desk:ring-1 desk:ring-inset desk:ring-primary/25">Session {session} of {sessions}</span>
           </div>
 
-          <div className="relative mt-4 aspect-[16/10] land:aspect-[16/9] overflow-hidden rounded-2xl border border-border bg-[radial-gradient(60%_70%_at_50%_45%,#11223f,#05080f)]">
+          <div className="relative mt-4 aspect-[16/10] land:aspect-[16/9] overflow-hidden rounded-2xl border border-border desk:mt-5 desk:rounded-[24px] desk:border-white/[0.06] bg-[radial-gradient(60%_70%_at_50%_45%,#11223f,#05080f)]">
             <Figure motion={g.motion} />
           </div>
           <p className="mt-2 text-xs text-muted-foreground">Preview loop · the full demo video is coming.</p>
 
-          <div className="mt-3 grid grid-cols-3 gap-2">
+          <div className="mt-3 grid grid-cols-3 gap-2 desk:mt-5 desk:gap-3">
             {[
               ["Every", plural(g.everyDays ?? 1, "day")],
               ["Per day", plural(parseInt(g.perDay) || 1, "time")],
               ["Repeat", `${g.repeatHours ?? 4} hr`],
             ].map(([l, v]) => (
-              <div key={l} className="rounded-xl bg-muted/40 px-3 py-2.5">
+              <div key={l} className="rounded-xl bg-muted/40 px-3 py-2.5 desk:rounded-2xl desk:border desk:border-white/[0.06] desk:bg-white/[0.02] desk:px-5 desk:py-3.5">
                 <div className="text-xs text-muted-foreground">{l}</div>
-                <div className="mt-0.5 text-[15px] font-semibold">{v}</div>
+                <div className="mt-0.5 text-[15px] font-semibold desk:text-[18px]">{v}</div>
               </div>
             ))}
           </div>
-          <div className="mt-2 grid grid-cols-2 gap-2">
+          <div className="mt-2 grid grid-cols-2 gap-2 desk:mt-3 desk:gap-3">
             <Info icon={<Target className="h-4 w-4" />} label="Goal" value={g.goal} />
             <Info icon={<Armchair className="h-4 w-4" />} label="You need" value={g.need} />
           </div>
         </div>
 
         {/* right: how to, safety, start */}
-        <div className="mt-4 land:mt-0 land:flex land:flex-col land:self-stretch">
+        <div className="mt-4 land:mt-0 land:flex land:flex-col land:self-stretch desk:rounded-[24px] desk:border desk:border-white/[0.06] desk:bg-[#0d1320]/80 desk:p-6">
           {/* one segmented track instead of three loose pills */}
           <div className="grid grid-cols-3 rounded-full border border-white/[0.06] bg-white/[0.03] p-1">
             {TABS.map((t) => (
@@ -101,7 +101,7 @@ export function ExerciseIntro({
           </div>
 
           {/* pinned to the bottom of the screen so Start is always in reach, with the content fading out behind it */}
-          <div className="sticky bottom-0 z-10 -mx-4 -mb-10 mt-4 hidden land:mx-0 land:mt-auto land:block land:px-0 bg-gradient-to-t from-background from-60% to-transparent px-4 pb-4 pt-6">
+          <div className="sticky bottom-0 z-10 -mx-4 -mb-10 mt-4 hidden land:mx-0 land:mt-auto land:block land:px-0 bg-gradient-to-t from-background from-60% to-transparent px-4 pb-4 pt-6 desk:static desk:mb-0 desk:bg-none desk:pb-0 desk:pt-6">
             <button
               onClick={onStart}
               className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-secondary text-[15px] font-semibold text-white shadow-[0_10px_30px_-12px] shadow-primary transition hover:opacity-95 active:scale-[0.99]"
@@ -127,7 +127,7 @@ export function ExerciseIntro({
 
 function Info({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="flex gap-2.5 rounded-xl bg-muted/40 px-3 py-2.5">
+    <div className="flex gap-2.5 rounded-xl bg-muted/40 px-3 py-2.5 desk:rounded-2xl desk:border desk:border-white/[0.06] desk:bg-white/[0.02] desk:px-4 desk:py-3.5">
       <span className="mt-0.5 text-primary">{icon}</span>
       <div className="min-w-0">
         <div className="text-xs text-muted-foreground">{label}</div>
