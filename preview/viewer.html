@@ -440,7 +440,13 @@
   // which simulated device the reviewer is looking at (read by the comment kit)
   window.poscuraDevice = function () { var d = view(); if (d.kind === "desktop" && frame) return { name: "Web · Desktop browser", size: frame.clientWidth + "×" + frame.clientHeight + " px" }; return { name: d.name, size: d.w + "×" + d.h + " " + d.unit }; };
   // routes may come back with the query encoded differently ("+" vs "%20"), so compare decoded
-  function norm(p) { try { return decodeURIComponent(String(p || "").replace(/\+/g, " ")); } catch (e) { return String(p || ""); } }
+  // the router re-serialises search values (numbers-as-strings get quotes, keys may reorder), so compare path + sorted, unquoted params
+  function norm(p) {
+    var t; try { t = decodeURIComponent(String(p || "").replace(/\+/g, " ")); } catch (e) { t = String(p || ""); }
+    var i = t.indexOf("?"), path = i < 0 ? t : t.slice(0, i), q = i < 0 ? "" : t.slice(i + 1);
+    var parts = q.split("&").filter(Boolean).map(function (kv) { return kv.replace(/"/g, ""); }).sort();
+    return path + (parts.length ? "?" + parts.join("&") : "");
+  }
   function markActive(path) {
     var want = norm(path);
     document.querySelectorAll("#screens button").forEach(function (b) { b.classList.toggle("on", norm(b.dataset.path) === want); });

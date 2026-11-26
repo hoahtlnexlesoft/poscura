@@ -1,5 +1,5 @@
 import { Dumbbell } from "lucide-react";
-import noWorkouts from "@/assets/no-workouts.png";
+import { NoWorkoutsArt } from "@/components/EmptyArt";
 import { cn } from "@/lib/utils";
 
 /** Today's sessions before a program schedule exists (after the first scan report).
@@ -13,7 +13,7 @@ export function NoWorkoutsToday({ className }: { className?: string }) {
       </div>
       <div className="relative flex flex-1 flex-col items-center justify-center py-8 text-center">
         <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-[60%] rounded-full bg-primary/10 blur-3xl" />
-        <img src={noWorkouts} alt="" className="relative h-[120px] w-[120px] rounded-full opacity-95 fold:h-[136px] fold:w-[136px]" />
+        <NoWorkoutsArt className="relative w-[150px] fold:w-[170px]" />
         <h3 className="relative mt-5 text-[15px] font-semibold tracking-tight">No Workouts Today</h3>
       </div>
     </section>

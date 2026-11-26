@@ -1,13 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { Play } from "lucide-react";
-import noPlan from "@/assets/no-plan.png";
+import { NoPlanArt } from "@/components/EmptyArt";
 
 /** Workout before the first posture scan: there's no plan yet, monitoring creates it. Light, centred, no box. */
 export function NoWorkoutPlan() {
   return (
     <section className="relative flex min-h-[calc(100dvh-220px)] flex-col items-center justify-center px-6 py-10 text-center">
       <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-[62%] rounded-full bg-primary/10 blur-3xl" />
-      <img src={noPlan} alt="" className="relative w-[180px] opacity-95 fold:w-[200px]" />
+      <NoPlanArt className="relative w-[170px] fold:w-[190px]" />
       <h2 className="relative mt-6 text-[18px] font-semibold tracking-tight">No Workouts Plan</h2>
       <p className="relative mt-1.5 max-w-[300px] text-[13px] leading-relaxed text-muted-foreground">Run monitoring to receive a personalized workout.</p>
       <Link to="/posture-monitor"
