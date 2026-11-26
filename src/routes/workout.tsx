@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { useDesk } from "@/desktop/useDesk";
-import { DeskWorkoutHome, DeskProgram } from "@/desktop/DeskWorkout";
+import { DeskWorkoutHome } from "@/desktop/DeskWorkout";
 import { useEffect, useState } from "react";
 import { Play, Calendar, Dumbbell, Clock, CheckCircle2, XCircle, AlertTriangle, Eye, ChevronRight } from "lucide-react";
 import { WorkoutSession } from "@/components/WorkoutSession";
@@ -95,9 +95,8 @@ function WorkoutPage() {
     const done = w ? w.done >= w.sessions : true;
     return <ExerciseDetail exerciseName={view.name} badge={done ? "Completed" : "Main"} sessionLabel={w ? `${w.done}/${w.sessions}` : "2/2"} onClose={toList} onStart={() => setView({ kind: "intro", name: view.name })} />;
   }
-  if (desk && view.kind === "program") return <DeskProgram onBack={() => setView({ kind: "list" })} />;
-  if (desk) return <DeskWorkoutHome onProgram={() => setView({ kind: "program" })} />;
   if (view.kind === "program") return <WorkoutProgramDetail onClose={() => setView({ kind: "list" })} onStartSession={(name) => setView({ kind: "intro", name })} />;
+  if (desk) return <DeskWorkoutHome onProgram={() => setView({ kind: "program" })} onExercise={(name) => setView({ kind: "exercise", name })} onStart={(name) => setView({ kind: "intro", name })} />;
 
   return (
     <div className="space-y-4 fold:grid fold:grid-cols-2 fold:gap-4 land:gap-x-6 hinge-split fold:space-y-0 fold:items-start">

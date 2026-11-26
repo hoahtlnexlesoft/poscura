@@ -13,7 +13,7 @@ import { useFitFrame } from "@/hooks/useFitFrame";
 
 export const Route = createFileRoute("/posture-monitor")({
   validateSearch: (search: Record<string, unknown>) => ({
-    report: typeof search.report === "string" ? search.report : undefined,
+    report: search.report === undefined ? undefined : String(search.report),
   }),
   component: PostureMonitor,
 });

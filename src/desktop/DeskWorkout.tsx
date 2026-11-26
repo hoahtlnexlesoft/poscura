@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { CalendarDays, ChevronDown, ChevronLeft, ChevronRight, History, Play, Share2, Tag, Volume2, VolumeX, CalendarClock, Pause } from "lucide-react";
+import { Dumbbell, Clock, Eye, CalendarDays, ChevronDown, ChevronLeft, ChevronRight, History, Play, Share2, Tag, Volume2, VolumeX, CalendarClock, Pause } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Panel, PageHead, btn, Page, Eyebrow } from "./ui";
 import { ScheduleDialog } from "./DeskDashboard";
+import { TODAYS_WORKOUTS, TODAY_TIME, NEXT_WORKOUT } from "@/lib/todays-workouts";
 
 const PROGRAM = {
   name: "Posture & Neck Strengthening Program",
@@ -24,26 +25,31 @@ const HISTORY = [
 ];
 const PHASE = { "Warm up": "bg-sky-500/12 text-sky-300 ring-sky-400/25", Main: "bg-primary/12 text-primary ring-primary/25", "Cool down": "bg-success/12 text-success ring-success/25" } as const;
 
-export function DeskWorkoutHome({ onProgram }: { onProgram: () => void }) {
+// same program the Program screen shows, so Details opens what the card says
+const CURRENT = { name: "Shoulder & Neck Relief", sessions: 39, exercises: 4, start: "Nov 20, 2026", end: "Dec 18, 2026", done: 0 };
+
+export function DeskWorkoutHome({ onProgram, onExercise, onStart }: { onProgram: () => void; onExercise: (n: string) => void; onStart: (n: string) => void }) {
   const [more, setMore] = useState(false);
-  const pct = Math.round((PROGRAM.done / PROGRAM.sessions) * 100);
+  const pct = Math.round((CURRENT.done / CURRENT.sessions) * 100);
   return (
     <Page>
       <PageHead title="Workout" subtitle="Personalized workout plans" />
+      <div className="grid grid-cols-[minmax(0,1fr)_400px] items-start gap-6">
+      <TodaysSessions onExercise={onExercise} onStart={onStart} />
       <div className="space-y-6">
         <Panel title="Current Program" icon={<CalendarDays className="h-4 w-4 text-primary" />}
           action={<button onClick={onProgram} className={btn.ghost}>Details <ChevronRight className="h-4 w-4" /></button>}>
-          <button onClick={onProgram} className="group w-full rounded-[20px] border border-white/[0.06] bg-gradient-to-br from-primary/[0.07] via-transparent to-secondary/[0.05] p-6 text-left transition hover:border-primary/30">
-            <h3 className="text-[18px] font-semibold tracking-tight">{PROGRAM.name}</h3>
+          <button onClick={onProgram} className="group w-full rounded-[20px] border border-white/[0.06] bg-gradient-to-br from-primary/[0.07] via-transparent to-secondary/[0.05] p-5 text-left transition hover:border-primary/30">
+            <h3 className="text-[16px] font-semibold leading-snug tracking-tight">{CURRENT.name}</h3>
             <dl className="mt-5 grid grid-cols-4 divide-x divide-white/[0.06] rounded-2xl border border-white/[0.06] bg-background/30">
-              {[["Total", PROGRAM.sessions], ["Exercises", PROGRAM.exercises], ["Start", "N/A"], ["End", "N/A"]].map(([l, v]) => (
-                <div key={l} className="px-5 py-3.5">
+              {[["Total", CURRENT.sessions], ["Exercises", CURRENT.exercises], ["Start", CURRENT.start], ["End", CURRENT.end]].map(([l, v]) => (
+                <div key={l} className="px-3 py-3">
                   <dt className="text-[12px] text-muted-foreground">{l}</dt>
-                  <dd className={cn("mt-1 text-[19px] font-semibold tabular-nums", v === "N/A" && "text-muted-foreground/70")}>{v}</dd>
+                  <dd className={cn("mt-1 font-semibold tabular-nums", typeof v === "number" ? "text-[19px]" : "text-[12.5px] leading-tight")}>{v}</dd>
                 </div>
               ))}
             </dl>
-            <div className="mt-5 flex justify-between text-[12.5px]"><span className="font-semibold">{pct}% completed</span><span className="tabular-nums text-muted-foreground">{PROGRAM.done}/{PROGRAM.sessions}</span></div>
+            <div className="mt-5 flex justify-between text-[12.5px]"><span className="font-semibold">{pct}% completed</span><span className="tabular-nums text-muted-foreground">{CURRENT.done}/{CURRENT.sessions}</span></div>
             <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/[0.06]"><div className="h-full rounded-full bg-gradient-to-r from-primary to-secondary" style={{ width: `${Math.max(pct, 1)}%` }} /></div>
           </button>
         </Panel>
@@ -53,10 +59,12 @@ export function DeskWorkoutHome({ onProgram }: { onProgram: () => void }) {
             {(more ? HISTORY : HISTORY.slice(0, 2)).map((h) => (
               <li key={h.name}>
                 <button onClick={onProgram} className="group flex w-full items-center gap-4 rounded-2xl px-4 py-3.5 text-left transition hover:bg-white/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
-                  <span className="min-w-0 flex-1 truncate text-[14.5px] font-semibold">{h.name}</span>
-                  <span className="text-[12.5px] text-muted-foreground">End <span className="text-destructive">{h.end}</span></span>
-                  <span className="w-28 shrink-0">
-                    <span className="flex justify-between text-[12px] text-muted-foreground"><span>Completed</span><span className="font-semibold tabular-nums text-foreground/90">{h.pct}%</span></span>
+                                    <span className="min-w-0 flex-1">
+                    <span className="block truncate text-[14px] font-semibold">{h.name}</span>
+                    <span className="text-[12px] text-muted-foreground">End <span className="text-destructive">{h.end}</span></span>
+                  </span>
+                  <span className="w-16 shrink-0">
+                    <span className="block text-right text-[12.5px] font-semibold tabular-nums text-foreground/90">{h.pct}%</span>
                     <span className="mt-1 block h-1 overflow-hidden rounded-full bg-white/[0.06]"><span className="block h-full rounded-full bg-secondary" style={{ width: `${h.pct}%` }} /></span>
                   </span>
                   <ChevronRight className="h-4 w-4 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground" />
@@ -67,7 +75,38 @@ export function DeskWorkoutHome({ onProgram }: { onProgram: () => void }) {
           <button onClick={() => setMore((m) => !m)} className={cn(btn.ghost, "mx-auto mt-1 flex")}>{more ? "View less" : "View more"} <ChevronDown className={cn("h-4 w-4 transition", more && "rotate-180")} /></button>
         </Panel>
       </div>
+      </div>
     </Page>
+  );
+}
+
+function TodaysSessions({ onExercise, onStart }: { onExercise: (n: string) => void; onStart: (n: string) => void }) {
+  return (
+    <Panel title="Today's Sessions" icon={<Dumbbell className="h-4 w-4 text-primary" />} bodyClass="px-3 pb-3">
+      <div className="mx-3 mb-2 flex items-center gap-2 rounded-xl bg-primary/[0.08] px-3.5 py-2.5 text-[12.5px] text-primary ring-1 ring-inset ring-primary/20">
+        <Clock className="h-3.5 w-3.5" /> Next: <span className="font-semibold">{NEXT_WORKOUT}</span> at <span className="font-semibold">{TODAY_TIME}</span>
+      </div>
+      <ul className="space-y-1">
+        {TODAYS_WORKOUTS.map((w) => {
+          const done = w.done >= w.sessions;
+          return (
+            <li key={w.name} className="group flex items-center gap-4 rounded-2xl px-3 py-3 transition hover:bg-white/[0.04]">
+              <button onClick={() => onExercise(w.name)} className="min-w-0 flex-1 text-left focus-visible:outline-none">
+                <div className="truncate text-[14.5px] font-semibold transition group-hover:text-primary">{w.name}</div>
+                <div className="mt-1 flex items-center gap-2 text-[12px] text-muted-foreground">
+                  <span className={cn("rounded-full px-2 py-px text-[11px] font-semibold ring-1 ring-inset", done ? "bg-success/12 text-success ring-success/25" : "bg-destructive/12 text-destructive ring-destructive/25")}>{done ? "Completed" : "Incompleted"}</span>
+                  {TODAY_TIME} · {w.done}/{w.sessions}
+                </div>
+              </button>
+              <button onClick={() => (done ? onExercise(w.name) : onStart(w.name))} aria-label={done ? `View ${w.name}` : `Start ${w.name}`}
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/12 text-primary ring-1 ring-inset ring-primary/30 transition hover:bg-primary hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+                {done ? <Eye className="h-4 w-4" /> : <Play className="ml-0.5 h-3.5 w-3.5 fill-current" />}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </Panel>
   );
 }
 
