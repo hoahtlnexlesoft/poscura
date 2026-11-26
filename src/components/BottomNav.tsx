@@ -3,7 +3,7 @@ import { Home, Activity, Dumbbell, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const items = [
-  { title: "Home", url: "/", icon: Home },
+  { title: "Dashboard", url: "/", icon: Home },
   { title: "Monitor", url: "/posture-monitor", icon: Activity },
   { title: "Workout", url: "/workout", icon: Dumbbell },
   { title: "Community", url: "/community", icon: Users },
