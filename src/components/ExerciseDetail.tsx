@@ -323,13 +323,14 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
 
       {/* ---------- move through the exercises in order: Back / Next, as on the session screen ---------- */}
       {(onPrev || onNext) && (
-        /* a bar along the bottom of the screen, like the session screen; stays in view while scrolling */
-        <nav className="sticky bottom-0 z-30 -mx-4 -mb-6 flex items-center justify-between border-t border-white/10 bg-[#0b1220]/95 px-2 py-2 pb-[max(8px,env(safe-area-inset-bottom))] backdrop-blur-xl land:col-span-2 desk:-mx-8 max-[699px]:desk:-mx-4">
-          <button onClick={onPrev ?? onClose} className="inline-flex h-10 items-center gap-1 rounded-full px-3 text-[14.5px] font-medium text-primary transition hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
-            <ChevronLeft className="h-5 w-5" /> Back
+        /* floating capsule at the bottom centre: always in reach, covers almost nothing */
+        <nav aria-label="Exercises" className="sticky bottom-4 z-30 mx-auto flex w-max items-center rounded-full border border-white/[0.1] bg-[#121a2a]/90 p-1 shadow-[0_18px_40px_-12px_rgba(0,0,0,.75)] backdrop-blur-xl land:col-start-2">
+          <button onClick={onPrev ?? onClose} className="inline-flex h-10 items-center gap-1 rounded-full pl-3 pr-4 text-[14px] font-semibold text-foreground/85 transition hover:bg-white/[0.07] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+            <ChevronLeft className="h-[18px] w-[18px]" /> Back
           </button>
-          <button onClick={onNext} disabled={!onNext} className="inline-flex h-10 items-center gap-1 rounded-full px-3 text-[14.5px] font-medium text-primary transition enabled:hover:bg-primary/10 disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
-            Next <ChevronRight className="h-5 w-5" />
+          <span aria-hidden className="mx-0.5 h-5 w-px bg-white/[0.12]" />
+          <button onClick={onNext} disabled={!onNext} className="inline-flex h-10 items-center gap-1 rounded-full pl-4 pr-3 text-[14px] font-semibold text-primary transition enabled:hover:bg-primary/10 disabled:text-muted-foreground disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+            Next <ChevronRight className="h-[18px] w-[18px]" />
           </button>
         </nav>
       )}
