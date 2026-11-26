@@ -9,7 +9,7 @@ import { ExerciseIntro } from "@/components/ExerciseIntro";
 import { WorkoutAssessment } from "@/components/WorkoutAssessment";
 import { SessionResult } from "@/components/SessionResult";
 import { SessionEvaluation } from "@/components/SessionEvaluation";
-import { WorkoutProgramDetail } from "@/components/WorkoutProgramDetail";
+import { WorkoutProgramDetail, exerciseList } from "@/components/WorkoutProgramDetail";
 import { ExerciseDetail } from "@/components/ExerciseDetail";
 import { NEXT_WORKOUT, TODAYS_WORKOUTS, TODAY_TIME } from "@/lib/todays-workouts";
 
@@ -100,7 +100,11 @@ function WorkoutPage() {
     const wi = TODAYS_WORKOUTS.findIndex((x) => x.name === view.name);
     const w = TODAYS_WORKOUTS[wi];
     const done = w ? w.done >= w.sessions : true;
-    const pw = wi > 0 ? TODAYS_WORKOUTS[wi - 1] : undefined, nw = wi >= 0 ? TODAYS_WORKOUTS[wi + 1] : undefined;
+    // move through today's sessions; an exercise that isn't on today's list moves through the program's exercises
+    const order = wi >= 0 ? TODAYS_WORKOUTS.map((x) => x.name) : exerciseList.map((x) => x.name);
+    const oi = order.indexOf(view.name);
+    const pn = oi > 0 ? order[oi - 1] : undefined, nn = oi >= 0 ? order[oi + 1] : order[0];
+    const pw = pn ? { name: pn } : undefined, nw = nn && nn !== view.name ? { name: nn } : undefined;
     return <ExerciseDetail key={`${view.name}|${schedule ?? ""}`} exerciseName={view.name} badge={done ? "Completed" : "Main"} sessionLabel={w ? `${w.done}/${w.sessions}` : "2/2"} onClose={toList} onStart={() => setView({ kind: "intro", name: view.name })} scheduled={schedule !== "none"}
       onPrev={pw ? () => setView({ kind: "exercise", name: pw.name }) : undefined} onNext={nw ? () => setView({ kind: "exercise", name: nw.name }) : undefined} prevName={pw?.name} nextName={nw?.name} />;
   }

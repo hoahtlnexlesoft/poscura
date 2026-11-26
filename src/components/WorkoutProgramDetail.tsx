@@ -24,7 +24,7 @@ const todaySessions = [
   { name: "Cat Cow", status: "Incompleted" as const, scheduledAt: "05:15 AM", sessionLabel: "0/3", progressPct: 0 },
 ];
 
-const exerciseList: ExerciseListItem[] = [
+export const exerciseList: ExerciseListItem[] = [
   { name: "Squeeze Blades", description: "Strengthens muscles between your shoulder blades", badge: "Warm Up", sessions: "5 sessions", thumbnailGradient: "from-amber-400/35 to-orange-500/25" },
   { name: "Neck Rotation", description: "Improves cervical mobility", badge: "Mobility", sessions: "3 sessions", thumbnailGradient: "from-sky-400/35 to-blue-500/25" },
   { name: "Cat Cow", description: "Mobilizes the spine and relieves back tension", badge: "Flexibility", sessions: "4 sessions", thumbnailGradient: "from-emerald-400/35 to-teal-500/25" },
