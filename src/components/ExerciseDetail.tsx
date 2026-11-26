@@ -5,7 +5,8 @@ import { useNavigate } from "@tanstack/react-router";
 import { ScoreRing, scoreBand } from "@/components/SessionResult";
 import { cn } from "@/lib/utils";
 import { StepTimeline } from "@/components/StepTimeline";
-import { SessionEvaluationDetail } from "@/components/SessionEvaluationDetail";
+import { SessionEvaluation } from "@/components/SessionEvaluation";
+import { stepsFor, stepBand } from "@/lib/stepEval";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { ScheduleDialog } from "@/desktop/DeskDashboard";
@@ -127,7 +128,7 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
   };
 
   if (sessionDetail) {
-    return <SessionEvaluationDetail date={sessionDetail.date} time={sessionDetail.time} score={sessionDetail.score} onClose={() => setSessionDetail(null)} />;
+    return <SessionEvaluation exerciseName={exerciseName} score={sessionDetail.score} when={sessionDetail.date} onBack={() => setSessionDetail(null)} />;
   }
 
   return (
@@ -272,7 +273,7 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
           </button>
           {chartOpen && (
             <div className="mt-4">
-              <AccuracyChart data={accuracySeries} onPointClick={(i, v) => setSessionDetail({ date: `Session ${i + 1}`, time: "06:00 PM", score: v })} />
+              <AccuracyChart data={accuracySeries} onPointClick={(i, v) => setSessionDetail({ date: sessionWhen(i, accuracySeries.length), time: "", score: v })} />
               <p className="mt-2 text-[11.5px] text-muted-foreground">Tap a point to see that session's evaluation.</p>
             </div>
           )}
@@ -326,6 +327,15 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
       </>)}
     </div>
   );
+}
+
+/* chart point → when that session happened: the last one is today, one session a day before it */
+function sessionWhen(i: number, n: number) {
+  const back = n - 1 - i;
+  if (back === 0) return "Today, 16:00";
+  if (back === 1) return "Yesterday, 16:00";
+  const d = new Date(); d.setDate(d.getDate() - back);
+  return `${d.toLocaleDateString("en-US", { month: "short", day: "numeric" })}, 16:00`;
 }
 
 /* "HH:MM" from the schedule dialog → "05:15 AM" */
@@ -382,33 +392,9 @@ function TodayCard({ label, onStart, done, time }: { label?: string; onStart?: (
   );
 }
 
-/* ---------- AI evaluation, per step of the exercise ---------- */
-const STEP_SCORES: Record<string, { title: string; score: number }[]> = {
-  "Cat Cow": [
-    { title: "Start on hands and knees", score: 78 },
-    { title: "Arch your back (cow)", score: 74 },
-    { title: "Round your spine (cat)", score: 91 },
-  ],
-  "Squeeze Blades": [
-    { title: "Sit tall, arms relaxed", score: 84 },
-    { title: "Squeeze your shoulder blades", score: 72 },
-    { title: "Hold, then release slowly", score: 88 },
-  ],
-};
-const DEFAULT_STEPS = [
-  { title: "Sit or stand upright", score: 78 },
-  { title: "Turn your head to one side", score: 74 },
-  { title: "Return to centre, then switch sides", score: 91 },
-];
-
-function stepBand(score: number) {
-  if (score >= 85) return { label: "Perfect form", msg: "You've mastered this step. Keep that feeling every rep.", text: "text-success", bar: "bg-success", dot: "bg-success/15 text-success ring-success/30" };
-  if (score >= 75) return { label: "Almost there", msg: "Great work. You're just a touch away from perfect.", text: "text-sky-400", bar: "bg-sky-400", dot: "bg-sky-400/15 text-sky-300 ring-sky-400/30" };
-  return { label: "Building up", msg: "Good start. Focus on this step next time and watch it improve.", text: "text-warning", bar: "bg-warning", dot: "bg-warning/15 text-warning ring-warning/30" };
-}
-
+/* ---------- AI evaluation, per step of the exercise (bands and data shared with the session evaluation) ---------- */
 function StepAccuracy({ exerciseName }: { exerciseName: string }) {
-  const items = STEP_SCORES[exerciseName] ?? DEFAULT_STEPS;
+  const items = stepsFor(exerciseName);
   const weakest = items.reduce((w, it, i) => (it.score < items[w].score ? i : w), 0);
   const wb = stepBand(items[weakest].score);
   return (
@@ -423,7 +409,7 @@ function StepAccuracy({ exerciseName }: { exerciseName: string }) {
             <li key={it.title} className="relative flex gap-3.5 pb-5 last:pb-0">
               {i < items.length - 1 && <span aria-hidden className="absolute bottom-0 left-[13px] top-7 w-px bg-white/[0.08]" />}
               <span className={cn("relative z-[1] flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[12.5px] font-semibold tabular-nums ring-1 ring-inset",
-                focus ? "bg-warning text-[#1b1406] ring-warning shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-warning)_18%,transparent)]" : b.dot)}>{i + 1}</span>
+                focus ? b.solid : b.dot)} style={focus ? { boxShadow: `0 0 0 4px color-mix(in oklab, ${b.color} 20%, transparent)` } : undefined}>{i + 1}</span>
               <div className="min-w-0 flex-1">
                 <div className="flex items-baseline justify-between gap-3">
                   <span className="text-[14px] font-semibold leading-snug">{it.title}</span>

@@ -8,12 +8,13 @@ import { WorkoutSession } from "@/components/WorkoutSession";
 import { ExerciseIntro } from "@/components/ExerciseIntro";
 import { WorkoutAssessment } from "@/components/WorkoutAssessment";
 import { SessionResult } from "@/components/SessionResult";
+import { SessionEvaluation } from "@/components/SessionEvaluation";
 import { WorkoutProgramDetail } from "@/components/WorkoutProgramDetail";
 import { ExerciseDetail } from "@/components/ExerciseDetail";
 import { NEXT_WORKOUT, TODAYS_WORKOUTS, TODAY_TIME } from "@/lib/todays-workouts";
 
 export const Route = createFileRoute("/workout")({
-  validateSearch: z.object({ session: z.string().optional(), exercise: z.string().optional(), schedule: z.enum(["none"]).optional() }),
+  validateSearch: z.object({ session: z.string().optional(), exercise: z.string().optional(), schedule: z.enum(["none"]).optional(), evaluate: z.string().optional(), score: z.coerce.number().optional() }),
   component: WorkoutPage,
 });
 
@@ -37,20 +38,21 @@ type View =
   | { kind: "session"; name: string }
   | { kind: "result"; name: string; score: number; recordedUrl: string | null }
   | { kind: "assessment"; name: string; score: number; recordedUrl: string | null }
+  | { kind: "evaluation"; name: string; score: number; recordedUrl: string | null; when: string; from?: "result" }
   | { kind: "exercise"; name: string }
   | { kind: "program" };
 
 function WorkoutPage() {
-  const { session, exercise, schedule } = Route.useSearch();
+  const { session, exercise, schedule, evaluate, score } = Route.useSearch();
   const desk = useDesk();
-  const [view, setView] = useState<View>(session ? { kind: "intro", name: session } : exercise ? { kind: "exercise", name: exercise } : { kind: "list" });
+  const [view, setView] = useState<View>(evaluate ? { kind: "evaluation", name: evaluate, score: score ?? 88, recordedUrl: null, when: "Today, 16:45" } : session ? { kind: "intro", name: session } : exercise ? { kind: "exercise", name: exercise } : { kind: "list" });
   // deep links (?exercise= / ?session=) also work when the page is already open
   useEffect(() => {
-    setView(session ? { kind: "intro", name: session } : exercise ? { kind: "exercise", name: exercise } : { kind: "list" });
-  }, [session, exercise]);
+    setView(evaluate ? { kind: "evaluation", name: evaluate, score: score ?? 88, recordedUrl: null, when: "Today, 16:45" } : session ? { kind: "intro", name: session } : exercise ? { kind: "exercise", name: exercise } : { kind: "list" });
+  }, [session, exercise, evaluate, score]);
   const navigate = useNavigate();
   // leaving a deep-linked screen also clears the ?exercise= / ?session= from the URL
-  const toList = () => { setView({ kind: "list" }); if (session || exercise) navigate({ to: "/workout", search: {}, replace: true }); };
+  const toList = () => { setView({ kind: "list" }); if (session || exercise || evaluate) navigate({ to: "/workout", search: {}, replace: true }); };
 
   if (view.kind === "intro") {
     const w = TODAYS_WORKOUTS.find((x) => x.name === view.name);
@@ -83,11 +85,15 @@ function WorkoutPage() {
         sessions={w?.sessions ?? 1}
         score={view.score}
         next={nw ? { name: nw.name, session: nw.done + 1, sessions: nw.sessions } : undefined}
-        onEvaluation={() => setView({ kind: "assessment", name: view.name, score: view.score, recordedUrl: view.recordedUrl })}
+        onEvaluation={() => setView({ kind: "evaluation", name: view.name, score: view.score, recordedUrl: view.recordedUrl, when: `Today, ${new Date().toTimeString().slice(0, 5)}`, from: "result" })}
         onContinue={nw ? () => setView({ kind: "intro", name: nw.name }) : undefined}
         onDone={() => setView({ kind: "list" })}
       />
     );
+  }
+  if (view.kind === "evaluation") {
+    const back = view.from === "result" ? () => setView({ kind: "result", name: view.name, score: view.score, recordedUrl: view.recordedUrl }) : toList;
+    return <SessionEvaluation exerciseName={view.name} score={view.score} when={view.when} videoUrl={view.recordedUrl} onBack={back} />;
   }
   if (view.kind === "assessment") return <WorkoutAssessment workoutName={view.name} recordedVideoUrl={view.recordedUrl} onClose={() => setView({ kind: "result", name: view.name, score: view.score, recordedUrl: view.recordedUrl })} />;
   if (view.kind === "exercise") {
