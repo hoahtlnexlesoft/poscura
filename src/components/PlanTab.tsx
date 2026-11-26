@@ -251,11 +251,90 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
 
   return (
     <>
-      {/* ---------- two columns on wide screens, sized to end close together; one column on phones ---------- */}
+      {/* ---------- wide screens: account sections on the left, plans to upgrade to on the right; one column on phones (upgrade last) ---------- */}
+      {plan === "business" ? (
       <div className="space-y-4 fold:grid fold:grid-cols-2 fold:items-start fold:gap-4 fold:space-y-0 land:gap-x-6 hinge-split land:items-start">
         <div className="space-y-4 fold:flex fold:flex-col fold:gap-4 fold:space-y-0">
-        {/* current plan */}
-        {plan === "business" ? <BusinessPlanCard /> : (
+        <BusinessPlanCard />
+        <div className="fold:hidden">
+          <Card title="Professional benefits" className="scroll-mt-20">
+            <ul className="grid gap-x-4 gap-y-2.5 sm:grid-cols-2">
+              {BENEFITS.map((b) => (
+                <li key={b} className="flex items-center gap-2.5 text-[13.5px]">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-success/15"><Check className="h-3 w-3 text-success" /></span>
+                  {b}
+                </li>
+              ))}
+            </ul>
+          </Card>
+        </div>
+
+
+        <Card title="Usage this month">
+          <div className="grid grid-cols-3 divide-x divide-white/[0.06] rounded-[16px] border border-white/[0.06] bg-white/[0.02]">
+            {[
+              { l: "Hours", v: unlimited ? "∞" : "0.8", of: unlimited ? "unlimited" : "of 20.2 h", pct: unlimited ? null : 4 },
+              { l: "Sessions", v: "10", of: unlimited ? "unlimited" : "of 112", pct: unlimited ? null : 9 },
+              { l: "Reports", v: "6", of: "this month", pct: null },
+            ].map((u) => (
+              <div key={u.l} className="px-3 py-3">
+                <div className="text-[11.5px] text-muted-foreground">{u.l}</div>
+                <div className="mt-1 text-[19px] font-semibold leading-none tabular-nums">{u.v}</div>
+                <div className="mt-1 text-[11px] text-muted-foreground">{u.of}</div>
+                {u.pct !== null && <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/[0.07]"><div className="h-full rounded-full bg-primary" style={{ width: `${u.pct}%` }} /></div>}
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-[12px] text-muted-foreground">Resets on Nov 26, 2026.</p>
+        </Card>
+        <Card title="Add-ons" action={<button onClick={() => setBrowse(true)} className={outlineBtn}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button>}>
+          {addons.length ? (
+            <ul className="space-y-2">
+              {addons.map((a) => (
+                <li key={a.id} className="rounded-[16px] border border-white/[0.06] bg-white/[0.02] p-3.5">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="text-[14px] font-semibold">{a.name}</span>
+                    <span className="shrink-0 text-[14px] font-semibold tabular-nums">{vnd(a.price)}</span>
+                  </div>
+                  <div className="mt-1.5 flex items-center justify-between gap-3 text-[11.5px] text-muted-foreground">
+                    <span className={cn("rounded-full px-2 py-px text-[10.5px] font-semibold ring-1 ring-inset", statusTone.Active)}>Active</span>
+                    <span>{a.date}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : <p className="text-[13px] text-muted-foreground">No add-ons yet.</p>}
+        </Card>
+        <Card title="Subscription history">
+          <ul className="space-y-2">
+            {hist.slice(0, 2).map((h, i) => <HistRow key={i} h={h} />)}
+          </ul>
+          {hist.length > 2 && <MoreButton count={hist.length} onClick={() => setHistOpen(true)} />}
+        </Card>
+        <Card title="Vouchers" action={<span className="text-[12px] text-muted-foreground">{VOUCHERS.filter((x) => x.status === "Active").length} active · tap a code to copy</span>}>
+          <ul className="space-y-3">
+            {VOUCHERS.filter((v) => v.status === "Active").slice(0, 2).map((v) => <VoucherTicket key={v.code} v={v} />)}
+          </ul>
+          {VOUCHERS.length > 2 && <MoreButton count={VOUCHERS.length} onClick={() => setVouOpen(true)} />}
+        </Card>
+        </div>
+        {/* wide screens: benefits alone on the right */}
+        <div className="hidden fold:flex fold:flex-col fold:gap-4 fold:sticky fold:top-4">
+          <Card id="member-benefits" title="Professional benefits" className="scroll-mt-20">
+            <ul className="grid gap-x-4 gap-y-2.5 sm:grid-cols-2">
+              {BENEFITS.map((b) => (
+                <li key={b} className="flex items-center gap-2.5 text-[13.5px]">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-success/15"><Check className="h-3 w-3 text-success" /></span>
+                  {b}
+                </li>
+              ))}
+            </ul>
+          </Card>
+        </div>
+      </div>
+      ) : (
+      <div className="space-y-4 fold:grid fold:grid-cols-2 fold:items-start fold:gap-4 fold:space-y-0 land:gap-x-6 hinge-split land:items-start">
+        <div className="space-y-4 fold:flex fold:flex-col fold:gap-4 fold:space-y-0">
         <Card>
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
@@ -290,24 +369,6 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
             </div>
           )}
         </Card>
-        )}
-
-        {plan === "business" ? (
-          <>
-          <Card id="member-benefits" title="Professional benefits" className="scroll-mt-20">
-            <ul className="grid gap-x-4 gap-y-2.5 sm:grid-cols-2">
-              {BENEFITS.map((b) => (
-                <li key={b} className="flex items-center gap-2.5 text-[13.5px]">
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-success/15"><Check className="h-3 w-3 text-success" /></span>
-                  {b}
-                </li>
-              ))}
-            </ul>
-          </Card>
-          </>
-        ) : (
-          <>
-        {/* usage */}
         <Card title="Usage this month">
           <div className="grid grid-cols-3 divide-x divide-white/[0.06] rounded-[16px] border border-white/[0.06] bg-white/[0.02]">
             {[
@@ -325,9 +386,6 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
           </div>
           <p className="mt-3 text-[12px] text-muted-foreground">Resets on {plan === "free" ? "Dec 17, 2026" : "Nov 26, 2026"}.</p>
         </Card>
-
-          </>
-        )}
         <Card title="Add-ons" action={<button onClick={() => setBrowse(true)} className={outlineBtn}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button>}>
           {addons.length ? (
             <ul className="space-y-2">
@@ -346,37 +404,12 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
             </ul>
           ) : <p className="text-[13px] text-muted-foreground">No add-ons yet.</p>}
         </Card>
-
-        </div>
-        <div className="space-y-4 fold:flex fold:flex-col fold:gap-4 fold:space-y-0">
-        {plan === "business" && (<>
-        {/* usage */}
-        <Card title="Usage this month">
-          <div className="grid grid-cols-3 divide-x divide-white/[0.06] rounded-[16px] border border-white/[0.06] bg-white/[0.02]">
-            {[
-              { l: "Hours", v: unlimited ? "∞" : "0.8", of: unlimited ? "unlimited" : "of 20.2 h", pct: unlimited ? null : 4 },
-              { l: "Sessions", v: "10", of: unlimited ? "unlimited" : "of 112", pct: unlimited ? null : 9 },
-              { l: "Reports", v: "6", of: "this month", pct: null },
-            ].map((u) => (
-              <div key={u.l} className="px-3 py-3">
-                <div className="text-[11.5px] text-muted-foreground">{u.l}</div>
-                <div className="mt-1 text-[19px] font-semibold leading-none tabular-nums">{u.v}</div>
-                <div className="mt-1 text-[11px] text-muted-foreground">{u.of}</div>
-                {u.pct !== null && <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/[0.07]"><div className="h-full rounded-full bg-primary" style={{ width: `${u.pct}%` }} /></div>}
-              </div>
-            ))}
-          </div>
-          <p className="mt-3 text-[12px] text-muted-foreground">Resets on Nov 26, 2026.</p>
-        </Card>
-
-        </>)}
         <Card title="Subscription history">
           <ul className="space-y-2">
             {hist.slice(0, 2).map((h, i) => <HistRow key={i} h={h} />)}
           </ul>
           {hist.length > 2 && <MoreButton count={hist.length} onClick={() => setHistOpen(true)} />}
         </Card>
-
         <Card title="Vouchers" action={<span className="text-[12px] text-muted-foreground">{VOUCHERS.filter((x) => x.status === "Active").length} active · tap a code to copy</span>}>
           <ul className="space-y-3">
             {VOUCHERS.filter((v) => v.status === "Active").slice(0, 2).map((v) => <VoucherTicket key={v.code} v={v} />)}
@@ -384,14 +417,11 @@ export function PlanTab({ plan }: { plan: PlanKind }) {
           {VOUCHERS.length > 2 && <MoreButton count={VOUCHERS.length} onClick={() => setVouOpen(true)} />}
         </Card>
         </div>
-      </div>
-
-      {/* ---------- last: plans to upgrade to (not for business members, their plan is paid by the business) ---------- */}
-      {plan !== "business" && (
-      <section id="upgrade-your-plan" className="mt-4 scroll-mt-20 rounded-[22px] border border-white/[0.06] bg-card p-5">
+      <section id="upgrade-your-plan" className="mt-4 scroll-mt-20 fold:mt-0 fold:sticky fold:top-4 rounded-[22px] border border-white/[0.06] bg-card p-5">
         <h2 className="mb-4 text-center text-[17px] font-semibold tracking-tight">Upgrade your plan</h2>
         <PlanPicker currentId={plan === "free" ? "freemium" : plan === "individual" ? "individual" : "none"} />
       </section>
+      </div>
       )}
 
       <ListModal open={histOpen} onOpenChange={setHistOpen} title="Subscription history" subtitle={`${hist.length} periods, newest first`}>
