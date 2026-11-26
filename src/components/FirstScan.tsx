@@ -1,13 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { ScanLine } from "lucide-react";
-import { FirstScanArt } from "@/components/EmptyArt";
+import firstScan from "@/assets/first-scan.png";
 
 /** Dashboard before the first posture scan: one welcome card and a single way in. */
 export function FirstScan() {
   return (
     <section className="relative mx-auto flex min-h-[calc(100dvh-180px)] max-w-[880px] flex-col items-center justify-center px-6 py-10 text-center">
       <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-[62%] rounded-full bg-primary/10 blur-3xl" />
-      <FirstScanArt className="relative w-[170px] fold:w-[190px]" />
+      <img src={firstScan} alt="" className="relative w-[150px] drop-shadow-[0_18px_30px_rgba(0,0,0,.5)] fold:w-[170px]" />
       <h1 className="relative mt-6 text-[20px] font-semibold tracking-tight">Welcome to Poscura!</h1>
       <p className="relative mt-2 text-[14px] text-foreground/80">Ready for better Posture?</p>
       <p className="relative mt-1 max-w-[420px] text-[13px] leading-relaxed text-muted-foreground">Start with your first scan to unlock personalized insights and improvement plans</p>
