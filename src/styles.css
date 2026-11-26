@@ -20,6 +20,7 @@
 /* Desktop web app (≥1200px): sidebar + top bar instead of the phone chrome */
 @custom-variant desk {
   @media (min-width: 1200px) { @slot; }
+  &:where(html[data-desktop], html[data-desktop] *) { @slot; }
 }
 
 @custom-variant dark (&:is(.dark *));
@@ -35,6 +36,9 @@
 @media (min-width: 1200px) {
   .hinge-split { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; column-gap: 28px !important; }
 }
+/* desktop app: keeps the desktop UI at any window width (Slack-style); one column when narrow */
+html[data-desktop] .hinge-split { display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; column-gap: 28px !important; }
+@media (max-width: 899px) { html[data-desktop] .hinge-split { grid-template-columns: minmax(0, 1fr) !important; row-gap: 20px !important; } }
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -284,3 +288,4 @@ html[data-side] [data-lightbox] img { max-width: 100%; }
 @media (min-width: 1200px) {
   html [data-app-shell]:has([data-desk-sidebar]) { padding-left: var(--desk-sb, 248px) !important; padding-right: 0 !important; transition: padding-left .3s ease; }
 }
+html[data-desktop] [data-app-shell]:has([data-desk-sidebar]) { padding-left: var(--desk-sb, 248px) !important; padding-right: 0 !important; transition: padding-left .3s ease; }

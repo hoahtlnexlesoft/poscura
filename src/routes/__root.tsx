@@ -129,7 +129,7 @@ function AuthGate() {
       {!isOnboarding && <DesktopSidebar />}
       {!isOnboarding && <DesktopTopBar />}
       {!hideTopBar && <MobileTopBar />}
-      <main className={`flex-1 p-4 ${isOnboarding ? "pb-6" : "pb-24 rail:pb-6 desk:px-8 desk:pt-7 desk:pb-10"}`}>
+      <main className={`flex-1 p-4 ${isOnboarding ? "pb-6" : "pb-24 rail:pb-6 desk:px-8 desk:pt-7 desk:pb-10 max-[699px]:desk:px-4 max-[699px]:desk:pt-5"}`}>
         <div className="fold:max-w-[1040px] fold:mx-auto desk:max-w-[1180px]">
           <Outlet />
         </div>

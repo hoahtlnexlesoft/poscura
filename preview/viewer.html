@@ -347,13 +347,13 @@
     document.body.style.cursor = getComputedStyle(g).cursor;
     function move(ev) {
       var w = w0, h = h0;
-      if (mode !== "s") w = Math.round(Math.min(2560, Math.max(720, w0 + (ev.clientX - x0) / sc)));
+      if (mode !== "s") w = Math.round(Math.min(2560, Math.max(480, w0 + (ev.clientX - x0) / sc)));
       if (mode !== "e") h = Math.round(Math.min(1600, Math.max(520, h0 + (ev.clientY - y0) / sc)));
       var dev_ = g.closest(".device"), scr = dev_ && dev_.querySelector(".screen");
       if (dev_) { dev_.style.width = w + "px"; dev_.style.height = (h + 38) + "px"; }
       if (scr) { scr.style.width = w + "px"; scr.style.height = h + "px"; }
       state.macSize = { w: w, h: h };
-      if (lab) { lab.style.display = "block"; lab.textContent = w + " × " + h + (w < 1200 ? "  ·  mobile layout" : ""); }
+      if (lab) { lab.style.display = "block"; lab.textContent = w + " × " + h; }
     }
     function up() {
       document.removeEventListener("pointermove", move); document.removeEventListener("pointerup", up);
@@ -401,7 +401,7 @@
     // a new frame, named before it loads, so the app reads its options on start-up
     var nf = document.createElement("iframe");
     nf.title = "Poscura"; nf.id = "app";
-    nf.name = JSON.stringify({ layout: view().layout || "", side: !!view().side, auth: auth });
+    nf.name = JSON.stringify({ layout: view().layout || "", side: !!view().side, auth: auth, desktop: view().kind === "macapp" });
     nf.src = "app.html#" + path;
     frame.replaceWith(nf);
     frame = nf;

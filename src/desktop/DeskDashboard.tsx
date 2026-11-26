@@ -14,7 +14,7 @@ const progressTotal = TODAYS_WORKOUTS.reduce((a, w) => a + w.programTotal, 0);
 
 export function DeskDashboard({ empty }: { empty?: boolean }) {
   return (
-    <Page className="grid grid-cols-[minmax(0,1fr)_380px] items-start gap-6">
+    <Page className="grid grid-cols-[minmax(0,1fr)_380px] items-start gap-6 max-[1099px]:grid-cols-1">
       <div className="space-y-6">
         <Highlights />
         <Summary />
@@ -53,7 +53,7 @@ function Highlights() {
 function Summary() {
   return (
     <Panel title="Posture Summary">
-      <div className="flex items-end justify-between gap-6">
+      <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-5">
         <div>
           <Eyebrow>Average score</Eyebrow>
           <SegGauge value={92} size={170} className="mt-4" />

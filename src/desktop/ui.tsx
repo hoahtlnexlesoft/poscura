@@ -9,12 +9,12 @@ export function Panel({ title, icon, action, children, className, bodyClass }: {
   return (
     <section className={cn("rounded-[24px] border border-white/[0.06] bg-[#0d1320]/80 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset]", className)}>
       {(title || action) && (
-        <header className="flex items-center justify-between gap-3 px-6 pt-5">
+        <header className="flex items-center justify-between gap-3 px-6 pt-5 max-[559px]:px-5">
           <h2 className="flex items-center gap-2 text-[15px] font-semibold tracking-tight">{icon}{title}</h2>
           {action}
         </header>
       )}
-      <div className={cn("p-6", (title || action) && "pt-4", bodyClass)}>{children}</div>
+      <div className={cn("p-6 max-[559px]:px-5", (title || action) && "pt-4", bodyClass)}>{children}</div>
     </section>
   );
 }

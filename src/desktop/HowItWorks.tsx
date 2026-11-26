@@ -62,15 +62,15 @@ export function HowItWorks() {
   return (
     <Page className="flex min-h-[calc(100dvh-140px)] flex-col">
       <Stepper i={i} onGo={setI} />
-      <div key={i} className="mt-8 grid flex-1 grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] items-center gap-10 animate-in fade-in slide-in-from-right-2 duration-300">
+      <div key={i} className="mt-8 grid flex-1 grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] items-center gap-10 max-[899px]:grid-cols-1 max-[899px]:gap-6 animate-in fade-in slide-in-from-right-2 duration-300">
         <div>
           <div className="text-[12px] font-semibold uppercase tracking-[0.16em] text-primary">Step {i + 1} of {STEPS.length}</div>
-          <h1 className="mt-3 text-[30px] font-semibold leading-tight tracking-tight">{s.title}</h1>
+          <h1 className="mt-3 text-[30px] max-[699px]:text-[24px] font-semibold leading-tight tracking-tight">{s.title}</h1>
           <div className="mt-4 text-[14.5px] leading-relaxed text-muted-foreground">{s.body}</div>
         </div>
-        <div className="relative flex min-h-[420px] items-center justify-center rounded-[28px] border border-white/[0.06] bg-[radial-gradient(70%_70%_at_50%_45%,rgba(59,139,255,0.12),transparent_70%),linear-gradient(180deg,#0d1422,#080c14)] p-8">
+        <div className="relative flex min-h-[420px] max-[699px]:min-h-[320px] max-[699px]:p-4 items-center justify-center overflow-hidden rounded-[28px] border border-white/[0.06] bg-[radial-gradient(70%_70%_at_50%_45%,rgba(59,139,255,0.12),transparent_70%),linear-gradient(180deg,#0d1422,#080c14)] p-8">
           {/* illustrations are drawn at 540px and scaled to the panel */}
-          <div className="[zoom:.74] min-[1440px]:[zoom:.9] min-[1640px]:[zoom:1]">{s.art()}</div>
+          <div className="[zoom:.74] max-[699px]:[zoom:.58] min-[1440px]:[zoom:.9] min-[1640px]:[zoom:1]">{s.art()}</div>
         </div>
       </div>
       <div className="mt-8 flex items-center justify-between border-t border-white/[0.06] pt-6">
@@ -98,7 +98,7 @@ function Stepper({ i, onGo }: { i: number; onGo: (n: number) => void }) {
                   : "bg-white/[0.05] text-muted-foreground ring-1 ring-inset ring-white/10 hover:text-foreground")}>
               {lastDot ? <RefreshCw className="h-3.5 w-3.5" /> : done ? <Check className="h-3.5 w-3.5" /> : n + 1}
             </button>
-            {n < STEPS.length - 1 && <span className={cn("mx-1.5 h-[2px] w-12 rounded-full", n < i ? "bg-primary/60" : "bg-white/[0.08]")} />}
+            {n < STEPS.length - 1 && <span className={cn("mx-1.5 h-[2px] w-12 rounded-full max-[699px]:mx-1 max-[699px]:w-5", n < i ? "bg-primary/60" : "bg-white/[0.08]")} />}
           </li>
         );
       })}

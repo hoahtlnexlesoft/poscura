@@ -14,7 +14,7 @@ export function Bust({ head = "balanced", shoulders = "balanced", spine = "sligh
     { part: "spine", label: "Spine & Torso", w: 20, tone: spine, x: 230, y: 236, side: "r" },
   ] as const;
   return (
-    <div className="relative mx-auto h-[340px] w-[460px]">
+    <div className="relative mx-auto h-[340px] w-[460px] max-[679px]:[zoom:.84] max-[559px]:[zoom:.7]">
       <svg viewBox="0 0 460 340" className="absolute inset-0 h-full w-full" aria-hidden>
         <defs>
           <linearGradient id="bustBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#1a2233" /><stop offset="1" stopColor="#070a10" /></linearGradient>

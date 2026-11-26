@@ -34,14 +34,14 @@ export function DeskWorkoutHome({ onProgram, onExercise, onStart }: { onProgram:
   return (
     <Page>
       <PageHead title="Workout" subtitle="Personalized workout plans" />
-      <div className="grid grid-cols-[minmax(0,1fr)_400px] items-start gap-6">
+      <div className="grid grid-cols-[minmax(0,1fr)_400px] items-start gap-6 max-[1099px]:grid-cols-1">
       <TodaysSessions onExercise={onExercise} onStart={onStart} />
       <div className="space-y-6">
         <Panel title="Current Program" icon={<CalendarDays className="h-4 w-4 text-primary" />}
           action={<button onClick={onProgram} className={btn.ghost}>Details <ChevronRight className="h-4 w-4" /></button>}>
           <button onClick={onProgram} className="group w-full rounded-[20px] border border-white/[0.06] bg-gradient-to-br from-primary/[0.07] via-transparent to-secondary/[0.05] p-5 text-left transition hover:border-primary/30">
             <h3 className="text-[16px] font-semibold leading-snug tracking-tight">{CURRENT.name}</h3>
-            <dl className="mt-5 grid grid-cols-4 divide-x divide-white/[0.06] rounded-2xl border border-white/[0.06] bg-background/30">
+            <dl className="mt-5 grid grid-cols-4 max-[639px]:grid-cols-2 max-[639px]:[&>*:nth-child(3)]:border-l-0 max-[639px]:[&>*:nth-child(n+3)]:border-t max-[639px]:[&>*]:border-white/[0.06] divide-x divide-white/[0.06] rounded-2xl border border-white/[0.06] bg-background/30">
               {[["Total", CURRENT.sessions], ["Exercises", CURRENT.exercises], ["Start", CURRENT.start], ["End", CURRENT.end]].map(([l, v]) => (
                 <div key={l} className="px-3 py-3">
                   <dt className="text-[12px] text-muted-foreground">{l}</dt>
@@ -84,7 +84,7 @@ function TodaysSessions({ onExercise, onStart }: { onExercise: (n: string) => vo
   return (
     <Panel title="Today's Sessions" icon={<Dumbbell className="h-4 w-4 text-primary" />} bodyClass="px-3 pb-3">
       <div className="mx-3 mb-2 flex items-center gap-2 rounded-xl bg-primary/[0.08] px-3.5 py-2.5 text-[12.5px] text-primary ring-1 ring-inset ring-primary/20">
-        <Clock className="h-3.5 w-3.5" /> Next: <span className="font-semibold">{NEXT_WORKOUT}</span> at <span className="font-semibold">{TODAY_TIME}</span>
+        <Clock className="h-3.5 w-3.5 shrink-0" /><span className="min-w-0">Next: <span className="font-semibold">{NEXT_WORKOUT}</span> at <span className="whitespace-nowrap font-semibold">{TODAY_TIME}</span></span>
       </div>
       <ul className="space-y-1">
         {TODAYS_WORKOUTS.map((w) => {
@@ -129,7 +129,7 @@ export function DeskProgram({ onBack }: { onBack: () => void }) {
               <p className="mt-3 max-w-[640px] text-[13.5px] leading-relaxed text-muted-foreground">{PROGRAM.desc}</p>
             </div>
           </div>
-          <div className="mt-6 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-8">
+          <div className="mt-6 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-8 max-[899px]:grid-cols-1 max-[899px]:gap-5">
             <div>
               <div className="flex justify-between text-[12.5px]"><Eyebrow>Progress</Eyebrow><span className="tabular-nums text-muted-foreground">{PROGRAM.done}/{PROGRAM.sessions} session(s)</span></div>
               <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-white/[0.06]"><div className="h-full w-[1%] rounded-full bg-gradient-to-r from-primary to-secondary" /></div>
@@ -146,7 +146,7 @@ export function DeskProgram({ onBack }: { onBack: () => void }) {
         </Panel>
 
         <Panel title="Exercise list">
-          <ul className="grid grid-cols-2 gap-3">
+          <ul className="grid grid-cols-2 gap-3 max-[699px]:grid-cols-1">
             {EXERCISES.map((e) => (
               <li key={e.name}>
                 <button onClick={() => setVideo(e.name)} className="group flex w-full items-center gap-4 rounded-[18px] border border-white/[0.06] bg-white/[0.015] p-3 text-left transition hover:border-white/15 hover:bg-white/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">

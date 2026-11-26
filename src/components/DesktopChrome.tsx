@@ -13,6 +13,7 @@ import { useNotifications, badge } from "@/lib/notifications";
 import { useAuth, signOut } from "@/lib/auth-store";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/poscura-logo.png";
+import { useNarrow } from "@/desktop/useDesk";
 
 /* Desktop (≥1200px) chrome: left sidebar + top bar. Below that width the mobile top bar / tab bar take over. */
 
@@ -28,32 +29,36 @@ const NAV = [
 
 const SB_KEY = "poscura.sidebar";
 function useSidebar() {
-  const [collapsed, setCollapsed] = useState<boolean>(() => { try { return localStorage.getItem(SB_KEY) === "1"; } catch { return false; } });
+  const [pref, setPref] = useState<boolean>(() => { try { return localStorage.getItem(SB_KEY) === "1"; } catch { return false; } });
+  // narrow window: fold to the icon rail automatically (Slack-style) without overwriting the saved choice
+  const narrow = useNarrow();
+  const collapsed = narrow || pref;
   useEffect(() => {
     // the shell's left padding follows the sidebar width
     document.documentElement.style.setProperty("--desk-sb", collapsed ? "76px" : "248px");
-    try { localStorage.setItem(SB_KEY, collapsed ? "1" : "0"); } catch { /* private mode */ }
   }, [collapsed]);
-  return [collapsed, setCollapsed] as const;
+  useEffect(() => { try { localStorage.setItem(SB_KEY, pref ? "1" : "0"); } catch { /* private mode */ } }, [pref]);
+  return [collapsed, (v: boolean | ((c: boolean) => boolean)) => setPref((p) => (typeof v === "function" ? v(narrow || p) : v)), narrow] as const;
 }
 
 export function DesktopSidebar() {
   const path = useRouterState({ select: (r) => r.location.pathname });
-  const [collapsed, setCollapsed] = useSidebar();
+  const [collapsed, setCollapsed, narrow] = useSidebar();
   return (
     <aside data-desk-sidebar data-collapsed={collapsed || undefined}
       className={cn("fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-white/[0.06] bg-[#0b0f18]/90 pb-5 pt-4 backdrop-blur-xl transition-[width] duration-300 desk:flex", collapsed ? "w-[76px] px-3" : "w-[248px] px-4")}>
       <div className={cn("flex h-11 items-center", collapsed ? "justify-center" : "justify-between pl-2")}>
+        {narrow && <Link to="/" aria-label="Poscura"><img src={logo} alt="" className="h-8 w-8 rounded-lg object-contain" /></Link>}
         {!collapsed && (
           <Link to="/" className="flex items-center gap-2.5">
             <img src={logo} alt="" className="h-8 w-8 rounded-lg object-contain" />
             <span className="text-[16px] font-bold tracking-[0.1em]">POSCURA</span>
           </Link>
         )}
-        <button onClick={() => setCollapsed((c) => !c)} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} title={collapsed ? "Expand" : "Collapse"}
+        {!narrow && <button onClick={() => setCollapsed((c) => !c)} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} title={collapsed ? "Expand" : "Collapse"}
           className="flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground transition hover:bg-white/[0.06] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
           {collapsed ? <PanelLeftOpen className="h-[18px] w-[18px]" /> : <PanelLeftClose className="h-[18px] w-[18px]" />}
-        </button>
+        </button>}
       </div>
 
       <nav className="mt-6 flex flex-col gap-1">
@@ -82,7 +87,7 @@ export function DesktopTopBar() {
   const navigate = useNavigate();
   const user = useAuth();
   return (
-    <header className="sticky top-0 z-30 hidden h-16 items-center justify-end gap-2.5 border-b border-white/[0.06] bg-background/80 px-8 backdrop-blur-xl desk:flex">
+    <header className="sticky top-0 z-30 hidden h-16 items-center justify-end gap-2.5 border-b border-white/[0.06] bg-background/80 px-8 backdrop-blur-xl desk:flex max-[699px]:px-4">
       <Link to="/checkout"
         className="mr-1 inline-flex h-10 items-center gap-2 rounded-full bg-gradient-to-r from-primary to-secondary px-4 text-[14px] font-semibold text-white shadow-[0_10px_24px_-14px] shadow-primary transition hover:brightness-110 active:scale-[0.98]">
         <Crown className="h-4 w-4" /> Upgrade

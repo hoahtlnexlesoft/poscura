@@ -41,7 +41,7 @@ export function DeskPostureMonitor({ initialReport }: { initialReport?: boolean 
   const mm = String(Math.floor(left / 60)).padStart(2, "0"), ss = String(left % 60).padStart(2, "0");
 
   return (
-    <Page className="grid grid-cols-[minmax(0,1fr)_340px] items-start gap-6">
+    <Page className="grid grid-cols-[minmax(0,1fr)_340px] items-start gap-6 max-[1099px]:grid-cols-1">
       {/* ---------- camera stage ---------- */}
       <section className="overflow-hidden rounded-[24px] border border-white/[0.06] bg-black">
         <div className="relative aspect-[16/10] bg-[radial-gradient(80%_70%_at_50%_45%,#0f1828,#05070b_75%)]">
