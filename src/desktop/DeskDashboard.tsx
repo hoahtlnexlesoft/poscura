@@ -7,6 +7,7 @@ import { TODAYS_WORKOUTS, TODAY_TIME, PROGRESS_ORDER } from "@/lib/todays-workou
 import { cn } from "@/lib/utils";
 import { Panel, Eyebrow, btn, Page } from "./ui";
 import { FirstScan } from "@/components/FirstScan";
+import { NoWorkoutsArt } from "@/components/EmptyArt";
 import { SegGauge } from "./SegGauge";
 import { Bust, BustLegend } from "./Bust";
 
@@ -138,21 +139,22 @@ export function NoWorkouts() {
   const [open, setOpen] = useState(false);
   return (
     <Panel title="Today's Workouts">
-      <div className="flex flex-col items-center py-4 text-center">
-        <div className="relative flex h-20 w-20 items-center justify-center rounded-[24px] bg-gradient-to-br from-primary/20 to-secondary/10 ring-1 ring-inset ring-white/10">
-          <CalendarClock className="h-9 w-9 text-primary" strokeWidth={1.6} />
-        </div>
-        <div className="mt-4 text-[15px] font-semibold">No Workouts Scheduled</div>
+      <div className="flex flex-col items-center pb-5 pt-1 text-center">
+        <NoWorkoutsArt className="w-[150px]" />
+        <div className="mt-3 text-[15px] font-semibold">No Workouts Scheduled</div>
       </div>
-      <div className="mt-2 rounded-[18px] border border-success/25 bg-gradient-to-b from-success/[0.07] to-transparent p-5">
-        <h3 className="text-[16px] font-semibold leading-snug">Posture &amp; Neck Strengthening Program</h3>
-        <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/[0.05] px-2.5 py-1 text-[11.5px] text-foreground/80 ring-1 ring-inset ring-white/10"><Tag className="h-3 w-3" /> Posture Correction</span>
-        <p className="mt-3 text-[12.5px] leading-relaxed text-muted-foreground">A beginner-friendly routine to improve neck posture, reduce pain, and enhance overall spinal health.</p>
-        <div className="mt-4 grid grid-cols-2 divide-x divide-white/[0.06] rounded-2xl border border-white/[0.06] bg-background/30">
-          <div className="px-4 py-3"><div className="text-[20px] font-semibold tabular-nums">91</div><div className="text-[11.5px] text-muted-foreground">sessions</div></div>
-          <div className="px-4 py-3"><div className="text-[20px] font-semibold tabular-nums">4</div><div className="text-[11.5px] text-muted-foreground">exercises</div></div>
+      {/* the program waiting for a schedule */}
+      <div className="relative overflow-hidden rounded-[20px] bg-gradient-to-b from-white/[0.05] to-white/[0.015] p-5 ring-1 ring-inset ring-white/[0.07]">
+        <div aria-hidden className="pointer-events-none absolute -right-12 -top-16 h-40 w-40 rounded-full bg-secondary/15 blur-3xl" />
+        <span className="relative inline-flex items-center gap-1.5 rounded-full bg-white/[0.05] px-2.5 py-1 text-[11.5px] text-foreground/80 ring-1 ring-inset ring-white/10"><Tag className="h-3 w-3" /> Posture Correction</span>
+        <h3 className="relative mt-3 text-[16.5px] font-semibold leading-snug tracking-tight">Posture &amp; Neck Strengthening Program</h3>
+        <p className="relative mt-2 text-[12.5px] leading-relaxed text-muted-foreground">A beginner-friendly routine to improve neck posture, reduce pain, and enhance overall spinal health.</p>
+        <div className="relative mt-4 flex items-center gap-5 border-t border-white/[0.06] pt-4">
+          <div><div className="text-[20px] font-semibold leading-none tabular-nums">91</div><div className="mt-1 text-[11.5px] text-muted-foreground">sessions</div></div>
+          <span aria-hidden className="h-8 w-px bg-white/[0.08]" />
+          <div><div className="text-[20px] font-semibold leading-none tabular-nums">4</div><div className="mt-1 text-[11.5px] text-muted-foreground">exercises</div></div>
         </div>
-        <button onClick={() => setOpen(true)} className={cn(btn.primary, "mt-4 w-full")}><CalendarClock className="h-4 w-4" /> Set schedule</button>
+        <button onClick={() => setOpen(true)} className={cn(btn.primary, "relative mt-5 w-full")}><CalendarClock className="h-4 w-4" /> Set schedule</button>
       </div>
       <ScheduleDialog open={open} onOpenChange={setOpen} />
     </Panel>
