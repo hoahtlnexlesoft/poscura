@@ -176,7 +176,12 @@
     if (!d.rotate) return d;
     return Object.assign({}, d, { w:d.h, h:d.w, crease:"v", land:true });
   }
-  function dev() { return DEVICES.filter(function (d) { return d.id === state.dev; })[0]; }
+  function dev() {
+    var d = DEVICES.filter(function (d) { return d.id === state.dev; })[0];
+    // the desktop app window can be resized by dragging its corner; remember the size
+    if (d && d.kind === "macapp" && state.macSize) d = Object.assign({}, d, { w: state.macSize.w, h: state.macSize.h });
+    return d;
+  }
 
   // ---------- status bar icons ----------
   var W = "#fff";
@@ -275,6 +280,11 @@
       extra = '<div style="position:absolute;left:0;right:0;top:0;height:38px;display:flex;align-items:center;padding:0 16px;gap:8px;border-bottom:1px solid rgba(255,255,255,.06);border-radius:12px 12px 0 0;background:linear-gradient(180deg,#1d2129,#161920)">' +
         '<i style="width:12px;height:12px;border-radius:50%;background:#ff5f57;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.25)"></i><i style="width:12px;height:12px;border-radius:50%;background:#febc2e;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.25)"></i><i style="width:12px;height:12px;border-radius:50%;background:#28c840;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.25)"></i>' +
         '<span style="position:absolute;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.55);font:600 13px/1 -apple-system,\'SF Pro Text\',system-ui,sans-serif">Poscura</span></div>';
+      // resize grips: right edge, bottom edge and corner, like a real Mac window
+      extra += '<div data-rz="e" title="Drag to resize" style="position:absolute;top:38px;right:-6px;bottom:10px;width:12px;cursor:ew-resize;z-index:5"></div>' +
+        '<div data-rz="s" title="Drag to resize" style="position:absolute;left:10px;right:10px;bottom:-6px;height:12px;cursor:ns-resize;z-index:5"></div>' +
+        '<div data-rz="se" title="Drag to resize" style="position:absolute;right:-8px;bottom:-8px;width:22px;height:22px;cursor:nwse-resize;z-index:6"></div>' +
+        '<div id="rzlabel" style="display:none;position:absolute;right:14px;bottom:14px;z-index:7;padding:6px 10px;border-radius:8px;background:rgba(0,0,0,.75);color:#fff;font:600 12px/1 -apple-system,system-ui,sans-serif;font-variant-numeric:tabular-nums;pointer-events:none"></div>';
     } else {
       ow = d.w + 28; oh = d.h + 30; sl = 14; st = 15; radius = d.radius || 52; scr = d.scr || 40; top = 40; bot = 24;
       bg = "linear-gradient(145deg," + d.color + "," + (d.tone || "#24272c") + ")";
@@ -323,6 +333,41 @@
     var y = oh / 2 - 9;
     return '<span style="position:absolute;left:-4px;top:' + y + 'px;width:6px;height:18px;border-radius:3px;background:#2a3142"></span>' +
            '<span style="position:absolute;right:-4px;top:' + y + 'px;width:6px;height:18px;border-radius:3px;background:#2a3142"></span>';
+  }
+
+  // ---------- desktop app window resize ----------
+  document.addEventListener("pointerdown", function (e) {
+    var g = e.target.closest && e.target.closest("[data-rz]");
+    if (!g || dev().kind !== "macapp") return;
+    e.preventDefault();
+    var mode = g.getAttribute("data-rz"), d = dev(), x0 = e.clientX, y0 = e.clientY, w0 = d.w, h0 = d.h;
+    var m = /scale\(([\d.]+)\)/.exec(scaler.style.transform || ""), sc = m ? parseFloat(m[1]) : 1;
+    var lab = document.getElementById("rzlabel");
+    if (frame) frame.style.pointerEvents = "none"; // keep receiving moves over the app
+    document.body.style.cursor = getComputedStyle(g).cursor;
+    function move(ev) {
+      var w = w0, h = h0;
+      if (mode !== "s") w = Math.round(Math.min(2560, Math.max(720, w0 + (ev.clientX - x0) / sc)));
+      if (mode !== "e") h = Math.round(Math.min(1600, Math.max(520, h0 + (ev.clientY - y0) / sc)));
+      var dev_ = g.closest(".device"), scr = dev_ && dev_.querySelector(".screen");
+      if (dev_) { dev_.style.width = w + "px"; dev_.style.height = (h + 38) + "px"; }
+      if (scr) { scr.style.width = w + "px"; scr.style.height = h + "px"; }
+      state.macSize = { w: w, h: h };
+      if (lab) { lab.style.display = "block"; lab.textContent = w + " × " + h + (w < 1200 ? "  ·  mobile layout" : ""); }
+    }
+    function up() {
+      document.removeEventListener("pointermove", move); document.removeEventListener("pointerup", up);
+      document.body.style.cursor = "";
+      if (frame) frame.style.pointerEvents = "";
+      if (lab) lab.style.display = "none";
+      save(); buildPhoneKeep();
+    }
+    document.addEventListener("pointermove", move); document.addEventListener("pointerup", up);
+  });
+  // rebuild the frame chrome at the new size without reloading the app inside it
+  function buildPhoneKeep() {
+    var d = view(); size = { w: d.w, h: d.h + 38 }; layout();
+    document.getElementById("meta").textContent = "Poscura app prototype · " + d.w + " × " + d.h + " " + d.unit + " · drag the window edge to resize";
   }
 
   function layout() {
@@ -394,7 +439,7 @@
     o.classList.toggle("show", false);
     o.querySelectorAll("button").forEach(function (b) { b.classList.toggle("on", b.dataset.o === (state.orient || "portrait")); });
     document.getElementById("title").textContent = "Poscura · " + d.name;
-    document.getElementById("meta").textContent = "Poscura app prototype · " + d.w + " × " + d.h + " " + d.unit;
+    document.getElementById("meta").textContent = "Poscura app prototype · " + d.w + " × " + d.h + " " + d.unit + (d.kind === "macapp" ? " · drag the window edge to resize" : "");
   }
   document.getElementById("devices").addEventListener("click", function (e) {
     var b = e.target.closest("button"); if (!b || b.dataset.id === state.dev) return;
