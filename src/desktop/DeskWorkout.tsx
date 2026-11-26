@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Panel, PageHead, btn, Page, Eyebrow } from "./ui";
 import { ScheduleDialog } from "./DeskDashboard";
+import { NoWorkoutsToday } from "@/components/NoWorkoutsToday";
 import { TODAYS_WORKOUTS, TODAY_TIME, NEXT_WORKOUT } from "@/lib/todays-workouts";
 
 const PROGRAM = {
@@ -28,14 +29,14 @@ const PHASE = { "Warm up": "bg-sky-500/12 text-sky-300 ring-sky-400/25", Main: "
 // same program the Program screen shows, so Details opens what the card says
 const CURRENT = { name: "Shoulder & Neck Relief", sessions: 39, exercises: 4, start: "Nov 20, 2026", end: "Dec 18, 2026", done: 0 };
 
-export function DeskWorkoutHome({ onProgram, onExercise, onStart }: { onProgram: () => void; onExercise: (n: string) => void; onStart: (n: string) => void }) {
+export function DeskWorkoutHome({ empty, onProgram, onExercise, onStart }: { empty?: boolean; onProgram: () => void; onExercise: (n: string) => void; onStart: (n: string) => void }) {
   const [more, setMore] = useState(false);
   const pct = Math.round((CURRENT.done / CURRENT.sessions) * 100);
   return (
     <Page>
       <PageHead title="Workout" subtitle="Personalized workout plans" />
       <div className="grid grid-cols-[minmax(0,1fr)_400px] items-start gap-6 max-[1099px]:grid-cols-1">
-      <TodaysSessions onExercise={onExercise} onStart={onStart} />
+      {empty ? <NoWorkoutsToday className="rounded-[24px] py-14" /> : <TodaysSessions onExercise={onExercise} onStart={onStart} />}
       <div className="space-y-6">
         <Panel title="Current Program" icon={<CalendarDays className="h-4 w-4 text-primary" />}
           action={<button onClick={onProgram} className={btn.ghost}>Details <ChevronRight className="h-4 w-4" /></button>}>

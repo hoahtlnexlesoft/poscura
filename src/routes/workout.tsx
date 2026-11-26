@@ -9,12 +9,13 @@ import { ExerciseIntro } from "@/components/ExerciseIntro";
 import { WorkoutAssessment } from "@/components/WorkoutAssessment";
 import { SessionResult } from "@/components/SessionResult";
 import { SessionEvaluation } from "@/components/SessionEvaluation";
+import { NoWorkoutsToday } from "@/components/NoWorkoutsToday";
 import { WorkoutProgramDetail, exerciseList } from "@/components/WorkoutProgramDetail";
 import { ExerciseDetail } from "@/components/ExerciseDetail";
 import { NEXT_WORKOUT, TODAYS_WORKOUTS, TODAY_TIME } from "@/lib/todays-workouts";
 
 export const Route = createFileRoute("/workout")({
-  validateSearch: z.object({ session: z.string().optional(), exercise: z.string().optional(), schedule: z.enum(["none"]).optional(), evaluate: z.string().optional(), score: z.coerce.number().optional() }),
+  validateSearch: z.object({ session: z.string().optional(), exercise: z.string().optional(), schedule: z.enum(["none"]).optional(), evaluate: z.string().optional(), score: z.coerce.number().optional(), empty: z.coerce.string().optional() }),
   component: WorkoutPage,
 });
 
@@ -43,7 +44,7 @@ type View =
   | { kind: "program" };
 
 function WorkoutPage() {
-  const { session, exercise, schedule, evaluate, score } = Route.useSearch();
+  const { session, exercise, schedule, evaluate, score, empty } = Route.useSearch();
   const desk = useDesk();
   const [view, setView] = useState<View>(evaluate ? { kind: "evaluation", name: evaluate, score: score ?? 88, recordedUrl: null, when: "Today, 16:45" } : session ? { kind: "intro", name: session } : exercise ? { kind: "exercise", name: exercise } : { kind: "list" });
   // deep links (?exercise= / ?session=) also work when the page is already open
@@ -109,7 +110,7 @@ function WorkoutPage() {
       onPrev={pw ? () => setView({ kind: "exercise", name: pw.name }) : undefined} onNext={nw ? () => setView({ kind: "exercise", name: nw.name }) : undefined} prevName={pw?.name} nextName={nw?.name} />;
   }
   if (view.kind === "program") return <WorkoutProgramDetail onClose={() => setView({ kind: "list" })} onStartSession={(name) => setView({ kind: "intro", name })} />;
-  if (desk) return <DeskWorkoutHome onProgram={() => setView({ kind: "program" })} onExercise={(name) => setView({ kind: "exercise", name })} onStart={(name) => setView({ kind: "intro", name })} />;
+  if (desk) return <DeskWorkoutHome empty={!!empty} onProgram={() => setView({ kind: "program" })} onExercise={(name) => setView({ kind: "exercise", name })} onStart={(name) => setView({ kind: "intro", name })} />;
 
   return (
     <div className="space-y-4 fold:grid fold:grid-cols-2 fold:gap-4 land:gap-x-6 hinge-split fold:space-y-0 fold:items-start">
@@ -118,6 +119,7 @@ function WorkoutPage() {
         <p className="text-xs text-muted-foreground mt-0.5">Personalized routines from your posture data.</p>
       </div>
 
+      {empty ? <NoWorkoutsToday className="fold:col-start-1 fold:row-start-2" /> : (
       <section className="glass-card p-4 space-y-3 fold:col-start-1 fold:row-start-2">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           <div className="flex items-center gap-2">
@@ -159,6 +161,7 @@ function WorkoutPage() {
           })}
         </div>
       </section>
+      )}
 
       <div className="space-y-4 fold:col-start-2 fold:row-start-2">
       <section className="glass-card p-4">
