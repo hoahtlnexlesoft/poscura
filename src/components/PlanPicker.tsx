@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Check, User, Users, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { PLANS, formatVND, priceFor, type BillingCycle, type Plan } from "@/lib/plans";
+import { PLANS, formatVND, priceFor, ANNUAL_DISCOUNT, type BillingCycle, type Plan } from "@/lib/plans";
 
 const ICONS = { freemium: Zap, individual: User, family: Users } as const;
 
@@ -50,9 +50,19 @@ function PlanCard({ plan, cycle }: { plan: Plan; cycle: BillingCycle }) {
       </div>
       <p className="mt-0.5 min-h-[16px] text-[11px] text-muted-foreground">{plan.note}</p>
 
-      <div className="mt-4 flex items-baseline gap-1.5">
-        <span className="text-[28px] font-bold leading-none tracking-tight">{free ? "Free" : formatVND(price)}</span>
-        <span className="text-sm text-muted-foreground">{free ? "forever" : cycle === "annual" ? "/ year" : "/ month"}</span>
+      {/* keyed by cycle so the price visibly swaps when Monthly / Annual changes */}
+      <div key={cycle} className="mt-4 animate-in fade-in slide-in-from-bottom-1 duration-300">
+        <div className="flex items-baseline gap-1.5">
+          <span className="text-[28px] font-bold leading-none tracking-tight">{free ? "Free" : formatVND(price)}</span>
+          <span className="text-sm text-muted-foreground">{free ? "forever" : cycle === "annual" ? "/ year" : "/ month"}</span>
+        </div>
+        {!free && cycle === "annual" && (
+          <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px]">
+            <span className="text-muted-foreground line-through">{formatVND(plan.monthly * 12)}</span>
+            <span className="rounded-full bg-warning/15 px-1.5 py-px text-[10.5px] font-bold text-warning">Save {Math.round(ANNUAL_DISCOUNT * 100)}%</span>
+            <span className="text-muted-foreground">≈ {formatVND(Math.round(price / 12 / 1000) * 1000)} / month</span>
+          </div>
+        )}
       </div>
 
       <ul className="mt-4 flex-1 space-y-2 text-[13px]">

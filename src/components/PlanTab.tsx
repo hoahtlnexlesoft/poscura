@@ -151,7 +151,15 @@ function Confirm({ trigger, title, body, action, onConfirm }: { trigger: React.R
   );
 }
 
-const toUpgrade = () => document.getElementById("upgrade-your-plan")?.scrollIntoView({ behavior: "smooth", block: "start" });
+/* Upgrade → the plans: scroll to them (phones), and always flash them so it's clear where to pick, even when they're already beside you (two-pane) */
+const toUpgrade = () => {
+  const el = document.getElementById("upgrade-your-plan");
+  if (!el) return;
+  const r = el.getBoundingClientRect();
+  if (r.top < 0 || r.top > window.innerHeight * 0.6) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  el.classList.remove("plan-flash"); void el.offsetWidth; el.classList.add("plan-flash");
+  window.setTimeout(() => el.classList.remove("plan-flash"), 1600);
+};
 
 /* ---------- voucher as a ticket: discount stub, perforation, details ---------- */
 function VoucherTicket({ v }: { v: Voucher }) {

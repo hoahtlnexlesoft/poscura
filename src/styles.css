@@ -304,3 +304,9 @@ html[data-layout="bottom"] [data-app-nav] a { min-width: 78px; padding: 7px 14px
 html[data-layout="bottom"] [data-app-nav] a:hover { background: rgba(255,255,255,.05); }
 html[data-layout="bottom"] [data-app-nav] a[data-active] { background: color-mix(in oklab, var(--color-primary) 16%, transparent); }
 html[data-layout="bottom"] [data-app-nav] a[data-active]:hover { background: color-mix(in oklab, var(--color-primary) 22%, transparent); }
+
+/* Plan tab: the plans light up when "Upgrade" is pressed */
+@keyframes plan-flash { 0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-primary) 0%, transparent); border-color: rgba(255,255,255,.06); }
+  25% { box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-primary) 35%, transparent), 0 0 40px -6px var(--color-primary); border-color: var(--color-primary); }
+  100% { box-shadow: 0 0 0 0 transparent; border-color: rgba(255,255,255,.06); } }
+.plan-flash { animation: plan-flash 1.5s ease-out; }
