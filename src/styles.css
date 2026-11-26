@@ -281,5 +281,5 @@ html[data-side] [data-lightbox] img { max-width: 100%; }
 
 /* desktop web app: the shell always clears the fixed sidebar, on main tabs and sub pages alike */
 @media (min-width: 1200px) {
-  html [data-app-shell]:has([data-desk-sidebar]) { padding-left: 264px !important; padding-right: 0 !important; }
+  html [data-app-shell]:has([data-desk-sidebar]) { padding-left: var(--desk-sb, 248px) !important; padding-right: 0 !important; transition: padding-left .3s ease; }
 }

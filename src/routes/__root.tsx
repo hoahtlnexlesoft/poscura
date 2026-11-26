@@ -125,7 +125,7 @@ function AuthGate() {
   const isOnboarding = location.pathname === "/onboarding";
   const hideTopBar = isOnboarding || location.pathname === "/account" || location.pathname === "/settings" || location.pathname === "/support";
   return (
-    <div data-app-shell className={`flex flex-col min-h-screen w-full bg-background text-foreground ${isOnboarding ? "" : "rail:pr-[92px] desk:pr-0 desk:pl-[264px]"}`}>
+    <div data-app-shell className={`flex flex-col min-h-screen w-full bg-background text-foreground ${isOnboarding ? "" : "rail:pr-[92px] desk:pr-0"}`}>
       {!isOnboarding && <DesktopSidebar />}
       {!isOnboarding && <DesktopTopBar />}
       {!hideTopBar && <MobileTopBar />}

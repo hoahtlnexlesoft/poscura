@@ -1,16 +1,25 @@
+import { z } from "zod";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ChevronRight, Play, Clock } from "lucide-react";
+import { useDesk } from "@/desktop/useDesk";
+import { DeskDashboard } from "@/desktop/DeskDashboard";
 import { ScoreGauge } from "@/components/ScoreGauge";
 import bodyTorso from "@/assets/body-torso.png";
 import { NEXT_WORKOUT, PROGRESS_ORDER, TODAYS_WORKOUTS, TODAY_TIME } from "@/lib/todays-workouts";
 
-export const Route = createFileRoute("/")({ component: Dashboard });
+export const Route = createFileRoute("/")({
+  component: Dashboard,
+  validateSearch: z.object({ empty: z.coerce.string().optional() }),
+});
 
 const progressDone = TODAYS_WORKOUTS.reduce((a, w) => a + w.programDone, 0);
 const progressTotal = TODAYS_WORKOUTS.reduce((a, w) => a + w.programTotal, 0);
 
 function Dashboard() {
   const navigate = useNavigate();
+  const desk = useDesk();
+  const { empty } = Route.useSearch();
+  if (desk) return <DeskDashboard empty={!!empty} />;
   return (
     <div className="space-y-4 fold:grid fold:grid-cols-[1.25fr_1fr] land:grid-cols-2 hinge-split fold:gap-4 land:gap-x-6 fold:space-y-0 fold:items-start">
       <div className="space-y-4">

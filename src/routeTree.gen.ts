@@ -9,73 +9,29 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WorkoutRouteImport } from './routes/workout'
-import { Route as SupportRouteImport } from './routes/support'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as PostureMonitorRouteImport } from './routes/posture-monitor'
-import { Route as OnboardingRouteImport } from './routes/onboarding'
-import { Route as NotificationsRouteImport } from './routes/notifications'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as DiscomfortRouteImport } from './routes/discomfort'
-import { Route as CommunityRouteImport } from './routes/community'
-import { Route as CheckoutRouteImport } from './routes/checkout'
-import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as SupportIndexRouteImport } from './routes/support.index'
-import { Route as SupportTicketsRouteImport } from './routes/support.tickets'
-import { Route as SupportReportRouteImport } from './routes/support.report'
+import { Route as AccountRouteImport } from './routes/account'
+import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as CommunityRouteImport } from './routes/community'
+import { Route as DiscomfortRouteImport } from './routes/discomfort'
+import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as NotificationsRouteImport } from './routes/notifications'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as PostureMonitorRouteImport } from './routes/posture-monitor'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SupportRouteImport } from './routes/support'
+import { Route as WorkoutRouteImport } from './routes/workout'
 import { Route as BodyPartPartRouteImport } from './routes/body-part.$part'
+import { Route as SupportIndexRouteImport } from './routes/support.index'
+import { Route as SupportReportRouteImport } from './routes/support.report'
+import { Route as SupportTicketsRouteImport } from './routes/support.tickets'
 import { Route as SupportTicketsIndexRouteImport } from './routes/support.tickets.index'
 import { Route as SupportTicketsIdRouteImport } from './routes/support.tickets.$id'
 
-const WorkoutRoute = WorkoutRouteImport.update({
-  id: '/workout',
-  path: '/workout',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SupportRoute = SupportRouteImport.update({
-  id: '/support',
-  path: '/support',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PostureMonitorRoute = PostureMonitorRouteImport.update({
-  id: '/posture-monitor',
-  path: '/posture-monitor',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OnboardingRoute = OnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NotificationsRoute = NotificationsRouteImport.update({
-  id: '/notifications',
-  path: '/notifications',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DiscomfortRoute = DiscomfortRouteImport.update({
-  id: '/discomfort',
-  path: '/discomfort',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CommunityRoute = CommunityRouteImport.update({
-  id: '/community',
-  path: '/community',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CheckoutRoute = CheckoutRouteImport.update({
-  id: '/checkout',
-  path: '/checkout',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccountRoute = AccountRouteImport.update({
@@ -83,9 +39,64 @@ const AccountRoute = AccountRouteImport.update({
   path: '/account',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunityRoute = CommunityRouteImport.update({
+  id: '/community',
+  path: '/community',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiscomfortRoute = DiscomfortRouteImport.update({
+  id: '/discomfort',
+  path: '/discomfort',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HowItWorksRoute = HowItWorksRouteImport.update({
+  id: '/how-it-works',
+  path: '/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PostureMonitorRoute = PostureMonitorRouteImport.update({
+  id: '/posture-monitor',
+  path: '/posture-monitor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorkoutRoute = WorkoutRouteImport.update({
+  id: '/workout',
+  path: '/workout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BodyPartPartRoute = BodyPartPartRouteImport.update({
+  id: '/body-part/$part',
+  path: '/body-part/$part',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SupportIndexRoute = SupportIndexRouteImport.update({
@@ -93,20 +104,15 @@ const SupportIndexRoute = SupportIndexRouteImport.update({
   path: '/',
   getParentRoute: () => SupportRoute,
 } as any)
-const SupportTicketsRoute = SupportTicketsRouteImport.update({
-  id: '/tickets',
-  path: '/tickets',
-  getParentRoute: () => SupportRoute,
-} as any)
 const SupportReportRoute = SupportReportRouteImport.update({
   id: '/report',
   path: '/report',
   getParentRoute: () => SupportRoute,
 } as any)
-const BodyPartPartRoute = BodyPartPartRouteImport.update({
-  id: '/body-part/$part',
-  path: '/body-part/$part',
-  getParentRoute: () => rootRouteImport,
+const SupportTicketsRoute = SupportTicketsRouteImport.update({
+  id: '/tickets',
+  path: '/tickets',
+  getParentRoute: () => SupportRoute,
 } as any)
 const SupportTicketsIndexRoute = SupportTicketsIndexRouteImport.update({
   id: '/',
@@ -125,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/community': typeof CommunityRoute
   '/discomfort': typeof DiscomfortRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/notifications': typeof NotificationsRoute
   '/onboarding': typeof OnboardingRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/community': typeof CommunityRoute
   '/discomfort': typeof DiscomfortRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/notifications': typeof NotificationsRoute
   '/onboarding': typeof OnboardingRoute
@@ -164,6 +172,7 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/community': typeof CommunityRoute
   '/discomfort': typeof DiscomfortRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/notifications': typeof NotificationsRoute
   '/onboarding': typeof OnboardingRoute
@@ -186,6 +195,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/community'
     | '/discomfort'
+    | '/how-it-works'
     | '/login'
     | '/notifications'
     | '/onboarding'
@@ -206,6 +216,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/community'
     | '/discomfort'
+    | '/how-it-works'
     | '/login'
     | '/notifications'
     | '/onboarding'
@@ -224,6 +235,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/community'
     | '/discomfort'
+    | '/how-it-works'
     | '/login'
     | '/notifications'
     | '/onboarding'
@@ -245,6 +257,7 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   CommunityRoute: typeof CommunityRoute
   DiscomfortRoute: typeof DiscomfortRoute
+  HowItWorksRoute: typeof HowItWorksRoute
   LoginRoute: typeof LoginRoute
   NotificationsRoute: typeof NotificationsRoute
   OnboardingRoute: typeof OnboardingRoute
@@ -257,74 +270,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/workout': {
-      id: '/workout'
-      path: '/workout'
-      fullPath: '/workout'
-      preLoaderRoute: typeof WorkoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/support': {
-      id: '/support'
-      path: '/support'
-      fullPath: '/support'
-      preLoaderRoute: typeof SupportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/posture-monitor': {
-      id: '/posture-monitor'
-      path: '/posture-monitor'
-      fullPath: '/posture-monitor'
-      preLoaderRoute: typeof PostureMonitorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/onboarding': {
-      id: '/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof OnboardingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/notifications': {
-      id: '/notifications'
-      path: '/notifications'
-      fullPath: '/notifications'
-      preLoaderRoute: typeof NotificationsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/discomfort': {
-      id: '/discomfort'
-      path: '/discomfort'
-      fullPath: '/discomfort'
-      preLoaderRoute: typeof DiscomfortRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/community': {
-      id: '/community'
-      path: '/community'
-      fullPath: '/community'
-      preLoaderRoute: typeof CommunityRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/checkout': {
-      id: '/checkout'
-      path: '/checkout'
-      fullPath: '/checkout'
-      preLoaderRoute: typeof CheckoutRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/account': {
@@ -334,11 +284,88 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community': {
+      id: '/community'
+      path: '/community'
+      fullPath: '/community'
+      preLoaderRoute: typeof CommunityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/discomfort': {
+      id: '/discomfort'
+      path: '/discomfort'
+      fullPath: '/discomfort'
+      preLoaderRoute: typeof DiscomfortRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/how-it-works': {
+      id: '/how-it-works'
+      path: '/how-it-works'
+      fullPath: '/how-it-works'
+      preLoaderRoute: typeof HowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/posture-monitor': {
+      id: '/posture-monitor'
+      path: '/posture-monitor'
+      fullPath: '/posture-monitor'
+      preLoaderRoute: typeof PostureMonitorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/workout': {
+      id: '/workout'
+      path: '/workout'
+      fullPath: '/workout'
+      preLoaderRoute: typeof WorkoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/body-part/$part': {
+      id: '/body-part/$part'
+      path: '/body-part/$part'
+      fullPath: '/body-part/$part'
+      preLoaderRoute: typeof BodyPartPartRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/support/': {
@@ -348,13 +375,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SupportIndexRouteImport
       parentRoute: typeof SupportRoute
     }
-    '/support/tickets': {
-      id: '/support/tickets'
-      path: '/tickets'
-      fullPath: '/support/tickets'
-      preLoaderRoute: typeof SupportTicketsRouteImport
-      parentRoute: typeof SupportRoute
-    }
     '/support/report': {
       id: '/support/report'
       path: '/report'
@@ -362,12 +382,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SupportReportRouteImport
       parentRoute: typeof SupportRoute
     }
-    '/body-part/$part': {
-      id: '/body-part/$part'
-      path: '/body-part/$part'
-      fullPath: '/body-part/$part'
-      preLoaderRoute: typeof BodyPartPartRouteImport
-      parentRoute: typeof rootRouteImport
+    '/support/tickets': {
+      id: '/support/tickets'
+      path: '/tickets'
+      fullPath: '/support/tickets'
+      preLoaderRoute: typeof SupportTicketsRouteImport
+      parentRoute: typeof SupportRoute
     }
     '/support/tickets/': {
       id: '/support/tickets/'
@@ -421,6 +441,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   CommunityRoute: CommunityRoute,
   DiscomfortRoute: DiscomfortRoute,
+  HowItWorksRoute: HowItWorksRoute,
   LoginRoute: LoginRoute,
   NotificationsRoute: NotificationsRoute,
   OnboardingRoute: OnboardingRoute,
@@ -433,13 +454,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

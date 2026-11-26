@@ -1,8 +1,8 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Bell, ClipboardList, Crown, Home, Activity, Dumbbell, Users, Settings, HelpCircle, LifeBuoy, CheckCheck,
-  ArrowRight, User as UserIcon, LogOut, PanelLeftClose,
+  ArrowRight, User as UserIcon, LogOut, PanelLeftClose, PanelLeftOpen,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
@@ -22,46 +22,56 @@ const NAV = [
   { label: "Workout", to: "/workout", icon: Dumbbell },
   { label: "Community", to: "/community", icon: Users },
   { label: "Settings", to: "/settings", icon: Settings },
-  { label: "How Poscura Works", to: "/support", icon: HelpCircle },
+  { label: "How Poscura Works", to: "/how-it-works", icon: HelpCircle },
+  { label: "FAQs", to: "/support", icon: LifeBuoy },
 ] as const;
+
+const SB_KEY = "poscura.sidebar";
+function useSidebar() {
+  const [collapsed, setCollapsed] = useState<boolean>(() => { try { return localStorage.getItem(SB_KEY) === "1"; } catch { return false; } });
+  useEffect(() => {
+    // the shell's left padding follows the sidebar width
+    document.documentElement.style.setProperty("--desk-sb", collapsed ? "76px" : "248px");
+    try { localStorage.setItem(SB_KEY, collapsed ? "1" : "0"); } catch { /* private mode */ }
+  }, [collapsed]);
+  return [collapsed, setCollapsed] as const;
+}
 
 export function DesktopSidebar() {
   const path = useRouterState({ select: (r) => r.location.pathname });
+  const [collapsed, setCollapsed] = useSidebar();
   return (
-    <aside data-desk-sidebar className="fixed inset-y-0 left-0 z-40 hidden w-[264px] flex-col border-r border-white/[0.06] bg-sidebar/60 px-4 pb-5 pt-5 backdrop-blur-xl desk:flex">
-      <div className="flex h-11 items-center justify-between px-2">
-        <Link to="/" className="flex items-center gap-2.5">
-          <img src={logo} alt="" className="h-8 w-8 rounded-lg object-contain" />
-          <span className="text-[17px] font-bold tracking-[0.08em]">POSCURA</span>
-        </Link>
-        <button aria-label="Collapse sidebar" className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-white/[0.06] hover:text-foreground">
-          <PanelLeftClose className="h-4 w-4" />
+    <aside data-desk-sidebar data-collapsed={collapsed || undefined}
+      className={cn("fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-white/[0.06] bg-[#0b0f18]/90 pb-5 pt-4 backdrop-blur-xl transition-[width] duration-300 desk:flex", collapsed ? "w-[76px] px-3" : "w-[248px] px-4")}>
+      <div className={cn("flex h-11 items-center", collapsed ? "justify-center" : "justify-between pl-2")}>
+        {!collapsed && (
+          <Link to="/" className="flex items-center gap-2.5">
+            <img src={logo} alt="" className="h-8 w-8 rounded-lg object-contain" />
+            <span className="text-[16px] font-bold tracking-[0.1em]">POSCURA</span>
+          </Link>
+        )}
+        <button onClick={() => setCollapsed((c) => !c)} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} title={collapsed ? "Expand" : "Collapse"}
+          className="flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground transition hover:bg-white/[0.06] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+          {collapsed ? <PanelLeftOpen className="h-[18px] w-[18px]" /> : <PanelLeftClose className="h-[18px] w-[18px]" />}
         </button>
       </div>
 
-      <nav className="mt-7 flex flex-col gap-1">
+      <nav className="mt-6 flex flex-col gap-1">
         {NAV.map((n) => {
           const on = n.to === "/" ? path === "/" : path.startsWith(n.to);
           return (
-            <Link key={n.label} to={n.to}
+            <Link key={n.label} to={n.to} title={collapsed ? n.label : undefined}
               className={cn(
-                "group flex h-11 items-center gap-3 rounded-xl px-3.5 text-[14px] font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
-                on ? "bg-gradient-to-r from-primary to-secondary text-white shadow-[0_10px_24px_-14px] shadow-primary" : "text-foreground/70 hover:bg-white/[0.05] hover:text-foreground",
+                "group relative flex h-11 items-center rounded-xl text-[14px] font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
+                collapsed ? "justify-center" : "gap-3 px-3.5",
+                on ? "bg-gradient-to-r from-primary to-secondary text-white shadow-[0_10px_24px_-14px] shadow-primary" : "text-foreground/65 hover:bg-white/[0.05] hover:text-foreground",
               )}>
-              <n.icon className={cn("h-[18px] w-[18px]", !on && "text-muted-foreground group-hover:text-foreground")} />
-              {n.label}
+              <n.icon className={cn("h-[18px] w-[18px] shrink-0", !on && "text-muted-foreground group-hover:text-foreground")} />
+              {!collapsed && n.label}
             </Link>
           );
         })}
       </nav>
-
-      <div className="mt-auto rounded-2xl border border-white/[0.06] bg-gradient-to-br from-primary/15 via-transparent to-secondary/10 p-4">
-        <div className="flex items-center gap-2 text-[13px] font-semibold"><Crown className="h-4 w-4 text-warning" /> Go Premium</div>
-        <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">Unlimited monitoring time and full session reports.</p>
-        <Link to="/checkout" className="mt-3 inline-flex items-center gap-1 text-[12.5px] font-semibold text-primary transition hover:gap-1.5">
-          See plans <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
-      </div>
     </aside>
   );
 }
