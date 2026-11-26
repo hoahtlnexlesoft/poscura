@@ -287,7 +287,7 @@ export function PlanTab({ plan, noAddons = false }: { plan: PlanKind; noAddons?:
           </div>
           <p className="mt-3 text-[12px] text-muted-foreground">Resets on Nov 26, 2026.</p>
         </Card>
-        <Card title="Add-ons" action={addons.length ? <button onClick={() => setBrowse(true)} className={outlineBtn}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button> : undefined}>
+        <Card title="Add-ons" action={<button onClick={() => setBrowse(true)} className={outlineBtn}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button>}>
           {addons.length ? (
             <ul className="space-y-2">
               {addons.map((a) => (
@@ -304,12 +304,13 @@ export function PlanTab({ plan, noAddons = false }: { plan: PlanKind; noAddons?:
               ))}
             </ul>
           ) : (
-            /* nothing bought yet: one clear way in, instead of an empty list */
-            <div className="flex flex-col items-center px-5 pb-2 pt-3 text-center">
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/12 text-primary ring-1 ring-inset ring-primary/25"><PackagePlus className="h-5 w-5" /></span>
-              <div className="mt-3 text-[14px] font-semibold">No add-ons yet</div>
-              <p className="mt-1 max-w-[260px] text-[12.5px] leading-relaxed text-muted-foreground">Need more monitoring time? Add extra hours to your plan anytime.</p>
-              <button onClick={() => setBrowse(true)} className={cn(outlineBtn, "mt-4")}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button>
+            /* nothing bought yet: one compact line, the header button is the way in */
+            <div className="flex items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/12 text-primary ring-1 ring-inset ring-primary/25"><PackagePlus className="h-[18px] w-[18px]" /></span>
+              <div className="min-w-0">
+                <div className="text-[13.5px] font-semibold">No add-ons yet</div>
+                <p className="mt-0.5 text-[12px] leading-snug text-muted-foreground">Need more monitoring time? Add extra hours anytime.</p>
+              </div>
             </div>
           )}
         </Card>
@@ -394,7 +395,7 @@ export function PlanTab({ plan, noAddons = false }: { plan: PlanKind; noAddons?:
           </div>
           <p className="mt-3 text-[12px] text-muted-foreground">Resets on {plan === "free" ? "Dec 17, 2026" : "Nov 26, 2026"}.</p>
         </Card>
-        <Card title="Add-ons" action={addons.length ? <button onClick={() => setBrowse(true)} className={outlineBtn}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button> : undefined}>
+        <Card title="Add-ons" action={<button onClick={() => setBrowse(true)} className={outlineBtn}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button>}>
           {addons.length ? (
             <ul className="space-y-2">
               {addons.map((a) => (
@@ -411,12 +412,13 @@ export function PlanTab({ plan, noAddons = false }: { plan: PlanKind; noAddons?:
               ))}
             </ul>
           ) : (
-            /* nothing bought yet: one clear way in, instead of an empty list */
-            <div className="flex flex-col items-center px-5 pb-2 pt-3 text-center">
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/12 text-primary ring-1 ring-inset ring-primary/25"><PackagePlus className="h-5 w-5" /></span>
-              <div className="mt-3 text-[14px] font-semibold">No add-ons yet</div>
-              <p className="mt-1 max-w-[260px] text-[12.5px] leading-relaxed text-muted-foreground">Need more monitoring time? Add extra hours to your plan anytime.</p>
-              <button onClick={() => setBrowse(true)} className={cn(outlineBtn, "mt-4")}><Plus className="h-3.5 w-3.5" /> Browse add-ons</button>
+            /* nothing bought yet: one compact line, the header button is the way in */
+            <div className="flex items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/12 text-primary ring-1 ring-inset ring-primary/25"><PackagePlus className="h-[18px] w-[18px]" /></span>
+              <div className="min-w-0">
+                <div className="text-[13.5px] font-semibold">No add-ons yet</div>
+                <p className="mt-0.5 text-[12px] leading-snug text-muted-foreground">Need more monitoring time? Add extra hours anytime.</p>
+              </div>
             </div>
           )}
         </Card>
