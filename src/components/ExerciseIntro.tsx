@@ -1,5 +1,5 @@
 import { useImmersive } from "@/hooks/useImmersive";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Armchair, ChevronLeft, Lightbulb, Play, ShieldCheck, SkipForward, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { StepTimeline } from "@/components/StepTimeline";
@@ -18,6 +18,8 @@ export function ExerciseIntro({
 }: { name: string; session?: number; sessions?: number; onBack: () => void; onStart: () => void }) {
   const g = guideFor(name);
   useImmersive();
+  // full-focus screen: the app bar goes away while the intro is open
+  useEffect(() => { const el = document.documentElement; el.dataset.noBar = "1"; return () => { delete el.dataset.noBar; }; }, []);
   const [tab, setTab] = useState<Tab>("steps");
   const items = g[tab];
 

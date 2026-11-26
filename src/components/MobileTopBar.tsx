@@ -35,7 +35,7 @@ export function MobileTopBar() {
   };
 
   return (
-    <header className="desk:hidden h-14 border-b border-border flex items-center justify-between px-4 bg-background/80 backdrop-blur-xl sticky top-0 z-30">
+    <header data-app-bar className="desk:hidden h-14 border-b border-border flex items-center justify-between px-4 bg-background/80 backdrop-blur-xl sticky top-0 z-30">
       <div className="flex items-center gap-2">
         <button
           data-tb-inline
