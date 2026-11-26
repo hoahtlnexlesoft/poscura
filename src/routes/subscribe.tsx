@@ -75,23 +75,37 @@ function SubscribePage() {
         {/* ---------- the order: voucher, payment details, confirm ---------- */}
         <div className="flex flex-1 flex-col">
           <section className="rounded-[26px] border border-white/[0.07] bg-card p-5">
-            <button onClick={() => setPicking(true)}
-              className={cn("group flex w-full items-center gap-3 rounded-[16px] border border-dashed px-3.5 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
-                voucher ? "border-success/40 bg-success/[0.06]" : "border-white/15 hover:border-primary/50 hover:bg-primary/[0.05]")}>
-              <Ticket className={cn("h-5 w-5 shrink-0", voucher ? "text-success" : "text-primary")} />
-              {voucher ? (
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[14px] font-semibold">{voucher.name}</span>
-                  <span className="mt-0.5 block text-[12px] text-success"><span className="font-mono font-semibold tracking-wider">{voucher.code}</span> · {voucher.off} applied</span>
+            {voucher ? (
+              /* applied: the same ticket as in the picker, tap to change */
+              <div role="button" tabIndex={0} onClick={() => setPicking(true)} onKeyDown={(e) => e.key === "Enter" && setPicking(true)}
+                className="group relative flex w-full cursor-pointer items-stretch overflow-hidden rounded-[18px] bg-gradient-to-r from-primary/[0.14] to-secondary/[0.05] text-left ring-1 ring-inset ring-primary/40 transition hover:ring-primary/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+                <span className="flex w-[72px] shrink-0 flex-col items-center justify-center bg-gradient-to-br from-primary to-secondary py-3 text-white">
+                  <span className="text-[19px] font-bold leading-none tracking-tight">{voucher.off.replace(/\s*OFF/i, "")}</span>
+                  <span className="mt-1 text-[9.5px] font-semibold uppercase tracking-[0.2em] opacity-80">Off</span>
                 </span>
-              ) : (
-                <span className="flex-1 text-[14px] font-medium">Select voucher</span>
-              )}
-              {voucher ? (
-                <span role="button" tabIndex={0} aria-label="Remove voucher" onClick={(e) => { e.stopPropagation(); setVoucher(null); }}
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white/[0.08] hover:text-foreground"><X className="h-4 w-4" /></span>
-              ) : <ChevronRight className="h-5 w-5 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground" />}
-            </button>
+                <span className="min-w-0 flex-1 px-3.5 py-2.5">
+                  <span className="block truncate text-[14px] font-semibold">{voucher.name}</span>
+                  <span className="mt-1 flex items-center gap-2">
+                    <span className="rounded-md bg-white/[0.07] px-1.5 py-0.5 font-mono text-[11.5px] font-semibold tracking-wider text-foreground/80">{voucher.code}</span>
+                    <span className="inline-flex items-center gap-1 text-[11.5px] font-medium text-success"><Check className="h-3 w-3" strokeWidth={3} />Applied</span>
+                  </span>
+                </span>
+                <span className="flex items-center gap-0.5 pr-2">
+                  <span className="hidden text-[12px] font-semibold text-primary group-hover:inline">Change</span>
+                  <button aria-label="Remove voucher" onClick={(e) => { e.stopPropagation(); setVoucher(null); }}
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white/[0.08] hover:text-foreground"><X className="h-4 w-4" /></button>
+                </span>
+              </div>
+            ) : (
+              <button onClick={() => setPicking(true)}
+                className="group flex w-full items-center gap-3 rounded-[18px] bg-white/[0.035] px-3.5 py-3 text-left ring-1 ring-inset ring-white/[0.08] transition hover:bg-white/[0.05] hover:ring-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/12 text-primary ring-1 ring-inset ring-primary/20"><Ticket className="h-[18px] w-[18px]" /></span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[14px] font-semibold">Select voucher</span>
+                </span>
+                <ChevronRight className="h-5 w-5 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground" />
+              </button>
+            )}
 
             <h3 className="mt-6 text-[13px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Payment Details</h3>
             <dl className="mt-3 space-y-3 text-[14px]">
@@ -127,15 +141,15 @@ function SubscribePage() {
           </div>
         </div>
       </div>
-      <VoucherPicker open={picking} planId={plan.id} empty={!!novouchers} selected={voucher}
+      <VoucherPicker open={picking} planId={plan.id} price={price} empty={!!novouchers} selected={voucher}
         onClose={() => setPicking(false)} onDone={(v) => { setVoucher(v); setPicking(false); }} />
     </div>
   );
 }
 
-/** Vouchers, as a modal over the order (a bottom sheet on phones): pick one that fits this plan, or type a code. */
-function VoucherPicker({ open, planId, empty, selected, onClose, onDone }: {
-  open: boolean; planId: string; empty: boolean; selected: Voucher | null; onClose: () => void; onDone: (v: Voucher | null) => void;
+/** Vouchers, as a modal over the order (a bottom sheet on phones): type a code, or pick one that fits this plan. */
+function VoucherPicker({ open, planId, price, empty, selected, onClose, onDone }: {
+  open: boolean; planId: string; price: number; empty: boolean; selected: Voucher | null; onClose: () => void; onDone: (v: Voucher | null) => void;
 }) {
   const list = empty ? [] : VOUCHERS.filter((v) => v.status === "Active");
   const [pick, setPick] = useState<Voucher | null>(selected);
@@ -150,42 +164,71 @@ function VoucherPicker({ open, planId, empty, selected, onClose, onDone }: {
     if (!voucherFits(v, planId)) return setErr("This code can't be used with this plan.");
     setErr(""); setPick(v); setCode(""); setFlash(v.code); window.setTimeout(() => setFlash(null), 1200);
   };
+  const save = pick ? Math.round(price * voucherRate(pick)) : 0;
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="flex max-h-[min(720px,calc(100dvh-32px))] max-w-[480px] flex-col gap-0 overflow-hidden rounded-[26px] border-white/[0.08] bg-[#0f1726] p-0 [&>button:last-child]:hidden max-[599px]:bottom-0 max-[599px]:top-auto max-[599px]:max-h-[88dvh] max-[599px]:translate-y-0 max-[599px]:rounded-b-none">
-        <div className="flex items-center justify-between px-5 pb-2 pt-5">
-          <DialogTitle className="text-[17px]">Vouchers</DialogTitle>
-          <button onClick={onClose} aria-label="Close" className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white/[0.08] hover:text-foreground"><X className="h-4 w-4" /></button>
+      <DialogContent className="flex max-h-[min(680px,calc(100dvh-32px))] max-w-[460px] flex-col gap-0 overflow-hidden rounded-[28px] border-white/[0.08] bg-[#0e1524] p-0 shadow-[0_40px_100px_-30px_rgba(0,0,0,.9)] [&>button:last-child]:hidden max-[599px]:bottom-0 max-[599px]:top-auto max-[599px]:max-h-[88dvh] max-[599px]:translate-y-0 max-[599px]:rounded-b-none">
+        {/* header + code entry stay on top; only the list scrolls */}
+        <div className="relative border-b border-white/[0.06] px-5 pb-4 pt-5">
+          <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[radial-gradient(70%_100%_at_50%_0%,color-mix(in_oklab,var(--color-primary)_16%,transparent),transparent)]" />
+          <div className="relative flex items-center justify-between">
+            <DialogTitle className="text-[18px] font-semibold tracking-tight">Vouchers</DialogTitle>
+            <button onClick={onClose} aria-label="Close" className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.08] text-muted-foreground transition hover:border-white/20 hover:text-foreground"><X className="h-4 w-4" /></button>
+          </div>
+          <DialogDescription className="sr-only">Enter a voucher code or pick an available voucher.</DialogDescription>
+          <label htmlFor="vcode" className="sr-only">Voucher code</label>
+          <div className={cn("relative mt-4 flex items-center gap-2 rounded-2xl border bg-white/[0.03] p-1.5 pl-3.5 transition focus-within:ring-2",
+            err ? "border-destructive/60 focus-within:ring-destructive/25" : "border-white/10 focus-within:border-primary/60 focus-within:ring-primary/25")}>
+            <Ticket className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <input id="vcode" value={code} onChange={(e) => { setCode(e.target.value); setErr(""); }} onKeyDown={(e) => e.key === "Enter" && code.trim() && apply()}
+              placeholder="Enter voucher code, e.g. WELCOME50" autoCapitalize="characters"
+              className="h-9 min-w-0 flex-1 bg-transparent font-mono text-[14px] uppercase tracking-wider placeholder:font-sans placeholder:normal-case placeholder:tracking-normal placeholder:text-muted-foreground/70 focus:outline-none" />
+            <button onClick={apply} disabled={!code.trim()}
+              className="h-9 shrink-0 rounded-xl bg-primary px-4 text-[13px] font-semibold text-white transition enabled:hover:brightness-110 disabled:bg-white/[0.06] disabled:text-muted-foreground">Apply</button>
+          </div>
+          <p className={cn("relative mt-2 px-1 text-[11.5px]", err ? "text-destructive" : "text-muted-foreground")}>
+            {err || "Voucher codes are case-insensitive. Contact support if your code isn't working"}
+          </p>
         </div>
-        <DialogDescription className="sr-only">Pick an available voucher or enter a code.</DialogDescription>
 
-        <div className="mac-scroll flex-1 overflow-y-auto px-5 pb-4">
-          <h3 className="mt-2 text-[13px] font-semibold text-muted-foreground">Available Vouchers</h3>
+        <div className="mac-scroll flex-1 overflow-y-auto px-5 py-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-[13px] font-semibold">Available Vouchers</h3>
+            {list.length > 0 && <span className="text-[12px] text-muted-foreground">{list.length}</span>}
+          </div>
           {list.length ? (
-            <ul role="radiogroup" className="mt-2.5 space-y-2.5">
+            <ul role="radiogroup" className="mt-3 space-y-3">
               {list.map((v) => {
                 const ok = voucherFits(v, planId);
                 const on = pick?.code === v.code;
                 return (
                   <li key={v.code}>
                     <button role="radio" aria-checked={on} disabled={!ok} onClick={() => setPick(on ? null : v)}
-                      className={cn("flex w-full items-stretch overflow-hidden rounded-[16px] text-left ring-1 ring-inset transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
-                        on ? "bg-primary/[0.08] ring-primary/60" : "bg-white/[0.03] ring-white/[0.07] enabled:hover:ring-white/20",
+                      className={cn("group relative flex w-full items-stretch overflow-hidden rounded-[18px] text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
+                        on ? "bg-gradient-to-r from-primary/[0.16] to-secondary/[0.06] ring-[1.5px] ring-inset ring-primary shadow-[0_12px_30px_-16px] shadow-primary"
+                          : "bg-white/[0.035] ring-1 ring-inset ring-white/[0.07] enabled:hover:bg-white/[0.05] enabled:hover:ring-white/20",
                         flash === v.code && "plan-flash",
-                        !ok && "cursor-not-allowed opacity-50")}>
-                      <span className="flex w-[72px] shrink-0 flex-col items-center justify-center bg-gradient-to-br from-primary/30 via-primary/15 to-secondary/25 py-3">
-                        <span className="text-[19px] font-bold leading-none">{v.off.replace(/\s*OFF/i, "")}</span>
-                        <span className="mt-1 text-[9.5px] font-semibold uppercase tracking-[0.18em] text-foreground/75">Off</span>
+                        !ok && "cursor-not-allowed opacity-45 saturate-50")}>
+                      {/* ticket stub */}
+                      <span className={cn("flex w-[78px] shrink-0 flex-col items-center justify-center py-3.5 transition",
+                        on ? "bg-gradient-to-br from-primary to-secondary text-white" : "bg-gradient-to-br from-primary/35 via-primary/15 to-secondary/25")}>
+                        <span className="text-[20px] font-bold leading-none tracking-tight">{v.off.replace(/\s*OFF/i, "")}</span>
+                        <span className="mt-1 text-[9.5px] font-semibold uppercase tracking-[0.2em] opacity-80">Off</span>
                       </span>
-                      <span className="min-w-0 flex-1 px-3.5 py-3">
+                      {/* perforation with notches */}
+                      <span aria-hidden className="relative w-0 border-l-[1.5px] border-dashed border-white/15">
+                        <span className="absolute -left-[8px] -top-[8px] h-4 w-4 rounded-full bg-[#0e1524]" />
+                        <span className="absolute -bottom-[8px] -left-[8px] h-4 w-4 rounded-full bg-[#0e1524]" />
+                      </span>
+                      <span className="min-w-0 flex-1 px-4 py-3">
                         <span className="block truncate text-[14px] font-semibold">{v.name}</span>
-                        <span className="mt-0.5 block font-mono text-[12px] font-semibold tracking-wider text-foreground/70">{v.code}</span>
-                        <span className="mt-1 block text-[11.5px] text-muted-foreground">{ok ? `Valid until ${voucherUntil(v)}` : "Individual plan only"}</span>
+                        <span className="mt-1 inline-block rounded-md bg-white/[0.06] px-1.5 py-0.5 font-mono text-[11.5px] font-semibold tracking-wider text-foreground/80">{v.code}</span>
+                        <span className="mt-1.5 block text-[11.5px] text-muted-foreground">{ok ? `Valid until ${voucherUntil(v)}` : "Individual plan only"}</span>
                       </span>
-                      <span className="flex items-center pr-3.5">
-                        <span className={cn("flex h-5 w-5 items-center justify-center rounded-full ring-[1.5px] ring-inset transition", on ? "bg-primary ring-primary" : "ring-white/25")}>
-                          {on && <Check className="h-3 w-3 text-white" strokeWidth={3} />}
+                      <span className="flex items-center pr-4">
+                        <span className={cn("flex h-[22px] w-[22px] items-center justify-center rounded-full transition", on ? "bg-primary shadow-[0_0_0_4px] shadow-primary/20" : "ring-[1.5px] ring-inset ring-white/25 group-hover:ring-white/40")}>
+                          {on && <Check className="h-3.5 w-3.5 text-white" strokeWidth={3} />}
                         </span>
                       </span>
                     </button>
@@ -194,37 +237,24 @@ function VoucherPicker({ open, planId, empty, selected, onClose, onDone }: {
               })}
             </ul>
           ) : (
-            <div className="flex flex-col items-center py-6 text-center">
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/[0.05] text-muted-foreground ring-1 ring-inset ring-white/[0.08]"><TicketX className="h-5 w-5" /></span>
-              <p className="mt-2.5 text-[13.5px] text-muted-foreground">No data</p>
+            <div className="flex flex-col items-center py-8 text-center">
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/[0.05] text-muted-foreground ring-1 ring-inset ring-white/[0.08]"><TicketX className="h-5 w-5" /></span>
+              <p className="mt-3 text-[13.5px] text-muted-foreground">No data</p>
             </div>
           )}
-
-          <div className="my-5 flex items-center gap-3 text-[12px] text-muted-foreground">
-            <span className="h-px flex-1 bg-white/[0.07]" /> Or Enter Manually <span className="h-px flex-1 bg-white/[0.07]" />
-          </div>
-          <label htmlFor="vcode" className="text-[13px] font-semibold">Voucher code</label>
-          <div className="mt-2 flex gap-2">
-            <input id="vcode" value={code} onChange={(e) => { setCode(e.target.value); setErr(""); }} onKeyDown={(e) => e.key === "Enter" && code.trim() && apply()}
-              placeholder="EG: WELCOME50" autoCapitalize="characters"
-              className={cn("h-11 min-w-0 flex-1 rounded-xl border bg-background/50 px-3.5 font-mono text-[14px] uppercase tracking-wider placeholder:font-sans placeholder:normal-case placeholder:tracking-normal placeholder:text-muted-foreground/70 transition focus:outline-none focus:ring-2",
-                err ? "border-destructive/60 focus:ring-destructive/30" : "border-white/10 hover:border-white/20 focus:border-primary/60 focus:ring-primary/30")} />
-            <button onClick={apply} disabled={!code.trim()}
-              className="h-11 shrink-0 rounded-xl border border-white/[0.12] px-5 text-[14px] font-semibold transition enabled:hover:border-primary/50 enabled:hover:bg-primary/10 enabled:hover:text-primary disabled:opacity-40">Apply</button>
-          </div>
-          <p className={cn("mt-2 text-[12px]", err ? "text-destructive" : "text-muted-foreground")}>
-            {err || "Voucher codes are case-insensitive. Contact support if your code isn't working"}
-          </p>
         </div>
 
-        {/* what the button will do, so choosing a card reads as applied */}
-        <div className="border-t border-white/[0.06] px-5 pb-[max(20px,env(safe-area-inset-bottom))] pt-4">
-          {pick && (
-            <p key={pick.code} className="mb-3 flex items-center justify-center gap-1.5 text-[13px] text-success animate-in fade-in slide-in-from-bottom-1 duration-300">
-              <Check className="h-4 w-4" strokeWidth={3} /><span className="font-mono font-semibold tracking-wider">{pick.code}</span> · {pick.off.replace(/\s*OFF/i, "")} off applied
-            </p>
-          )}
-          <button className={cn(primaryBtn, "w-full flex-none")} onClick={() => onDone(pick)}>{pick ? "Use voucher" : "OK"}</button>
+        {/* footer: what you save, and the one action */}
+        <div className="flex items-center gap-4 border-t border-white/[0.06] bg-white/[0.02] px-5 pb-[max(18px,env(safe-area-inset-bottom))] pt-4">
+          <div className="min-w-0 flex-1">
+            {pick ? (
+              <div key={pick.code} className="animate-in fade-in slide-in-from-bottom-1 duration-300">
+                <div className="text-[11.5px] text-muted-foreground">You save</div>
+                <div className="text-[17px] font-bold tabular-nums text-success">{vnd(save)}</div>
+              </div>
+            ) : <div className="text-[12.5px] text-muted-foreground">No voucher selected</div>}
+          </div>
+          <button className={cn(primaryBtn, "h-12 flex-none px-7")} onClick={() => onDone(pick)}>{pick ? "Use voucher" : "OK"}</button>
         </div>
       </DialogContent>
     </Dialog>
