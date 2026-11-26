@@ -179,7 +179,7 @@
   function dev() {
     var d = DEVICES.filter(function (d) { return d.id === state.dev; })[0];
     // the desktop app window can be resized by dragging its corner; remember the size
-    if (d && d.kind === "macapp" && state.macSize) d = Object.assign({}, d, { w: state.macSize.w, h: state.macSize.h });
+    if (d && d.kind === "macapp" && state.macSize) d = Object.assign({}, d, { w: Math.max(800, state.macSize.w), h: state.macSize.h });
     return d;
   }
 
@@ -347,7 +347,7 @@
     document.body.style.cursor = getComputedStyle(g).cursor;
     function move(ev) {
       var w = w0, h = h0;
-      if (mode !== "s") w = Math.round(Math.min(2560, Math.max(480, w0 + (ev.clientX - x0) / sc)));
+      if (mode !== "s") w = Math.round(Math.min(2560, Math.max(800, w0 + (ev.clientX - x0) / sc)));
       if (mode !== "e") h = Math.round(Math.min(1600, Math.max(520, h0 + (ev.clientY - y0) / sc)));
       var dev_ = g.closest(".device"), scr = dev_ && dev_.querySelector(".screen");
       if (dev_) { dev_.style.width = w + "px"; dev_.style.height = (h + 38) + "px"; }
