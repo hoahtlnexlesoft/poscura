@@ -1,4 +1,5 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useGoBack } from "@/hooks/useGoBack";
 import { z } from "zod";
 import { ChevronLeft } from "lucide-react";
 import { toast } from "sonner";
@@ -13,11 +14,12 @@ export const Route = createFileRoute("/checkout")({
 
 function ChoosePlanPage() {
   const router = useRouter();
+  const goBack = useGoBack("/account");
   return (
     <div className="pb-4">
       <header className="relative flex h-11 items-center justify-center">
         <button
-          onClick={() => router.history.back()}
+          onClick={goBack}
           aria-label="Back"
           className="absolute left-0 flex h-9 w-9 -ml-1.5 items-center justify-center rounded-full hover:bg-white/[0.08] hover:text-foreground"
         >

@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { useGoBack } from "@/hooks/useGoBack";
 import { useRef, useState } from "react";
 import { User, Crown, Gift, Copy, Check, Plus, Trash2, Pencil, AlertTriangle, CreditCard, Ticket, ChevronRight, Facebook, Apple, Send, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -241,12 +242,13 @@ export const Route = createFileRoute("/account")({
 
 function AccountPage() {
   const router = useRouter();
+  const goBack = useGoBack("/");
   const { tab, plan } = Route.useSearch();
   return (
     <div className="-mx-4 -mt-4">
       <header className="h-14 sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border flex items-center px-4 gap-2">
         <button
-          onClick={() => router.history.back()}
+          onClick={goBack}
           aria-label="Back"
           className="h-9 w-9 -ml-2 rounded-full flex items-center justify-center hover:bg-white/[0.08] hover:text-foreground"
         >

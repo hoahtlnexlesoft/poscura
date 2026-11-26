@@ -1,4 +1,5 @@
 import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
+import { useGoBack } from "@/hooks/useGoBack";
 import { ArrowLeft, Camera, X, ListChecks } from "lucide-react";
 import { useRef, useState } from "react";
 import {
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/support/report")({ component: ReportPage 
 
 function ReportPage() {
   const router = useRouter();
+  const goBack = useGoBack("/support");
   const fileRef = useRef<HTMLInputElement>(null);
   const [title, setTitle] = useState("");
   const [supportType, setSupportType] = useState<string>("");
@@ -79,7 +81,7 @@ function ReportPage() {
     <div className="-mx-4 -mt-4 min-h-full flex flex-col">
       <header className="h-14 sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border flex items-center px-4 gap-2">
         <button
-          onClick={() => router.history.back()}
+          onClick={goBack}
           aria-label="Back"
           className="h-9 w-9 -ml-2 rounded-full flex items-center justify-center hover:bg-white/[0.08] hover:text-foreground"
         >

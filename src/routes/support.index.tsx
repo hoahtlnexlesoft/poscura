@@ -1,4 +1,5 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useGoBack } from "@/hooks/useGoBack";
 import { useState } from "react";
 import { ArrowLeft, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -72,6 +73,7 @@ const faqs: { topic: string; question: string; answer: string }[] = [
 
 function SupportPage() {
   const router = useRouter();
+  const goBack = useGoBack("/");
   const [topic, setTopic] = useState<string>("all");
   const [q, setQ] = useState("");
   const query = q.trim().toLowerCase();
@@ -83,7 +85,7 @@ function SupportPage() {
     <div className="-mx-4 -mt-4 min-h-full flex flex-col desk:mx-0 desk:mt-0">
       <header className="desk:hidden h-14 sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border flex items-center px-4 gap-2">
         <button
-          onClick={() => router.history.back()}
+          onClick={goBack}
           aria-label="Back"
           className="h-9 w-9 -ml-2 rounded-full flex items-center justify-center hover:bg-white/[0.08] hover:text-foreground"
         >

@@ -1,4 +1,5 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useGoBack } from "@/hooks/useGoBack";
 import { useState } from "react";
 import { Bell, Mic, Clock, Languages, ArrowLeft, ShieldAlert, ChevronRight } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -23,6 +24,7 @@ type RowProps = {
 
 function SettingsPage() {
   const router = useRouter();
+  const goBack = useGoBack("/");
   const [language, setLanguage] = useState("en");
   
   const [voice, setVoice] = useState(false);
@@ -37,7 +39,7 @@ function SettingsPage() {
       {desk && <PageHead title="Settings" subtitle="Language, monitoring, voice and notifications" />}
       <header className="desk:hidden h-14 sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border flex items-center px-4 gap-2">
         <button
-          onClick={() => router.history.back()}
+          onClick={goBack}
           aria-label="Back"
           className="h-9 w-9 -ml-2 rounded-full flex items-center justify-center hover:bg-white/[0.08] hover:text-foreground"
         >
