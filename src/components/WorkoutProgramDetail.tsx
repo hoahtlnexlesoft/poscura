@@ -98,7 +98,10 @@ export function WorkoutProgramDetail({ onClose, onStartSession }: Props) {
   };
 
   if (selectedExercise) {
-    return <ExerciseDetail exerciseName={selectedExercise.name} badge={selectedExercise.badge} onClose={() => setSelectedExercise(null)} />;
+    const i = exerciseList.findIndex((x) => x.name === selectedExercise.name);
+    const prev = exerciseList[i - 1], nxt = exerciseList[i + 1];
+    return <ExerciseDetail key={selectedExercise.name} exerciseName={selectedExercise.name} badge={selectedExercise.badge} onClose={() => setSelectedExercise(null)}
+      onPrev={prev ? () => setSelectedExercise(prev) : undefined} onNext={nxt ? () => setSelectedExercise(nxt) : undefined} />;
   }
 
   const next = todaySessions[0];

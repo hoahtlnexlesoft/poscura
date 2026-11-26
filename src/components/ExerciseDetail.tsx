@@ -84,6 +84,7 @@ function ShareToggle({ label, checked, onChange }: { label: string; checked: boo
 export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, onStart, evaluated = hasEvaluation(exerciseName), sessionLabel = "0/2", scheduled = true }: Props) {
   const [sched, setSched] = useState(scheduled);
   const [scrolled, setScrolled] = useState(false);
+  useEffect(() => { window.scrollTo(0, 0); }, []);
   useEffect(() => {
     const on = () => setScrolled(window.scrollY > 4);
     on(); window.addEventListener("scroll", on, { passive: true });
@@ -147,12 +148,6 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
           </div>
           <h1 className="mt-0.5 truncate text-[19px] font-semibold leading-tight tracking-tight">{exerciseName}</h1>
         </div>
-        {(onPrev || onNext) && (
-          <div className="flex shrink-0 overflow-hidden rounded-full border border-white/[0.08]">
-            <button onClick={onPrev} disabled={!onPrev} aria-label="Previous exercise" className="flex h-9 w-9 items-center justify-center text-foreground/80 transition enabled:hover:bg-white/[0.06] disabled:opacity-30"><ChevronLeft className="h-4 w-4" /></button>
-            <button onClick={onNext} disabled={!onNext} aria-label="Next exercise" className="flex h-9 w-9 items-center justify-center border-l border-white/[0.08] text-foreground/80 transition enabled:hover:bg-white/[0.06] disabled:opacity-30"><ChevronRight className="h-4 w-4" /></button>
-          </div>
-        )}
         <button onClick={() => setShareOpen(true)} aria-label="Share" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/[0.08] text-foreground/80 transition hover:border-primary/40 hover:text-primary">
           <Share2 className="h-4 w-4" />
         </button>
@@ -325,6 +320,18 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, o
         <HowTo phase={phase} setPhase={setPhase} withExtras />
       </section>
       </>)}
+
+      {/* ---------- move through the exercises in order, like the session screen's Back / Next ---------- */}
+      {(onPrev || onNext) && (
+        <nav className="flex items-center justify-between rounded-[18px] border border-white/[0.06] bg-card px-2 py-1.5 land:col-span-2">
+          <button onClick={onPrev ?? onClose} className="inline-flex h-10 items-center gap-1 rounded-full px-3 text-[14.5px] font-medium text-primary transition hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+            <ChevronLeft className="h-5 w-5" /> Back
+          </button>
+          <button onClick={onNext} disabled={!onNext} className="inline-flex h-10 items-center gap-1 rounded-full px-3 text-[14.5px] font-medium text-primary transition enabled:hover:bg-primary/10 disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+            Next <ChevronRight className="h-5 w-5" />
+          </button>
+        </nav>
+      )}
     </div>
   );
 }
