@@ -122,33 +122,63 @@ export function NoPlanArt({ className }: { className?: string }) {
   );
 }
 
-/** Seated figure inside a scan frame — ready for the first posture scan. */
+/** Seated person at a desk inside a scan frame, spine traced — the first posture scan.
+ *  Vector redraw of the original illustration, so it stays crisp at any size. */
 export function FirstScanArt({ className }: { className?: string }) {
   const id = useId().replace(/:/g, "");
   return (
-    <svg viewBox="0 0 200 160" className={cn("h-auto w-[190px]", className)} aria-hidden>
+    <svg viewBox="0 0 220 200" className={cn("h-auto w-[180px]", className)} aria-hidden>
       <Defs id={id} />
-      <ellipse cx="100" cy="82" rx="90" ry="70" fill={`url(#${id}-glow)`} />
-      <g filter={`url(#${id}-lift)`}><rect x="36" y="18" width="128" height="124" rx="28" fill={`url(#${id}-glass)`} /><rect x="36.5" y="18.5" width="127" height="123" rx="27.5" fill="none" stroke={`url(#${id}-edge)`} /></g>
-      {/* desk + chair */}
-      <rect x="112" y="92" width="38" height="4" rx="2" fill="#3a4d6e" />
-      <rect x="140" y="96" width="4" height="34" rx="2" fill="#2c3c58" />
-      <rect x="128" y="80" width="16" height="11" rx="2" fill="#2c3c58" />
-      <path d="M70 72v38a6 6 0 0 0 6 6h22" stroke="#3a4d6e" strokeWidth="5" strokeLinecap="round" fill="none" />
-      <path d="M84 118v12m-10 0h20" stroke="#2c3c58" strokeWidth="4" strokeLinecap="round" />
-      {/* figure, upright, with the spine traced */}
-      <circle cx="92" cy="45" r="8.5" fill="#dbe8ff" />
-      <path d="M90 57c-6 2-9 8-9 16v30h18l8 26" stroke="#dbe8ff" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-      <path d="M95 64l18 22h10" stroke="#dbe8ff" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-      <path d="M88 58v44" stroke={`url(#${id}-brand)`} strokeWidth="2.4" strokeLinecap="round" strokeDasharray="1 5" />
-      {/* scan frame + line */}
-      <g stroke={`url(#${id}-brand)`} strokeWidth="3" strokeLinecap="round" fill="none">
-        <path d="M60 40v-8a6 6 0 0 1 6-6h8" /><path d="M118 26h8a6 6 0 0 1 6 6v8" />
-        <path d="M132 112v8a6 6 0 0 1-6 6h-8" /><path d="M74 126h-8a6 6 0 0 1-6-6v-8" />
+      <linearGradient id={`${id}-sweater`} x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stopColor="#c9ced8" /><stop offset="1" stopColor="#8d94a3" />
+      </linearGradient>
+      <linearGradient id={`${id}-beam`} x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stopColor="#22d3ee" stopOpacity="0" /><stop offset="0.15" stopColor="#22d3ee" />
+        <stop offset="0.85" stopColor="#34d399" /><stop offset="1" stopColor="#34d399" stopOpacity="0" />
+      </linearGradient>
+      <ellipse cx="110" cy="104" rx="100" ry="82" fill={`url(#${id}-glow)`} />
+
+      {/* desk */}
+      <rect x="120" y="118" width="80" height="6" rx="2" fill="#b8ad9a" />
+      <rect x="182" y="124" width="6" height="56" rx="2" fill="#9b917f" />
+      <rect x="126" y="124" width="4" height="10" rx="1.5" fill="#9b917f" />
+      {/* laptop */}
+      <path d="M142 117l6-14h30l-4 14z" fill="#3b4558" />
+      <rect x="136" y="115.5" width="46" height="3" rx="1.5" fill="#596579" />
+
+      {/* chair */}
+      <rect x="56" y="74" width="8" height="58" rx="4" fill="#1f2b44" />
+      <rect x="58" y="128" width="58" height="10" rx="5" fill="#22325a" />
+      <rect x="84" y="138" width="6" height="26" rx="2" fill="#2a3346" />
+      <path d="M62 172h50M87 164v8" stroke="#2a3346" strokeWidth="5" strokeLinecap="round" />
+      {[62, 87, 112].map((x) => <circle key={x} cx={x} cy="176" r="4" fill="#1a2233" />)}
+
+      {/* legs */}
+      <path d="M74 128h44l10 44" stroke="#151b26" strokeWidth="15" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <path d="M124 172h12" stroke="#0e131c" strokeWidth="9" strokeLinecap="round" />
+      {/* torso (upright) */}
+      <path d="M68 72c0-10 8-17 18-17h4c10 0 16 8 16 18v52H70z" fill={`url(#${id}-sweater)`} />
+      {/* arm to the keyboard */}
+      <path d="M96 76l10 34h30" stroke="#a9afbc" strokeWidth="11" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <circle cx="139" cy="110" r="5" fill="#e8c4a6" />
+      {/* neck + head */}
+      <rect x="84" y="44" width="10" height="14" rx="4" fill="#e1b896" />
+      <circle cx="90" cy="36" r="13" fill="#e8c4a6" />
+      <path d="M77 34c0-10 7-16 15-16 8 0 13 5 13 11-6-2-12 0-16 3-4 1-8 4-8 10-3-2-4-5-4-8z" fill="#1b1f29" />
+      <circle cx="98" cy="35" r="1.3" fill="#3a2a22" />
+
+      {/* spine, traced */}
+      <path d="M84 50v28M80 84v36M80 126h30l8 36" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeDasharray="3 4" fill="none" opacity="0.95" />
+
+      {/* scan beam at elbow height */}
+      <rect x="40" y="102" width="150" height="16" rx="8" fill="#22d3ee" opacity="0.14" filter={`url(#${id}-shine)`} />
+      <rect x="40" y="108.5" width="150" height="3" rx="1.5" fill={`url(#${id}-beam)`} />
+
+      {/* scan corners */}
+      <g stroke="#22d3ee" strokeWidth="3.4" strokeLinecap="round" fill="none">
+        <path d="M44 34V18h16" /><path d="M146 18h16v16" />
+        <path d="M162 132v16h-16" /><path d="M60 148H44v-16" />
       </g>
-      <rect x="54" y="84" width="84" height="3" rx="1.5" fill={`url(#${id}-brand)`} />
-      <rect x="54" y="78" width="84" height="14" rx="7" fill="var(--color-secondary)" opacity="0.16" filter={`url(#${id}-shine)`} />
-      <circle cx="138" cy="85.5" r="2.8" fill="#e8fffb" />
     </svg>
   );
 }
