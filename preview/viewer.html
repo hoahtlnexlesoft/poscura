@@ -41,12 +41,6 @@
   .sb-icons svg { display:block; }
   .homebar { flex:none; background:var(--app); display:flex; justify-content:center; align-items:center; }
   .homebar i { display:block; border-radius:3px; background:#fff; opacity:.9; }
-  /* One UI taskbar on the open Galaxy Z Fold */
-  .taskbar { flex:none; height:52px; background:var(--app); position:relative; display:flex; justify-content:center; align-items:flex-start; padding-top:6px; gap:10px; }
-  .taskbar .tb-i { width:30px; height:30px; border-radius:9px; display:flex; align-items:center; justify-content:center; }
-  .taskbar .tb-sep { width:1px; height:20px; margin:5px 2px 0; background:rgba(255,255,255,.18); }
-  .taskbar .tb-on { position:relative; } .taskbar .tb-on:after { content:""; position:absolute; bottom:-6px; left:50%; width:10px; height:3px; margin-left:-5px; border-radius:2px; background:rgba(255,255,255,.8); }
-  .taskbar > i { position:absolute; bottom:5px; left:50%; width:120px; height:4px; margin-left:-60px; border-radius:3px; background:#fff; opacity:.9; }
   .cut { position:absolute; background:#000; z-index:2; pointer-events:none; }
   .sidebtn { position:absolute; width:4px; border-radius:2px; }
   .se-home { position:absolute; left:50%; transform:translateX(-50%); width:64px; height:64px; border-radius:50%; background:#121317; box-shadow:inset 0 0 0 2px #2c2e35; }
@@ -251,9 +245,9 @@
       ow = d.w + (d.android ? 20 : 28); oh = d.h + (d.android ? 20 : 28); sl = st = d.android ? 10 : 14; radius = d.android ? 10 : 44; scr = d.android ? 10 : 30;
       bg = d.silver ? "linear-gradient(145deg," + d.color + "," + d.tone + ")" : "linear-gradient(145deg," + d.color + "," + (d.tone || "#514b42") + " 40%,#1f2226)";
       if (d.android) {
-        top = 36; bot = d.layout === "bottom" ? 52 : 22;
+        top = 36; bot = 22;
         sb = '<div class="statusbar" style="height:36px;padding:0 24px;font-family:Roboto,system-ui,sans-serif;font-weight:500;font-size:14px"><span class="clock">' + clock() + '</span><span class="sb-icons">' + I.aWifi + I.aSig + I.aBatt + "</span></div>";
-        hb = d.layout === "bottom" ? taskbar() : '<div class="homebar" style="height:22px"><i style="width:120px;height:4px"></i></div>';
+        hb = '<div class="homebar" style="height:22px"><i style="width:120px;height:4px"></i></div>';
       } else {
         top = 44; bot = 20;
         sb = '<div class="statusbar" style="height:44px;padding:0 36px;font-size:16px"><span class="clock">' + clock() + '</span><span class="sb-icons">' + I.sig + I.wifi + I.batt + "</span></div>";
@@ -327,16 +321,6 @@
   }
 
   // faint fold line over the screen (does not block taps)
-  function taskbar() {
-    var dots = '<svg width="16" height="16" viewBox="0 0 16 16" fill="#e8ebf2">' + [2,8,14].map(function(x){return [2,8,14].map(function(y){return '<circle cx="'+x+'" cy="'+y+'" r="1.6"/>';}).join("");}).join("") + "</svg>";
-    var ico = function(bg, inner, on){ return '<span class="tb-i' + (on ? " tb-on" : "") + '" style="background:' + bg + '">' + inner + "</span>"; };
-    var phone = '<svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11 11 0 0 0 3.6.6 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.6 3.6a1 1 0 0 1-.25 1z"/></svg>';
-    var cam = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="3"/><circle cx="12" cy="13.5" r="3.5"/><path d="M9 7l1.5-3h3L15 7"/></svg>';
-    var gear = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>';
-    var p = '<span style="font:700 15px/1 system-ui;color:#fff">P</span>';
-    return '<div class="taskbar">' + '<span class="tb-i">' + dots + "</span>" + ico("#2fb35a", phone) + ico("#e24a4a", cam) + '<span class="tb-sep"></span>' +
-      ico("linear-gradient(135deg,#2f8cff,#2ad4c2)", p, true) + ico("#5b6170", gear) + "<i></i></div>";
-  }
   function crease(d) {
     if (d.crease === "h") return '<div style="position:absolute;left:0;right:0;top:50%;height:14px;transform:translateY(-50%);pointer-events:none;z-index:3;background:linear-gradient(180deg,transparent,rgba(255,255,255,.035) 45%,rgba(0,0,0,.18) 50%,rgba(255,255,255,.035) 55%,transparent)"></div>';
     if (d.crease === "v" && d.android) return '<div style="position:absolute;top:0;bottom:0;left:50%;width:10px;transform:translateX(-50%);pointer-events:none;z-index:3;background:linear-gradient(90deg,transparent,rgba(255,255,255,.02) 45%,rgba(0,0,0,.09) 50%,rgba(255,255,255,.02) 55%,transparent)"></div>';
