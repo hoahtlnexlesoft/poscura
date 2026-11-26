@@ -80,8 +80,8 @@ function SupportPage() {
     .filter((f) => (topic === "all" || f.topic === topic) && (!query || (f.question + " " + f.answer).toLowerCase().includes(query)));
 
   return (
-    <div className="-mx-4 -mt-4 min-h-full flex flex-col">
-      <header className="h-14 sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border flex items-center px-4 gap-2">
+    <div className="-mx-4 -mt-4 min-h-full flex flex-col desk:mx-0 desk:mt-0">
+      <header className="desk:hidden h-14 sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border flex items-center px-4 gap-2">
         <button
           onClick={() => router.history.back()}
           aria-label="Back"
@@ -92,7 +92,7 @@ function SupportPage() {
         <h1 className="text-base font-semibold">FAQs</h1>
       </header>
 
-      <div className="relative p-4 pt-6 flex-1 fold:mx-auto fold:w-full fold:max-w-[1000px] fold:px-6 land:px-4 fold:pt-8">
+      <div className="relative p-4 pt-6 flex-1 fold:mx-auto fold:w-full fold:max-w-[1000px] fold:px-6 land:px-4 fold:pt-8 desk:max-w-[1180px] desk:!px-0 desk:pt-2">
         <div aria-hidden className="pointer-events-none absolute -top-10 -left-10 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
         <div className="relative fold:grid fold:grid-cols-[minmax(0,290px)_minmax(0,1fr)] land:grid-cols-2 fold:items-start fold:gap-8 hinge-split">
           <div className="fold:sticky fold:top-[72px]">

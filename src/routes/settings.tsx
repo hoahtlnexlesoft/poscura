@@ -2,6 +2,8 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { Bell, Mic, Clock, Languages, ArrowLeft, ShieldAlert, ChevronRight } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { useDesk } from "@/desktop/useDesk";
+import { PageHead } from "@/desktop/ui";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -29,9 +31,11 @@ function SettingsPage() {
   const [workoutReminders, setWorkoutReminders] = useState(false);
   const [communityNotifications, setCommunityNotifications] = useState(true);
 
+  const desk = useDesk();
   return (
-    <div className="-mx-4 -mt-4">
-      <header className="h-14 sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border flex items-center px-4 gap-2">
+    <div className="-mx-4 -mt-4 desk:mx-auto desk:mt-0 desk:max-w-[760px]">
+      {desk && <PageHead title="Settings" subtitle="Language, monitoring, voice and notifications" />}
+      <header className="desk:hidden h-14 sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border flex items-center px-4 gap-2">
         <button
           onClick={() => router.history.back()}
           aria-label="Back"
@@ -41,7 +45,7 @@ function SettingsPage() {
         </button>
         <h1 className="text-base font-semibold">Settings</h1>
       </header>
-      <div className="p-4 flex flex-col gap-4 fold:block fold:columns-2 fold:gap-4 fold:[&_section]:break-inside-avoid fold:[&_section]:mb-4 hinge-split land:items-start">
+      <div className="p-4 flex flex-col gap-4 desk:p-0 desk:!flex desk:!columns-auto desk:gap-5 desk:[&>div]:!contents desk:[&_section]:w-full desk:[&_section]:!mb-0 fold:block fold:columns-2 fold:gap-4 fold:[&_section]:break-inside-avoid fold:[&_section]:mb-4 hinge-split land:items-start">
 
       <div className="contents land:block land:space-y-4">
       <Section className="order-1" icon={Languages} title="Language">
@@ -71,10 +75,11 @@ function SettingsPage() {
       <div className="contents land:block land:space-y-4">
       <Section className="order-2" icon={Clock} title="Monitoring">
         <Row label="Session length">
-          <Select defaultValue="40">
+          <Select defaultValue={desk ? "30" : "40"}>
             <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="20">20 min</SelectItem>
+              <SelectItem value="30">30 min</SelectItem>
               <SelectItem value="40">40 min</SelectItem>
               <SelectItem value="60">60 min</SelectItem>
             </SelectContent>
@@ -84,6 +89,7 @@ function SettingsPage() {
       </Section>
 
       <Section className="order-4" icon={Bell} title="Notifications">
+        {desk && <p className="mb-1 rounded-xl bg-destructive/[0.08] px-3 py-2.5 text-[12.5px] leading-relaxed text-destructive ring-1 ring-inset ring-destructive/20">Notifications are currently muted by your device. Turn them on in Settings to stay informed.</p>}
         <Row label="Allow notifications"><Switch checked={allowNotifications} onCheckedChange={setAllowNotifications} /></Row>
         <Row label="Posture alerts"><Switch checked={postureAlerts} onCheckedChange={setPostureAlerts} disabled={!allowNotifications} /></Row>
         <Row label="Workout reminders"><Switch checked={workoutReminders} onCheckedChange={setWorkoutReminders} disabled={!allowNotifications} /></Row>
@@ -99,7 +105,7 @@ function Section(props: SectionProps) {
   const { icon: Icon, title, children, className } = props;
 
   return (
-    <section className={`glass-card px-4 pt-4 pb-1 ${className ?? ""}`}>
+    <section className={`glass-card px-4 pt-4 pb-1 desk:rounded-[24px] desk:px-6 desk:pt-5 ${className ?? ""}`}>
       <div className="flex items-center gap-2 mb-1">
         <Icon className="h-[18px] w-[18px] text-primary" />
         <h2 className="text-[15px] font-semibold">{title}</h2>
