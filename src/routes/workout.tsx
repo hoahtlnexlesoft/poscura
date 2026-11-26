@@ -10,12 +10,14 @@ import { WorkoutAssessment } from "@/components/WorkoutAssessment";
 import { SessionResult } from "@/components/SessionResult";
 import { SessionEvaluation } from "@/components/SessionEvaluation";
 import { NoWorkoutsToday } from "@/components/NoWorkoutsToday";
+import { NoWorkoutPlan } from "@/components/NoWorkoutPlan";
+import { Page, PageHead } from "@/desktop/ui";
 import { WorkoutProgramDetail, exerciseList } from "@/components/WorkoutProgramDetail";
 import { ExerciseDetail } from "@/components/ExerciseDetail";
 import { NEXT_WORKOUT, TODAYS_WORKOUTS, TODAY_TIME } from "@/lib/todays-workouts";
 
 export const Route = createFileRoute("/workout")({
-  validateSearch: z.object({ session: z.string().optional(), exercise: z.string().optional(), schedule: z.enum(["none"]).optional(), evaluate: z.string().optional(), score: z.coerce.number().optional(), empty: z.coerce.string().optional() }),
+  validateSearch: z.object({ session: z.string().optional(), exercise: z.string().optional(), schedule: z.enum(["none"]).optional(), evaluate: z.string().optional(), score: z.coerce.number().optional(), empty: z.coerce.string().optional(), new: z.coerce.string().optional() }),
   component: WorkoutPage,
 });
 
@@ -44,7 +46,7 @@ type View =
   | { kind: "program" };
 
 function WorkoutPage() {
-  const { session, exercise, schedule, evaluate, score, empty } = Route.useSearch();
+  const { session, exercise, schedule, evaluate, score, empty, new: fresh } = Route.useSearch();
   const desk = useDesk();
   const [view, setView] = useState<View>(evaluate ? { kind: "evaluation", name: evaluate, score: score ?? 88, recordedUrl: null, when: "Today, 16:45" } : session ? { kind: "intro", name: session } : exercise ? { kind: "exercise", name: exercise } : { kind: "list" });
   // deep links (?exercise= / ?session=) also work when the page is already open
@@ -110,6 +112,13 @@ function WorkoutPage() {
       onPrev={pw ? () => setView({ kind: "exercise", name: pw.name }) : undefined} onNext={nw ? () => setView({ kind: "exercise", name: nw.name }) : undefined} prevName={pw?.name} nextName={nw?.name} />;
   }
   if (view.kind === "program") return <WorkoutProgramDetail onClose={() => setView({ kind: "list" })} onStartSession={(name) => setView({ kind: "intro", name })} />;
+  // never scanned: no plan yet, monitoring creates it
+  if (fresh) return desk ? <Page><PageHead title="Workout" subtitle="Personalized workout plans" /><NoWorkoutPlan /></Page> : (
+    <div className="space-y-4">
+      <div><h1 className="text-xl font-bold">Workout</h1><p className="mt-0.5 text-xs text-muted-foreground">Personalized routines from your posture data.</p></div>
+      <NoWorkoutPlan />
+    </div>
+  );
   if (desk) return <DeskWorkoutHome empty={!!empty} onProgram={() => setView({ kind: "program" })} onExercise={(name) => setView({ kind: "exercise", name })} onStart={(name) => setView({ kind: "intro", name })} />;
 
   return (

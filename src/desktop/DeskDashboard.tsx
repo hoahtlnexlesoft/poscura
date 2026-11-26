@@ -134,7 +134,7 @@ function WorkoutProgress() {
   );
 }
 
-function NoWorkouts() {
+export function NoWorkouts() {
   const [open, setOpen] = useState(false);
   return (
     <Panel title="Today's Workouts">

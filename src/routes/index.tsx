@@ -2,7 +2,7 @@ import { z } from "zod";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ChevronRight, Play, Clock } from "lucide-react";
 import { useDesk } from "@/desktop/useDesk";
-import { DeskDashboard } from "@/desktop/DeskDashboard";
+import { DeskDashboard, NoWorkouts } from "@/desktop/DeskDashboard";
 import { FirstScan } from "@/components/FirstScan";
 import { ScoreGauge } from "@/components/ScoreGauge";
 import bodyTorso from "@/assets/body-torso.png";
@@ -82,6 +82,7 @@ function Dashboard() {
       </div>
 
       <div className="space-y-4">
+      {empty ? <NoWorkouts /> : (<>
       <section className="glass-card p-4">
         <h2 className="text-base font-semibold mb-3">Today's Workouts</h2>
         <div className="rounded-xl bg-primary/10 border border-primary/30 p-3 mb-3">
@@ -128,6 +129,7 @@ function Dashboard() {
           Tap to view workout plan <ChevronRight className="h-3.5 w-3.5" />
         </Link>
       </section>
+      </>)}
       </div>
     </div>
   );
