@@ -561,14 +561,18 @@ function AccuracyChart({ data, onPointClick }: { data: number[]; onPointClick?: 
       {pts.map(([px, py], i) => (
         <g key={i} className="cursor-pointer" onClick={() => onPointClick?.(i, data[i])}>
           <circle cx={px} cy={py} r="11" fill="transparent" />
-          <circle cx={px} cy={py} r={i === pts.length - 1 ? 0 : 2.6} fill="var(--color-card)" stroke="var(--color-primary)" strokeWidth="1.6" />
+          <circle cx={px} cy={py} r={i === pts.length - 1 ? 0 : 2.6} fill="var(--color-card)" stroke="var(--color-primary)" strokeWidth="1.6" className="transition-[r] duration-150 [g:hover>&]:[r:4.5]" />
         </g>
       ))}
+      {/* the latest session: highlighted dot + score badge, clickable like every other point */}
+      <g className="cursor-pointer" onClick={() => onPointClick?.(data.length - 1, data[data.length - 1])}>
+      <circle cx={last[0]} cy={last[1]} r="12" fill="transparent" />
       <circle cx={last[0]} cy={last[1]} r="9" fill="var(--color-secondary)" opacity=".2" />
       <circle cx={last[0]} cy={last[1]} r="4.5" fill="var(--color-secondary)" stroke="var(--color-card)" strokeWidth="2" />
       <g transform={`translate(${last[0] - 16} ${last[1] - 26})`}>
         <rect width="32" height="18" rx="9" fill="var(--color-secondary)" />
         <text x="16" y="12.5" textAnchor="middle" fontSize="10.5" fontWeight="700" fill="#06121f">{data[data.length - 1]}</text>
+      </g>
       </g>
       <text x={x(0)} y={h - 6} fontSize="9" fill="currentColor" className="text-muted-foreground">S1</text>
       <text x={x(data.length - 1)} y={h - 6} textAnchor="end" fontSize="9" fill="currentColor" className="text-muted-foreground">S{data.length}</text>

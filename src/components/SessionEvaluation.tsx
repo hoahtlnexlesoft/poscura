@@ -102,7 +102,6 @@ export function SessionEvaluation({ exerciseName, score, when, videoUrl, onBack 
           ) : (
             <p className="mt-3 flex gap-2.5 text-[13.5px] leading-relaxed"><CircleCheck className="mt-0.5 h-4 w-4 shrink-0 text-success" />Perfect form! Every step matched the guide. Keep the same steady pace next time.</p>
           )}
-          <p className="mt-4 text-[11.5px] leading-relaxed text-muted-foreground/70">AI compares each step with the guide's ideal posture. Simulated in this preview.</p>
         </section>
 
         {/* a perfect session has nothing to review */}
