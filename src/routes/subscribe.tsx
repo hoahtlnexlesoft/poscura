@@ -67,36 +67,36 @@ function SubscribePage() {
             onChange={(v) => navigate({ to: "/subscribe", search: { plan: plan.id as "individual" | "family", cycle: v as "monthly" | "annual" }, replace: true })} />
         </div>
       } />
-      <div className="mx-auto flex w-full max-w-[640px] flex-1 flex-col gap-4 pt-3 land:grid land:max-w-none land:grid-cols-2 land:items-start land:gap-x-6 hinge-split">
+      <div className="mx-auto flex w-full max-w-[640px] flex-1 flex-col pt-3 land:max-w-[860px] land:flex-none">
+        <div className="overflow-hidden rounded-[24px] border border-white/[0.07] bg-card land:grid land:grid-cols-2">
 
         {/* ---------- the plan: what you're getting ---------- */}
-        <section className="relative overflow-hidden rounded-[26px] border border-white/[0.07] bg-gradient-to-b from-[#0f1c33] to-card p-6">
-          <div aria-hidden className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-primary/25 blur-3xl" />
+        <section className="relative overflow-hidden bg-gradient-to-br from-[#11203a] to-card p-5 land:p-6">
+          <div aria-hidden className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-primary/20 blur-3xl" />
           <div aria-hidden className="pointer-events-none absolute -bottom-24 -left-10 h-48 w-48 rounded-full bg-secondary/15 blur-3xl" />
           <div className="relative flex items-center gap-3">
-            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-secondary text-white shadow-[0_12px_30px_-12px] shadow-primary"><Icon className="h-6 w-6" /></span>
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-secondary text-white shadow-[0_12px_30px_-12px] shadow-primary"><Icon className="h-5 w-5" /></span>
             <div className="min-w-0">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Subscribe to</div>
-              <h2 className="text-[22px] font-semibold leading-tight tracking-tight">{plan.name}</h2>
+              <div className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Subscribe to</div>
+              <h2 className="text-[18px] font-semibold leading-tight tracking-tight">{plan.name}</h2>
             </div>
           </div>
-          <div className="relative mt-6 flex items-baseline gap-1.5">
-            <span className="text-[34px] font-bold leading-none tracking-tight">{formatVND(price)}</span>
-            <span className="text-[14px] text-muted-foreground">/ {per}</span>
+          <div className="relative mt-5 flex items-baseline gap-1.5">
+            <span className="text-[26px] font-bold leading-none tracking-tight">{formatVND(price)}</span>
+            <span className="text-[13px] text-muted-foreground">/ {per}</span>
           </div>
           {plan.note && <p className="relative mt-1.5 text-[12.5px] text-muted-foreground">{plan.note}</p>}
-          <ul className="relative mt-6 space-y-3 border-t border-white/[0.07] pt-5">
+          <ul className="relative mt-4 space-y-2.5 border-t border-white/[0.07] pt-4">
             {plan.features.map((f) => (
-              <li key={f} className="flex items-center gap-3 text-[14px]">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-success/15"><Check className="h-3 w-3 text-success" strokeWidth={3} /></span>{f}
+              <li key={f} className="flex items-center gap-2.5 text-[13px] text-foreground/90">
+                <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-success/15"><Check className="h-2.5 w-2.5 text-success" strokeWidth={3} /></span>{f}
               </li>
             ))}
           </ul>
         </section>
 
         {/* ---------- the order: voucher, payment details, confirm ---------- */}
-        <div className="flex flex-1 flex-col">
-          <section className="rounded-[26px] border border-white/[0.07] bg-card p-5">
+          <section className="border-t border-white/[0.07] p-5 land:border-l land:border-t-0 land:p-6">
             {voucher ? (
               /* applied: the same ticket as in the picker, tap to change */
               <div role="button" tabIndex={0} onClick={() => setPicking(true)} onKeyDown={(e) => e.key === "Enter" && setPicking(true)}
@@ -153,6 +153,7 @@ function SubscribePage() {
               <button onClick={goBack} className="h-11 rounded-2xl text-[14px] font-semibold text-muted-foreground transition hover:bg-white/[0.05] hover:text-foreground">Cancel</button>
             </div>
           </section>
+        </div>
 
           {/* phones: actions stay at the bottom of the screen */}
           <div className="sticky bottom-0 z-20 mt-auto pt-4 land:hidden">
@@ -161,7 +162,6 @@ function SubscribePage() {
               <button className={primaryBtn} onClick={confirm}>Confirm</button>
             </Actions>
           </div>
-        </div>
       </div>
       <VoucherPicker open={picking} planId={plan.id} price={price} empty={!!novouchers} selected={voucher}
         onClose={() => setPicking(false)} onDone={(v) => { setVoucher(v); setPicking(false); }} />
