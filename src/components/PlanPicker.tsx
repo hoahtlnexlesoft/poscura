@@ -9,17 +9,17 @@ const ICONS = { freemium: Zap, individual: User, family: Users } as const;
 export function BillingToggle({ cycle, onChange }: { cycle: BillingCycle; onChange: (c: BillingCycle) => void }) {
   const annual = cycle === "annual";
   const seg = (on: boolean) =>
-    cn("relative z-10 flex h-9 min-w-[112px] items-center justify-center gap-1.5 rounded-full px-5 text-[13px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
+    cn("relative z-10 flex h-9 min-w-[118px] items-center justify-center gap-1.5 rounded-full px-5 text-[13px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
       on ? "text-white" : "text-muted-foreground hover:text-foreground");
   return (
     /* segmented control: the sliding pill shows the chosen cycle */
-    <div role="radiogroup" aria-label="Billing cycle" className="relative mx-auto mt-2 grid w-max grid-cols-2 rounded-full border border-white/[0.08] bg-white/[0.03] p-1">
+    <div role="radiogroup" aria-label="Billing cycle" className="relative mx-auto grid w-max grid-cols-2 rounded-full border border-white/[0.08] bg-white/[0.03] p-1">
       <span aria-hidden className={cn("absolute inset-y-1 left-1 w-[calc(50%-4px)] rounded-full bg-gradient-to-r from-primary to-secondary shadow-[0_6px_18px_-6px] shadow-primary/60 transition-transform duration-300", annual && "translate-x-full")} />
       <button type="button" role="radio" aria-checked={!annual} onClick={() => onChange("monthly")} className={seg(!annual)}>Monthly</button>
       <button type="button" role="radio" aria-checked={annual} onClick={() => onChange("annual")} className={seg(annual)}>
         Annual
-        {/* saving tag rides on the segment's corner, so the control stays compact in narrow columns */}
-        <span className="pointer-events-none absolute -top-2.5 right-1 whitespace-nowrap rounded-full bg-warning px-1.5 py-px text-[9.5px] font-bold text-[#1b1406] shadow-[0_4px_10px_-4px_rgba(0,0,0,.6)]">Save up to 25%</span>
+        {/* short saving pill inside the segment: fits narrow columns, never overlaps */}
+        <span className={cn("whitespace-nowrap rounded-full px-1.5 py-px text-[10.5px] font-bold tabular-nums transition-colors", annual ? "bg-white/20 text-white" : "bg-warning/15 text-warning")}>−25%</span>
       </button>
     </div>
   );
