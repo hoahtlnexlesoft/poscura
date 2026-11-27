@@ -26,7 +26,7 @@ const vnd = (n: number) => `${n.toLocaleString("vi-VN")}đ`;
 /** small two-way switch used in the Subscribe header */
 function Seg({ value, options, onChange }: { value: string; options: [string, string][]; onChange: (v: string) => void }) {
   return (
-    <div role="radiogroup" className="inline-flex flex-1 rounded-full border border-white/[0.08] bg-white/[0.03] p-0.5 land:flex-none">
+    <div role="radiogroup" className="inline-flex flex-1 rounded-full border border-white/[0.08] bg-white/[0.03] p-0.5">
       {options.map(([v, label]) => (
         <button key={v} role="radio" aria-checked={value === v} onClick={() => value !== v && onChange(v)}
           className={cn("h-8 flex-1 rounded-full px-3.5 text-[12.5px] font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
@@ -58,15 +58,7 @@ function SubscribePage() {
 
   return (
     <div className="flex min-h-[calc(100dvh-40px)] flex-col desk:min-h-[calc(100dvh-80px)]">
-      {/* change the plan or the billing cycle right here, without going back to the plan list */}
-      <Header title="Subscribe" onBack={goBack} action={
-        <div className="flex gap-2">
-          <Seg value={plan.id} options={[["individual", "Individual"], ["family", "Family"]]}
-            onChange={(v) => navigate({ to: "/subscribe", search: { plan: v as "individual" | "family", cycle }, replace: true })} />
-          <Seg value={cycle} options={[["monthly", "Monthly"], ["annual", "Annual"]]}
-            onChange={(v) => navigate({ to: "/subscribe", search: { plan: plan.id as "individual" | "family", cycle: v as "monthly" | "annual" }, replace: true })} />
-        </div>
-      } />
+      <Header title="Subscribe" onBack={goBack} />
       <div className="mx-auto flex w-full max-w-[640px] flex-1 flex-col pt-3 land:max-w-[860px] land:flex-none">
         <div className="overflow-hidden rounded-[24px] border border-white/[0.07] bg-card land:grid land:grid-cols-2">
 
@@ -81,7 +73,14 @@ function SubscribePage() {
               <h2 className="text-[18px] font-semibold leading-tight tracking-tight">{plan.name}</h2>
             </div>
           </div>
-          <div className="relative mt-5 flex items-baseline gap-1.5">
+          {/* what you buy, all in one place: plan, billing cycle, then the price that follows from them */}
+          <div className="relative mt-4 flex gap-2">
+          <Seg value={plan.id} options={[["individual", "Individual"], ["family", "Family"]]}
+            onChange={(v) => navigate({ to: "/subscribe", search: { plan: v as "individual" | "family", cycle }, replace: true })} />
+          <Seg value={cycle} options={[["monthly", "Monthly"], ["annual", "Annual"]]}
+            onChange={(v) => navigate({ to: "/subscribe", search: { plan: plan.id as "individual" | "family", cycle: v as "monthly" | "annual" }, replace: true })} />
+        </div>
+          <div className="relative mt-4 flex items-baseline gap-1.5">
             <span className="text-[26px] font-bold leading-none tracking-tight">{formatVND(price)}</span>
             <span className="text-[13px] text-muted-foreground">/ {per}</span>
           </div>
