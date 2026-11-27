@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { SubscribeSheet } from "@/components/SubscribeSheet";
 import { Check, User, Users, Zap } from "lucide-react";
-import { useNavigate } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { PLANS, formatVND, priceFor, ANNUAL_DISCOUNT, type BillingCycle, type Plan } from "@/lib/plans";
 
@@ -25,8 +25,7 @@ export function BillingToggle({ cycle, onChange }: { cycle: BillingCycle; onChan
   );
 }
 
-function PlanCard({ plan, cycle }: { plan: Plan; cycle: BillingCycle }) {
-  const navigate = useNavigate();
+function PlanCard({ plan, cycle, onSubscribe }: { plan: Plan; cycle: BillingCycle; onSubscribe?: (id: string) => void }) {
   const Icon = ICONS[plan.id];
   const price = priceFor(plan, cycle);
   const free = plan.monthly === 0;
@@ -85,7 +84,7 @@ function PlanCard({ plan, cycle }: { plan: Plan; cycle: BillingCycle }) {
       ) : (
         <button
           type="button"
-          onClick={() => navigate({ to: "/subscribe", search: { plan: plan.id as "individual" | "family", cycle } })}
+          onClick={() => onSubscribe?.(plan.id)}
           className={cn(
             "mt-5 h-11 w-full rounded-xl text-sm font-semibold transition hover:opacity-90 active:scale-[0.98]",
             plan.highlighted
@@ -101,12 +100,12 @@ function PlanCard({ plan, cycle }: { plan: Plan; cycle: BillingCycle }) {
 }
 
 /** Plan cards only; side by side when there is room. */
-export function PlanCards({ cycle, className, currentId }: { cycle: BillingCycle; className?: string; currentId?: string }) {
+export function PlanCards({ cycle, className, currentId, onSubscribe }: { cycle: BillingCycle; className?: string; currentId?: string; onSubscribe?: (id: string) => void }) {
   return (
     <div className={cn("@container", className)}>
       <div className="grid gap-3 @[620px]:grid-cols-3 @[620px]:items-stretch @[620px]:gap-4 @[620px]:pt-[26px]">
         {PLANS.map((p) => (
-          <PlanCard key={p.id} plan={currentId ? { ...p, current: p.id === currentId } : p} cycle={cycle} />
+          <PlanCard key={p.id} plan={currentId ? { ...p, current: p.id === currentId } : p} cycle={cycle} onSubscribe={onSubscribe} />
         ))}
       </div>
     </div>
@@ -115,8 +114,14 @@ export function PlanCards({ cycle, className, currentId }: { cycle: BillingCycle
 
 /** Monthly/annual toggle + plan cards. */
 /** currentId marks which card is the user's plan (defaults to the one flagged in PLANS) */
-export function PlanPicker({ className, currentId, heading }: { className?: string; currentId?: string; heading?: React.ReactNode }) {
+export function PlanPicker({ className, currentId, heading, subscribe, emptyVouchers }: {
+  className?: string; currentId?: string; heading?: React.ReactNode;
+  /** open the checkout sheet for this plan right away (deep links / preview screens) */
+  subscribe?: string; emptyVouchers?: boolean;
+}) {
   const [cycle, setCycle] = useState<BillingCycle>("monthly");
+  const [sheet, setSheet] = useState<string | null>(subscribe ?? null);
+  useEffect(() => { setSheet(subscribe ?? null); }, [subscribe]);
   return (
     <div className={cn("space-y-5", className)}>
       {heading ? (
@@ -126,7 +131,8 @@ export function PlanPicker({ className, currentId, heading }: { className?: stri
           <div className="pt-1.5 [&>div]:mx-0"><BillingToggle cycle={cycle} onChange={setCycle} /></div>
         </div>
       ) : <BillingToggle cycle={cycle} onChange={setCycle} />}
-      <PlanCards cycle={cycle} currentId={currentId} />
+      <PlanCards cycle={cycle} currentId={currentId} onSubscribe={setSheet} />
+      <SubscribeSheet planId={sheet} cycle={cycle} open={!!sheet} onOpenChange={(o) => !o && setSheet(null)} emptyVouchers={emptyVouchers} />
     </div>
   );
 }

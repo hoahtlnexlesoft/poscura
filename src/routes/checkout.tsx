@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { PlanPicker } from "@/components/PlanPicker";
 import { BackButton } from "@/components/BackButton";
 
-const searchSchema = z.object({ plan: z.string().optional() });
+const searchSchema = z.object({ plan: z.string().optional(), subscribe: z.enum(["individual", "family"]).optional(), novouchers: z.coerce.string().optional() });
 
 export const Route = createFileRoute("/checkout")({
   validateSearch: searchSchema,
@@ -16,6 +16,7 @@ export const Route = createFileRoute("/checkout")({
 function ChoosePlanPage() {
   const router = useRouter();
   const goBack = useGoBack("/account");
+  const { subscribe, novouchers } = Route.useSearch();
   return (
     <div className="pb-1">
       <header className="page-head flex items-center gap-3">
@@ -24,7 +25,7 @@ function ChoosePlanPage() {
       </header>
 
       {/* cards sit side by side when there is room (open foldables), stacked on phones */}
-      <PlanPicker className="mt-3 space-y-4" heading={
+      <PlanPicker className="mt-3 space-y-4" subscribe={subscribe} emptyVouchers={!!novouchers} heading={
         <h2 className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-[24px] font-bold tracking-tight text-transparent">Unlock All Features</h2>
       } />
 

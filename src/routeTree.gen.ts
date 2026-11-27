@@ -20,7 +20,6 @@ import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as PostureMonitorRouteImport } from './routes/posture-monitor'
 import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as SubscribeRouteImport } from './routes/subscribe'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as WorkoutRouteImport } from './routes/workout'
 import { Route as BodyPartPartRouteImport } from './routes/body-part.$part'
@@ -85,11 +84,6 @@ const SettingsRoute = SettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SubscribeRoute = SubscribeRouteImport.update({
-  id: '/subscribe',
-  path: '/subscribe',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SupportRoute = SupportRouteImport.update({
   id: '/support',
   path: '/support',
@@ -143,7 +137,6 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/posture-monitor': typeof PostureMonitorRoute
   '/settings': typeof SettingsRoute
-  '/subscribe': typeof SubscribeRoute
   '/support': typeof SupportRouteWithChildren
   '/workout': typeof WorkoutRoute
   '/body-part/$part': typeof BodyPartPartRoute
@@ -165,7 +158,6 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/posture-monitor': typeof PostureMonitorRoute
   '/settings': typeof SettingsRoute
-  '/subscribe': typeof SubscribeRoute
   '/workout': typeof WorkoutRoute
   '/body-part/$part': typeof BodyPartPartRoute
   '/support/report': typeof SupportReportRoute
@@ -186,7 +178,6 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/posture-monitor': typeof PostureMonitorRoute
   '/settings': typeof SettingsRoute
-  '/subscribe': typeof SubscribeRoute
   '/support': typeof SupportRouteWithChildren
   '/workout': typeof WorkoutRoute
   '/body-part/$part': typeof BodyPartPartRoute
@@ -210,7 +201,6 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/posture-monitor'
     | '/settings'
-    | '/subscribe'
     | '/support'
     | '/workout'
     | '/body-part/$part'
@@ -232,7 +222,6 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/posture-monitor'
     | '/settings'
-    | '/subscribe'
     | '/workout'
     | '/body-part/$part'
     | '/support/report'
@@ -252,7 +241,6 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/posture-monitor'
     | '/settings'
-    | '/subscribe'
     | '/support'
     | '/workout'
     | '/body-part/$part'
@@ -275,7 +263,6 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   PostureMonitorRoute: typeof PostureMonitorRoute
   SettingsRoute: typeof SettingsRoute
-  SubscribeRoute: typeof SubscribeRoute
   SupportRoute: typeof SupportRouteWithChildren
   WorkoutRoute: typeof WorkoutRoute
   BodyPartPartRoute: typeof BodyPartPartRoute
@@ -358,13 +345,6 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/subscribe': {
-      id: '/subscribe'
-      path: '/subscribe'
-      fullPath: '/subscribe'
-      preLoaderRoute: typeof SubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/support': {
@@ -467,7 +447,6 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   PostureMonitorRoute: PostureMonitorRoute,
   SettingsRoute: SettingsRoute,
-  SubscribeRoute: SubscribeRoute,
   SupportRoute: SupportRouteWithChildren,
   WorkoutRoute: WorkoutRoute,
   BodyPartPartRoute: BodyPartPartRoute,

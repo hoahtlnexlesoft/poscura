@@ -1,60 +1,56 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { z } from "zod";
-import { ChevronLeft, ChevronRight, Ticket, Check, X, User, Users, Zap, TicketX, Info } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
+import { ChevronRight, Ticket, Check, X, User, Users, Zap, TicketX } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { useGoBack } from "@/hooks/useGoBack";
-import { Actions, Header, primaryBtn, outlineBtn } from "@/components/CheckoutBits";
+import { primaryBtn } from "@/components/CheckoutBits";
 import { getPlan, priceFor, formatVND, type BillingCycle } from "@/lib/plans";
 import { VOUCHERS, voucherFits, voucherRate, voucherUntil, type Voucher } from "@/lib/vouchers";
-
-export const Route = createFileRoute("/subscribe")({
-  validateSearch: z.object({
-    plan: z.enum(["individual", "family"]).catch("individual"),
-    cycle: z.enum(["monthly", "annual"]).catch("monthly"),
-    /** preview only: open the voucher list with no vouchers */
-    novouchers: z.coerce.string().optional(),
-  }),
-  component: SubscribePage,
-});
 
 const ICONS = { freemium: Zap, individual: User, family: Users } as const;
 const vnd = (n: number) => `${n.toLocaleString("vi-VN")}đ`;
 
-/** Subscribe: the plan on one side (what you get), the order on the other (voucher, total, confirm). */
-function SubscribePage() {
-  const { plan: planId, cycle, novouchers } = Route.useSearch();
+/* Phones: a full-width sheet that slides up from the bottom. Wide screens: a centred dialog. */
+export const sheetClass = "flex max-h-[min(680px,calc(100dvh-32px))] max-w-[440px] flex-col gap-0 overflow-hidden rounded-[28px] border-white/[0.08] bg-[#0e1524] p-0 shadow-[0_40px_100px_-30px_rgba(0,0,0,.9)] [&>button:last-child]:hidden max-[599px]:inset-x-0 max-[599px]:bottom-0 max-[599px]:top-auto max-[599px]:w-full max-[599px]:max-w-none max-[599px]:max-h-[88dvh] max-[599px]:translate-x-0 max-[599px]:translate-y-0 max-[599px]:rounded-b-none max-[599px]:border-x-0 max-[599px]:border-b-0 max-[599px]:data-[state=open]:slide-in-from-bottom-1/2 max-[599px]:data-[state=closed]:slide-out-to-bottom-1/2 max-[599px]:data-[state=open]:zoom-in-100 max-[599px]:data-[state=closed]:zoom-out-100";
+
+/** Subscribe as a checkout sheet over the plan list (Apple Pay style): same content as the live app —
+ *  Subscribe to <plan>, a voucher, payment details, Confirm. Closing it leaves you on the plans. */
+export function SubscribeSheet({ planId, cycle, open, onOpenChange, emptyVouchers = false }: {
+  planId: string | null; cycle: BillingCycle; open: boolean; onOpenChange: (v: boolean) => void; emptyVouchers?: boolean;
+}) {
   const navigate = useNavigate();
-  const goBack = useGoBack("/account");
-  const plan = getPlan(planId)!;
-  const Icon = ICONS[plan.id];
-  const price = priceFor(plan, cycle as BillingCycle);
+  const plan = planId ? getPlan(planId) : undefined;
   const [voucher, setVoucher] = useState<Voucher | null>(null);
-  // the "no vouchers" preview opens straight on the (empty) voucher list, so it looks different from the plain screen
-  const [picking, setPicking] = useState(!!novouchers);
-  useEffect(() => { setPicking(!!novouchers); setVoucher(null); }, [novouchers, planId]);
+  const [picking, setPicking] = useState(false);
+  useEffect(() => { if (open) { setVoucher(null); setPicking(emptyVouchers); } }, [open, planId, emptyVouchers]);
+  if (!plan) return null;
+  const Icon = ICONS[plan.id];
+  const price = priceFor(plan, cycle);
   const discount = voucher ? Math.round(price * voucherRate(voucher)) : 0;
   const charged = price - discount;
-  const per = cycle === "annual" ? "year" : "month";
   const confirm = () => {
+    onOpenChange(false);
     toast.success(`Subscribed to ${plan.name}`, { description: "Redirecting to secure payment…" });
     navigate({ to: "/account", search: { tab: "plan" } });
   };
 
   return (
-    <div className="flex min-h-[calc(100dvh-40px)] flex-col desk:min-h-[calc(100dvh-80px)]">
-      <Header title="Subscribe" onBack={goBack} />
-      {/* same content as the live app: what you're subscribing to, a voucher, what will be charged */}
-      <div className="mx-auto flex w-full max-w-[480px] flex-1 flex-col pt-2">
-        <section className="relative overflow-hidden rounded-[22px] border border-white/[0.07] bg-card p-4">
-          <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary text-white"><Info className="h-[18px] w-[18px]" /></span>
-            <h2 className="text-[16px] font-semibold tracking-tight">Subscribe to {plan.name}</h2>
+    <>
+      <Dialog open={open && !picking} onOpenChange={(o) => { if (!o && !picking) onOpenChange(false); }}>
+        <DialogContent className={sheetClass}>
+          {/* grabber: reads as a sheet on phones */}
+          <span aria-hidden className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-white/20 min-[600px]:hidden" />
+          <div className="flex items-center gap-3 px-5 pb-1 pt-4 min-[600px]:pt-5">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary text-white shadow-[0_10px_24px_-12px] shadow-primary"><Icon className="h-5 w-5" /></span>
+            <div className="min-w-0 flex-1">
+              <DialogTitle className="text-[17px] font-semibold tracking-tight">Subscribe to {plan.name}</DialogTitle>
+              <DialogDescription className="text-[12.5px] text-muted-foreground">{formatVND(price)} / {cycle === "annual" ? "year" : "month"}</DialogDescription>
+            </div>
+            <button onClick={() => onOpenChange(false)} aria-label="Close" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/[0.08] text-muted-foreground transition hover:border-white/20 hover:text-foreground"><X className="h-4 w-4" /></button>
           </div>
 
-          <div className="relative mt-4">
+          <div className="px-5 pb-2 pt-4">
             {voucher ? (
                 /* applied: the same ticket as in the picker, tap to change */
                 <div role="button" tabIndex={0} onClick={() => setPicking(true)} onKeyDown={(e) => e.key === "Enter" && setPicking(true)}
@@ -87,8 +83,8 @@ function SubscribePage() {
                 </button>
               )}
           </div>
-
-          <h3 className="relative mt-4 text-[12.5px] font-semibold text-muted-foreground">Payment Details</h3>
+          <div className="px-5 pb-5">
+          <h3 className="relative mt-3 text-[12.5px] font-semibold text-muted-foreground">Payment Details</h3>
           <div className="relative mt-2 overflow-hidden rounded-[16px] ring-1 ring-inset ring-white/[0.08]">
             <div className="flex items-center justify-between px-3.5 py-2.5 text-[13.5px]">
               <span className="text-muted-foreground">Subscription</span>
@@ -105,23 +101,22 @@ function SubscribePage() {
               <span key={charged} className="text-[17px] font-bold tabular-nums animate-in fade-in slide-in-from-bottom-1 duration-300">{vnd(charged)}</span>
             </div>
           </div>
-        </section>
+          </div>
 
-        <div className="sticky bottom-0 z-20 mt-auto pt-4 land:static land:mt-4 land:pt-0">
-          <Actions>
-            <button onClick={goBack} className={outlineBtn}>Cancel</button>
-            <button className={primaryBtn} onClick={confirm}>Confirm</button>
-          </Actions>
-        </div>
-      </div>
-      <VoucherPicker open={picking} planId={plan.id} price={price} empty={!!novouchers} selected={voucher}
+          <div className="border-t border-white/[0.06] bg-white/[0.02] px-5 pb-[max(18px,env(safe-area-inset-bottom))] pt-4">
+            <button className={cn(primaryBtn, "h-12 w-full flex-none")} onClick={confirm}>Confirm · {vnd(charged)}</button>
+            <button onClick={() => onOpenChange(false)} className="mt-1.5 h-10 w-full rounded-xl text-[13.5px] font-semibold text-muted-foreground transition hover:text-foreground">Cancel</button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <VoucherPicker open={open && picking} planId={plan.id} price={price} empty={emptyVouchers} selected={voucher}
         onClose={() => setPicking(false)} onDone={(v) => { setVoucher(v); setPicking(false); }} />
-    </div>
+    </>
   );
 }
 
 /** Vouchers, as a modal over the order (a bottom sheet on phones): type a code, or pick one that fits this plan. */
-function VoucherPicker({ open, planId, price, empty, selected, onClose, onDone }: {
+export function VoucherPicker({ open, planId, price, empty, selected, onClose, onDone }: {
   open: boolean; planId: string; price: number; empty: boolean; selected: Voucher | null; onClose: () => void; onDone: (v: Voucher | null) => void;
 }) {
   const list = empty ? [] : VOUCHERS.filter((v) => v.status === "Active");
