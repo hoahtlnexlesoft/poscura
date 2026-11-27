@@ -17,20 +17,18 @@ function ChoosePlanPage() {
   const router = useRouter();
   const goBack = useGoBack("/account");
   return (
-    <div className="pb-4">
+    <div className="pb-1">
       <header className="page-head flex items-center gap-3">
         <BackButton onClick={goBack} />
         <h1 className="text-[17px] font-semibold">Choose Your Plan</h1>
       </header>
 
-      <div className="mt-5 text-center">
-        <h2 className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-[24px] font-bold tracking-tight text-transparent">Unlock All Features</h2>
-      </div>
-
       {/* cards sit side by side when there is room (open foldables), stacked on phones */}
-      <PlanPicker className="mt-4" />
+      <PlanPicker className="mt-3 space-y-4" heading={
+        <h2 className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-[24px] font-bold tracking-tight text-transparent">Unlock All Features</h2>
+      } />
 
-      <div className="mt-6 text-center text-sm leading-relaxed">
+      <div className="mt-4 text-center text-sm leading-relaxed">
         <button onClick={() => toast("No previous purchases found")} className="font-medium text-primary hover:underline">
           Restore Purchase
         </button>

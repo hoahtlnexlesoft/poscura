@@ -9,23 +9,18 @@ const ICONS = { freemium: Zap, individual: User, family: Users } as const;
 export function BillingToggle({ cycle, onChange }: { cycle: BillingCycle; onChange: (c: BillingCycle) => void }) {
   const annual = cycle === "annual";
   const seg = (on: boolean) =>
-    cn("relative z-10 flex h-9 min-w-[104px] items-center justify-center gap-1.5 rounded-full px-5 text-[13px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
+    cn("relative z-10 flex h-9 min-w-[112px] items-center justify-center gap-1.5 rounded-full px-5 text-[13px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
       on ? "text-white" : "text-muted-foreground hover:text-foreground");
   return (
     /* segmented control: the sliding pill shows the chosen cycle */
-    <div className="flex flex-col items-center gap-2">
-      <div role="radiogroup" aria-label="Billing cycle" className="relative mx-auto grid w-max grid-cols-2 rounded-full border border-white/[0.08] bg-white/[0.03] p-1">
-        <span aria-hidden className={cn("absolute inset-y-1 left-1 w-[calc(50%-4px)] rounded-full bg-gradient-to-r from-primary to-secondary shadow-[0_6px_18px_-6px] shadow-primary/60 transition-transform duration-300", annual && "translate-x-full")} />
-        <button type="button" role="radio" aria-checked={!annual} onClick={() => onChange("monthly")} className={seg(!annual)}>Monthly</button>
-        <button type="button" role="radio" aria-checked={annual} onClick={() => onChange("annual")} className={seg(annual)}>
-          Annual
-
-        </button>
-      </div>
-      {/* the saving sits under the switch, out of the way */}
-      <p className={cn("text-[12px] font-medium transition-colors", annual ? "text-warning" : "text-muted-foreground")}>
-        <span className="text-warning">Save up to 25%</span> with annual billing
-      </p>
+    <div role="radiogroup" aria-label="Billing cycle" className="relative mx-auto mt-2 grid w-max grid-cols-2 rounded-full border border-white/[0.08] bg-white/[0.03] p-1">
+      <span aria-hidden className={cn("absolute inset-y-1 left-1 w-[calc(50%-4px)] rounded-full bg-gradient-to-r from-primary to-secondary shadow-[0_6px_18px_-6px] shadow-primary/60 transition-transform duration-300", annual && "translate-x-full")} />
+      <button type="button" role="radio" aria-checked={!annual} onClick={() => onChange("monthly")} className={seg(!annual)}>Monthly</button>
+      <button type="button" role="radio" aria-checked={annual} onClick={() => onChange("annual")} className={seg(annual)}>
+        Annual
+        {/* saving tag rides on the segment's corner, so the control stays compact in narrow columns */}
+        <span className="pointer-events-none absolute -top-2.5 right-1 whitespace-nowrap rounded-full bg-warning px-1.5 py-px text-[9.5px] font-bold text-[#1b1406] shadow-[0_4px_10px_-4px_rgba(0,0,0,.6)]">Save up to 25%</span>
+      </button>
     </div>
   );
 }
@@ -120,11 +115,17 @@ export function PlanCards({ cycle, className, currentId }: { cycle: BillingCycle
 
 /** Monthly/annual toggle + plan cards. */
 /** currentId marks which card is the user's plan (defaults to the one flagged in PLANS) */
-export function PlanPicker({ className, currentId }: { className?: string; currentId?: string }) {
+export function PlanPicker({ className, currentId, heading }: { className?: string; currentId?: string; heading?: React.ReactNode }) {
   const [cycle, setCycle] = useState<BillingCycle>("monthly");
   return (
     <div className={cn("space-y-5", className)}>
-      <BillingToggle cycle={cycle} onChange={setCycle} />
+      {heading ? (
+        /* heading and the switch share one row on wide screens, so the cards fit without scrolling */
+        <div className="flex flex-col items-center gap-4 fold:flex-row fold:justify-between fold:gap-6">
+          {heading}
+          <div className="pt-1.5 [&>div]:mx-0"><BillingToggle cycle={cycle} onChange={setCycle} /></div>
+        </div>
+      ) : <BillingToggle cycle={cycle} onChange={setCycle} />}
       <PlanCards cycle={cycle} currentId={currentId} />
     </div>
   );
