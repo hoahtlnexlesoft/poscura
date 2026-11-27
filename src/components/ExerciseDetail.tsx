@@ -242,22 +242,24 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, p
         <section className="relative overflow-hidden rounded-[22px] border border-white/[0.06] bg-card p-5">
           <div aria-hidden className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full opacity-60"
             style={{ background: `radial-gradient(closest-side, color-mix(in oklab, ${band.ring} 22%, transparent), transparent)` }} />
-          <div className="relative flex items-center gap-5">
-            <ScoreRing score={ACCURACY_AVG} size={118} />
+          {/* one row: score ring, then what it means and how far into the program */}
+          <div className="relative flex items-center gap-4">
+            <ScoreRing score={ACCURACY_AVG} size={84} stroke={7} />
             <div className="min-w-0 flex-1">
-              <div className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Accuracy average</div>
-              <div className="mt-1 inline-flex items-center gap-1.5 text-[13px] font-semibold" style={{ color: band.ring }}>
-                <span className="h-1.5 w-1.5 rounded-full" style={{ background: band.ring }} />{band.label}
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Accuracy average</span>
+                <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full px-2 py-0.5 text-[11.5px] font-semibold"
+                  style={{ color: band.ring, background: `color-mix(in oklab, ${band.ring} 14%, transparent)` }}>
+                  <span className="h-1.5 w-1.5 rounded-full" style={{ background: band.ring }} />{band.label}
+                </span>
               </div>
-            </div>
-          </div>
-          <div className="relative mt-5">
-            <div className="flex items-baseline justify-between text-[12px]">
-              <span className="text-muted-foreground">Program progress</span>
-              <span className="tabular-nums"><b className="font-semibold">2</b><span className="text-muted-foreground"> of 40 sessions</span></span>
-            </div>
-            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
-              <div className="h-full rounded-full bg-gradient-to-r from-primary to-secondary" style={{ width: "5%" }} />
+              <div className="mt-3.5 flex items-baseline justify-between text-[12px]">
+                <span className="text-muted-foreground">Program progress</span>
+                <span className="tabular-nums"><b className="font-semibold">2</b><span className="text-muted-foreground"> of 40</span></span>
+              </div>
+              <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
+                <div className="h-full rounded-full bg-gradient-to-r from-primary to-secondary" style={{ width: "5%" }} />
+              </div>
             </div>
           </div>
         </section>
