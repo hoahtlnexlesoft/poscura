@@ -148,7 +148,7 @@ export function WorkoutProgramDetail({ onClose, onStartSession, exercise, onExer
       </div>
 
       {/* ---------- left: program hero ---------- */}
-      <section className="relative overflow-hidden rounded-[22px] border border-white/[0.06] bg-card land:sticky land:top-[72px] desk:top-6">
+      <section className="relative overflow-hidden rounded-[22px] border border-white/[0.06] bg-card land:sticky land:top-[var(--pin-top)] desk:top-6">
         <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[radial-gradient(90%_100%_at_0%_0%,color-mix(in_oklab,var(--primary)_22%,transparent),transparent_70%),radial-gradient(70%_90%_at_100%_0%,color-mix(in_oklab,var(--secondary)_16%,transparent),transparent_70%)]" />
         <div className="relative p-5">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.06] px-2.5 py-1 text-[11px] font-medium text-foreground/80 ring-1 ring-inset ring-white/[0.08]">

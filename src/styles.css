@@ -329,3 +329,7 @@ html[data-desktop] .page-head { margin: -1.75rem -2rem 0; padding: 1.75rem 2rem 
   .page-head-phone { position: static; margin: 0; padding: 0; background: none; backdrop-filter: none; border: 0; }
 }
 }
+
+/* where pinned side panes stop: under the app bar, or at the top when a sub page hides it */
+:root { --pin-top: 72px; }
+/* pages with a pinned page header keep 72px; notifications has none on wide screens (its own class) */

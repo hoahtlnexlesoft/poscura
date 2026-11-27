@@ -155,7 +155,7 @@ function TicketDetailPage() {
 
       <div className="p-4 flex-1 flex flex-col gap-4 fold:grid fold:grid-cols-[1fr_1.3fr] fold:gap-5 fold:items-start">
         {/* Submission */}
-        <section className="glass-card p-4 space-y-3 fold:sticky fold:top-[72px] desk:top-6">
+        <section className="glass-card p-4 space-y-3 fold:sticky fold:top-[var(--pin-top)] desk:top-6">
           <div>
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               Title
