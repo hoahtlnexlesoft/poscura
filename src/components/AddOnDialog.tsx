@@ -28,7 +28,7 @@ export function AddOnDialog({ open, onOpenChange, onPurchased }: {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[min(680px,calc(100dvh-32px))] max-w-[440px] flex-col gap-0 overflow-hidden rounded-[28px] border-white/[0.08] bg-[#0e1524] p-0 shadow-[0_40px_100px_-30px_rgba(0,0,0,.9)] [&>button:last-child]:hidden max-[599px]:bottom-0 max-[599px]:top-auto max-[599px]:max-h-[88dvh] max-[599px]:translate-y-0 max-[599px]:rounded-b-none">
+      <DialogContent className="flex max-h-[min(680px,calc(100dvh-32px))] max-w-[440px] flex-col gap-0 overflow-hidden rounded-[28px] border-white/[0.08] bg-[#0e1524] p-0 shadow-[0_40px_100px_-30px_rgba(0,0,0,.9)] [&>button:last-child]:hidden max-[599px]:inset-x-0 max-[599px]:bottom-0 max-[599px]:top-auto max-[599px]:w-full max-[599px]:max-w-none max-[599px]:max-h-[88dvh] max-[599px]:translate-x-0 max-[599px]:translate-y-0 max-[599px]:rounded-b-none max-[599px]:border-x-0 max-[599px]:border-b-0 max-[599px]:data-[state=open]:slide-in-from-bottom-1/2 max-[599px]:data-[state=closed]:slide-out-to-bottom-1/2 max-[599px]:data-[state=open]:zoom-in-100 max-[599px]:data-[state=closed]:zoom-out-100">
         <div className="relative px-5 pb-4 pt-5">
           <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-[radial-gradient(70%_100%_at_50%_0%,color-mix(in_oklab,var(--color-primary)_18%,transparent),transparent)]" />
           <div className="relative flex items-start gap-3">

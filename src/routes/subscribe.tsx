@@ -170,7 +170,7 @@ function VoucherPicker({ open, planId, price, empty, selected, onClose, onDone }
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="flex max-h-[min(680px,calc(100dvh-32px))] max-w-[460px] flex-col gap-0 overflow-hidden rounded-[28px] border-white/[0.08] bg-[#0e1524] p-0 shadow-[0_40px_100px_-30px_rgba(0,0,0,.9)] [&>button:last-child]:hidden max-[599px]:bottom-0 max-[599px]:top-auto max-[599px]:max-h-[88dvh] max-[599px]:translate-y-0 max-[599px]:rounded-b-none">
+      <DialogContent className="flex max-h-[min(680px,calc(100dvh-32px))] max-w-[460px] flex-col gap-0 overflow-hidden rounded-[28px] border-white/[0.08] bg-[#0e1524] p-0 shadow-[0_40px_100px_-30px_rgba(0,0,0,.9)] [&>button:last-child]:hidden max-[599px]:inset-x-0 max-[599px]:bottom-0 max-[599px]:top-auto max-[599px]:w-full max-[599px]:max-w-none max-[599px]:max-h-[88dvh] max-[599px]:translate-x-0 max-[599px]:translate-y-0 max-[599px]:rounded-b-none max-[599px]:border-x-0 max-[599px]:border-b-0 max-[599px]:data-[state=open]:slide-in-from-bottom-1/2 max-[599px]:data-[state=closed]:slide-out-to-bottom-1/2 max-[599px]:data-[state=open]:zoom-in-100 max-[599px]:data-[state=closed]:zoom-out-100">
         {/* header + code entry stay on top; only the list scrolls */}
         <div className="relative border-b border-white/[0.06] px-5 pb-4 pt-5">
           <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[radial-gradient(70%_100%_at_50%_0%,color-mix(in_oklab,var(--color-primary)_16%,transparent),transparent)]" />
