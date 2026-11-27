@@ -23,7 +23,6 @@ export function SubscribeSheet({ planId, cycle, open, onOpenChange, emptyVoucher
   const navigate = useNavigate();
   const plan = planId ? getPlan(planId) : undefined;
   const [voucher, setVoucher] = useState<Voucher | null>(null);
-  const [codeOpen, setCodeOpen] = useState(false);
   const [code, setCode] = useState("");
   const [err, setErr] = useState("");
   const [showAll, setShowAll] = useState(false);
@@ -32,7 +31,7 @@ export function SubscribeSheet({ planId, cycle, open, onOpenChange, emptyVoucher
     .filter((v) => v.status === "Active" && voucherFits(v, planId))
     .sort((a, b) => voucherRate(b) - voucherRate(a));
   // opening the sheet pre-applies the best voucher; tap another to swap, tap it again to remove
-  useEffect(() => { if (open) { setVoucher(list[0] ?? null); setCodeOpen(false); setCode(""); setErr(""); setShowAll(false); } }, [open, planId, emptyVouchers, manyVouchers]);
+  useEffect(() => { if (open) { setVoucher(list[0] ?? null); setCode(""); setErr(""); setShowAll(false); } }, [open, planId, emptyVouchers, manyVouchers]);
   if (!plan) return null;
   const Icon = ICONS[plan.id];
   const price = priceFor(plan, cycle);
@@ -42,7 +41,7 @@ export function SubscribeSheet({ planId, cycle, open, onOpenChange, emptyVoucher
     const v = VOUCHERS.find((x) => x.code.toLowerCase() === code.trim().toLowerCase());
     if (!v || v.status !== "Active") return setErr("This code isn't valid or has expired.");
     if (!voucherFits(v, plan.id)) return setErr("This code can't be used with this plan.");
-    setErr(""); setCode(""); setCodeOpen(false); setShowAll(true); setVoucher(v);
+    setErr(""); setCode(""); setShowAll(true); setVoucher(v);
   };
   const confirm = () => {
     onOpenChange(false);
@@ -70,28 +69,23 @@ export function SubscribeSheet({ planId, cycle, open, onOpenChange, emptyVoucher
             <div className="flex items-center justify-between px-5">
               <h3 className="flex items-center gap-1.5 text-[12.5px] font-semibold text-muted-foreground">
                 Vouchers{list.length > 0 && <span className="rounded-full bg-white/[0.06] px-1.5 text-[10.5px] tabular-nums leading-4">{list.length}</span>}
-                {showAll && list.length > 3 && <button onClick={() => setShowAll(false)} className="ml-1 rounded text-[12px] font-medium text-muted-foreground/80 underline-offset-2 hover:text-foreground hover:underline">Show less</button>}
               </h3>
-              <button onClick={() => { setCodeOpen((o) => !o); setErr(""); }}
-                className="rounded-md text-[12.5px] font-semibold text-primary transition hover:brightness-125 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
-                {codeOpen ? "Cancel" : "Enter code"}
-              </button>
+              {showAll && list.length > 3 && <button onClick={() => setShowAll(false)} className="rounded-md text-[12.5px] font-semibold text-primary transition hover:brightness-125 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">Show less</button>}
             </div>
 
-            {codeOpen && (
-              <div className="px-5 pt-2 animate-in fade-in slide-in-from-top-1 duration-200">
+            {/* code entry is always there: type and apply, no extra tap */}
+            <div className="px-5 pt-2">
                 <div className={cn("flex items-center gap-1.5 rounded-xl border bg-white/[0.03] p-1 pl-3 transition focus-within:ring-2",
                   err ? "border-destructive/60 focus-within:ring-destructive/25" : "border-white/10 focus-within:border-primary/60 focus-within:ring-primary/25")}>
                   <label htmlFor="vcode" className="sr-only">Voucher code</label>
-                  <input id="vcode" autoFocus value={code} onChange={(e) => { setCode(e.target.value); setErr(""); }}
-                    onKeyDown={(e) => e.key === "Enter" && code.trim() && applyCode()} placeholder="Voucher code" autoCapitalize="characters"
+                  <input id="vcode" value={code} onChange={(e) => { setCode(e.target.value); setErr(""); }}
+                    onKeyDown={(e) => e.key === "Enter" && code.trim() && applyCode()} placeholder="Enter voucher code" autoCapitalize="characters" enterKeyHint="done"
                     className="h-8 min-w-0 flex-1 bg-transparent font-mono text-[13.5px] uppercase tracking-wider placeholder:font-sans placeholder:normal-case placeholder:tracking-normal placeholder:text-muted-foreground/70 focus:outline-none" />
                   <button onClick={applyCode} disabled={!code.trim()}
                     className="h-8 shrink-0 rounded-lg bg-primary px-3.5 text-[12.5px] font-semibold text-white transition enabled:hover:brightness-110 disabled:bg-white/[0.06] disabled:text-muted-foreground">Apply</button>
                 </div>
                 {err && <p className="mt-1.5 px-1 text-[11.5px] text-destructive">{err}</p>}
-              </div>
-            )}
+            </div>
 
             {list.length ? (
               <div role="radiogroup" aria-label="Vouchers" className={cn("grid grid-cols-3 gap-2 px-5 pt-2", showAll && list.length > 9 && "mac-scroll max-h-[132px] overflow-y-auto pb-1 pr-4")}>
@@ -128,15 +122,9 @@ export function SubscribeSheet({ planId, cycle, open, onOpenChange, emptyVoucher
                 )}
               </div>
             ) : (
-              !codeOpen && (
-                <div className="px-5 pt-2">
-                  <button onClick={() => setCodeOpen(true)}
-                    className="group flex h-9 w-full items-center gap-2.5 rounded-[10px] border border-dashed border-white/[0.12] px-3 text-left transition hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
-                    <TicketX className="h-4 w-4 shrink-0 text-muted-foreground/70" />
-                    <span className="flex-1 text-[12.5px] text-muted-foreground">No vouchers available</span>
-                  </button>
-                </div>
-              )
+              <p className="flex items-center gap-1.5 px-5 pt-2 text-[12px] text-muted-foreground/80">
+                <TicketX className="h-3.5 w-3.5" />No vouchers available
+              </p>
             )}
           </div>
 
