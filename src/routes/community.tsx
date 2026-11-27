@@ -270,7 +270,7 @@ function CommunityPage() {
         selectedTags={selectedTags} setSelectedTags={setSelectedTags}
       />
       <div className="space-y-3 fold:col-start-2 fold:row-start-1">
-      <div className="sticky top-14 -mx-4 px-4 py-2 z-20 bg-background/80 backdrop-blur-xl border-b border-border/50 space-y-2">
+      <div className="sticky top-14 desk:top-0 -mx-4 px-4 py-2 z-20 bg-background/80 backdrop-blur-xl border-b border-border/50 space-y-2">
         <div className="flex items-center gap-2">
           <h1 className="text-xl font-bold flex-1">Community</h1>
           <button
@@ -521,7 +521,7 @@ function PostDetail({ post, onBack, onLike, onShare, onComment, onLikeComment }:
     <div data-screen="Post details" className="hinge-split flex min-h-[calc(100dvh-var(--pd-off,104px))] flex-col land:grid-rows-[1fr_auto]">
       {/* ---------- post ---------- */}
       {/* open foldables: the post stays put while the conversation scrolls; a tall post scrolls inside its own pane */}
-      <section className="land:sticky land:top-[72px] land:row-span-2 land:flex land:max-h-[calc(100dvh-84px)] land:flex-col land:self-start">
+      <section className="land:sticky land:top-[72px] desk:top-6 land:row-span-2 land:flex land:max-h-[calc(100dvh-84px)] land:flex-col land:self-start">
         <div className="page-head mb-3 flex items-center gap-2 land:static land:m-0 land:border-0 land:bg-transparent land:p-0 land:backdrop-blur-0">
           <BackButton onClick={onBack} />
           <h1 className="text-[17px] font-semibold tracking-tight">Post</h1>
@@ -832,7 +832,7 @@ function CommunitySide({
   const toggleTag = (t: string) =>
     setSelectedTags(selectedTags.includes(t) ? selectedTags.filter((x) => x !== t) : [...selectedTags, t]);
   return (
-    <aside className="hidden fold:sticky fold:top-[72px] fold:col-start-1 fold:row-start-1 fold:block fold:space-y-3">
+    <aside className="hidden fold:sticky fold:top-[72px] desk:top-6 fold:col-start-1 fold:row-start-1 fold:block fold:space-y-3">
       <section className="glass-card p-2">
         <div className="flex items-center gap-1.5 px-2.5 pb-1.5 pt-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
           <Layers className="h-3.5 w-3.5" /> Feeds

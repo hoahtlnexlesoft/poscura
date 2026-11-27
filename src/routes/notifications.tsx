@@ -23,7 +23,7 @@ function NotificationsPage() {
   return (
     <div data-screen="Notifications" className="fold:mx-auto fold:max-w-[640px] land:max-w-none hinge-split land:items-start">
       {/* header (on open foldables it becomes the left pane, with the list across the hinge) */}
-      <div className="page-head-phone land:sticky land:top-[72px]">
+      <div className="page-head-phone land:sticky land:top-[72px] desk:top-6">
         <div className="flex items-center justify-between gap-3 land:block">
           <div className="flex items-center gap-3">
             <BackButton onClick={goBackHome} />

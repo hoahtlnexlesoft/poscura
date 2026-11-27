@@ -237,7 +237,7 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, p
 
       {evaluated ? (<>
       {/* ---------- left: score + trend ---------- */}
-      <div className="space-y-4 land:sticky land:top-[72px]">
+      <div className="space-y-4 land:sticky land:top-[72px] desk:top-6">
         {/* today's session: first thing under the exercise name (top of the left pane on open foldables, not across the hinge) */}
         {sched ? <TodayCard label={sessionLabel} onStart={onStart} done={badge === "Completed"} time={schedTime} /> : <><ScheduleCard onSchedule={() => setSchedOpen(true)} /><ScheduleDialog open={schedOpen} onOpenChange={setSchedOpen} onSaved={(t) => { setSchedTime(t); setSched(true); }} /></>}
         <section className="relative overflow-hidden rounded-[22px] border border-white/[0.06] bg-card p-5">
@@ -300,7 +300,7 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, p
       </div>
       </>) : (<>
       {/* ---------- not evaluated yet: today's session + why there's no score (left), how to do it (right) ---------- */}
-      <div className="space-y-4 land:sticky land:top-[72px]">
+      <div className="space-y-4 land:sticky land:top-[72px] desk:top-6">
         {/* today's session: first thing under the exercise name (top of the left pane on open foldables, not across the hinge) */}
         {sched ? <TodayCard label={sessionLabel} onStart={onStart} done={badge === "Completed"} time={schedTime} /> : <><ScheduleCard onSchedule={() => setSchedOpen(true)} /><ScheduleDialog open={schedOpen} onOpenChange={setSchedOpen} onSaved={(t) => { setSchedTime(t); setSched(true); }} /></>}
         <section className="relative overflow-hidden rounded-[22px] border border-dashed border-white/[0.1] bg-gradient-to-br from-primary/[0.07] via-transparent to-secondary/[0.05] p-5">

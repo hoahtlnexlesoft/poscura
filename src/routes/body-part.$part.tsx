@@ -39,7 +39,7 @@ function BodyPartDetail() {
         <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusCls}`}>{data.status}</span>
       </div>
 
-      <section className="glass-card p-4 fold:col-start-1 fold:row-start-2 fold:row-span-2 fold:sticky fold:top-[72px]">
+      <section className="glass-card p-4 fold:col-start-1 fold:row-start-2 fold:row-span-2 fold:sticky fold:top-[72px] desk:top-6">
         <div className="text-xs text-muted-foreground mb-1">Average score</div>
         <ScoreGauge value={data.score} size={120} />
 

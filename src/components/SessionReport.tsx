@@ -232,7 +232,7 @@ export function SessionReport({ onClose }: Props) {
       )}
 
       {/* ---------- left: score + alignment ---------- */}
-      <div className="space-y-4 land:col-start-1 land:row-start-2 land:sticky land:top-[72px]">
+      <div className="space-y-4 land:col-start-1 land:row-start-2 land:sticky land:top-[72px] desk:top-6">
         <section className="relative overflow-hidden rounded-[22px] border border-white/[0.07] bg-gradient-to-b from-primary/[0.08] to-transparent p-5">
           <div className="flex items-center gap-5">
             <ScoreRing score={SCORE} size={124} label="Score" />
