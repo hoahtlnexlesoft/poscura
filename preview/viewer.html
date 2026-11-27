@@ -9,14 +9,14 @@
   :root { --bg:#0b0f17; --text:#eef2fa; --muted:#8b97ad; --item:#161d2b; --item-h:#1c2536; --accent:#1f8bff; --accent-soft:rgba(31,139,255,.14); --app:#0f1726; }
   * { box-sizing:border-box; }
   html, body { margin:0; height:100%; background:var(--bg); color:var(--text); font-family:Quicksand, system-ui, sans-serif; }
-  body { display:grid; grid-template-columns: minmax(260px, 340px) 1fr minmax(220px, 300px); height:100vh; overflow:hidden; }
+  body { display:grid; grid-template-columns: minmax(230px, 280px) 1fr minmax(220px, 290px); height:100vh; overflow:hidden; }
 
   /* ---------- left: screens ---------- */
-  .left { overflow:auto; padding:40px 28px 40px 36px; }
-  .left h1 { font-size:26px; font-weight:700; margin:0 0 14px; letter-spacing:-.01em; line-height:1.2; }
-  .left p { color:var(--muted); font-size:14.5px; line-height:1.5; margin:0 0 18px; }
+  .left { overflow:auto; padding:32px 20px 32px 28px; }
+  .left h1 { font-size:20px; font-weight:700; margin:0 0 10px; letter-spacing:-.01em; line-height:1.2; }
+  .left p { color:var(--muted); font-size:12.5px; line-height:1.5; margin:0 0 14px; }
   .screens { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:0; }
-  .screens button { display:flex; align-items:baseline; width:100%; text-align:left; font:inherit; font-size:15px; font-weight:500; color:var(--text); background:transparent; border:0; border-radius:8px; padding:6px 12px; cursor:pointer; line-height:1.3; }
+  .screens button { display:flex; align-items:baseline; width:100%; text-align:left; font:inherit; font-size:13px; font-weight:500; color:var(--text); background:transparent; border:0; border-radius:8px; padding:5px 10px; cursor:pointer; line-height:1.3; }
   .screens button:hover { background:var(--item); }
   .screens button.on { background:var(--accent-soft); color:var(--accent); }
   /* same weight when active, so the label never re-wraps; wrapped lines hang under the label, not the number */
@@ -48,19 +48,19 @@
   .se-cam { position:absolute; width:10px; height:10px; border-radius:50%; background:#0b0b10; box-shadow:inset 0 0 0 2px #1e2028; }
 
   /* ---------- right: devices ---------- */
-  .right { overflow:auto; padding:40px 36px 40px 20px; display:flex; flex-direction:column; justify-content:center; }
-  .right h2 { font-size:24px; font-weight:700; margin:0 0 18px; }
+  .right { overflow:auto; padding:32px 28px 32px 16px; display:flex; flex-direction:column; justify-content:center; }
+  .right h2 { font-size:18px; font-weight:700; margin:0 0 12px; }
   .devices { display:flex; flex-direction:column; gap:6px; }
-  .devices button { font:inherit; font-size:15px; font-weight:600; text-align:left; color:var(--text); background:var(--item); border:0; border-radius:10px; padding:10px 16px; cursor:pointer; }
+  .devices button { font:inherit; font-size:13px; font-weight:600; text-align:left; color:var(--text); background:var(--item); border:0; border-radius:9px; padding:8px 12px; cursor:pointer; }
   .devices button:hover { background:var(--item-h); }
   .devices button.on { background:var(--accent); color:#fff; }
-  .meta { color:var(--muted); font-size:14px; margin-top:22px; line-height:1.5; }
+  .meta { color:var(--muted); font-size:12px; margin-top:18px; line-height:1.5; }
   .orient { display:none; margin-top:14px; background:var(--item); border-radius:12px; padding:4px; gap:4px; }
   .orient.show { display:flex; }
-  .orient button { flex:1; font:inherit; font-size:13.5px; font-weight:600; color:var(--muted); background:transparent; border:0; border-radius:9px; padding:8px 10px; cursor:pointer; }
+  .orient button { flex:1; font:inherit; font-size:12px; font-weight:600; color:var(--muted); background:transparent; border:0; border-radius:9px; padding:8px 10px; cursor:pointer; }
   .orient button.on { background:#24304a; color:var(--text); }
   .tools { display:flex; gap:8px; margin-top:16px; flex-wrap:wrap; }
-  .tools button { font:inherit; font-size:13px; font-weight:600; color:var(--muted); background:transparent; border:1px solid #263047; border-radius:10px; padding:7px 12px; cursor:pointer; }
+  .tools button { font:inherit; font-size:12px; font-weight:600; color:var(--muted); background:transparent; border:1px solid #263047; border-radius:10px; padding:7px 12px; cursor:pointer; }
   .tools button:hover { color:var(--text); border-color:var(--accent); }
 
   /* slim scrollbars to match the dark viewer */
@@ -72,19 +72,19 @@
   ::-webkit-scrollbar-thumb:hover { background-color:rgba(238,242,250,.3); }
   ::-webkit-scrollbar-corner { background:transparent; }
   /* room for the comment rail on the right edge */
-  .right { padding-right:118px; }
+  .right { padding-right:96px; }
   /* ---------- small screens ---------- */
   @media (max-width: 980px) {
     body { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; height:auto; min-height:100vh; overflow:auto; }
     .left { order:1; padding:20px 16px 8px; }
-    .left p { margin-bottom:12px; font-size:14px; }
+    .left p { margin-bottom:12px; font-size:12.5px; }
     .screens { flex-direction:row; overflow-x:auto; gap:6px; padding-bottom:6px; }
     .screens li { flex:none; }
-    .screens button { font-size:14px; padding:8px 12px; background:var(--item); white-space:nowrap; }
+    .screens button { font-size:13px; padding:7px 11px; background:var(--item); white-space:nowrap; }
     .right { order:2; padding:8px 16px; justify-content:flex-start; }
     .right h2, .meta { display:none; }
     .devices { flex-direction:row; overflow-x:auto; }
-    .devices button { font-size:14px; padding:8px 12px; white-space:nowrap; flex:none; }
+    .devices button { font-size:13px; padding:7px 11px; white-space:nowrap; flex:none; }
     .tools { margin-top:8px; }
     .center { order:3; padding:16px 0 32px; min-height:70vh; }
     body { padding-right:44px; }
