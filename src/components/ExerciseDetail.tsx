@@ -116,7 +116,6 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, p
   const [incAdvice, setIncAdvice] = useState(true);
   const navigate = useNavigate();
   const band = scoreBand(ACCURACY_AVG);
-  const best = Math.max(...accuracySeries);
   const trend = accuracySeries[accuracySeries.length - 1] - accuracySeries[0];
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
 
@@ -249,9 +248,6 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, p
               <div className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Accuracy average</div>
               <div className="mt-1 inline-flex items-center gap-1.5 text-[13px] font-semibold" style={{ color: band.ring }}>
                 <span className="h-1.5 w-1.5 rounded-full" style={{ background: band.ring }} />{band.label}
-              </div>
-              <div className="mt-3">
-                <Stat label="Best" value={`${best}`} />
               </div>
             </div>
           </div>
@@ -514,14 +510,6 @@ function Extra({ icon: Icon, label, text, tone }: { icon: typeof Target; label: 
   );
 }
 
-function Stat({ label, value, tone }: { label: string; value: string; tone?: string }) {
-  return (
-    <div>
-      <div className="text-[11px] text-muted-foreground">{label}</div>
-      <div className={cn("text-[17px] font-semibold tabular-nums leading-tight", tone)}>{value}</div>
-    </div>
-  );
-}
 
 function Meta({ label, value, suffix }: { label: string; value: string; suffix: string }) {
   return (
