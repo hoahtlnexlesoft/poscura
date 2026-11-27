@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { ChevronLeft, ChevronRight, Ticket, Check, X, User, Users, Zap, TicketX } from "lucide-react";
+import { ChevronLeft, ChevronRight, Ticket, Check, X, User, Users, Zap, TicketX, Info } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
@@ -22,19 +22,6 @@ export const Route = createFileRoute("/subscribe")({
 
 const ICONS = { freemium: Zap, individual: User, family: Users } as const;
 const vnd = (n: number) => `${n.toLocaleString("vi-VN")}đ`;
-
-/** small two-way switch used in the Subscribe header */
-function Seg({ value, options, onChange }: { value: string; options: [string, string][]; onChange: (v: string) => void }) {
-  return (
-    <div role="radiogroup" className="inline-flex flex-1 rounded-full border border-white/[0.08] bg-white/[0.03] p-0.5">
-      {options.map(([v, label]) => (
-        <button key={v} role="radio" aria-checked={value === v} onClick={() => value !== v && onChange(v)}
-          className={cn("h-8 flex-1 rounded-full px-3.5 text-[12.5px] font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
-            value === v ? "bg-gradient-to-r from-primary to-secondary text-white" : "text-muted-foreground hover:text-foreground")}>{label}</button>
-      ))}
-    </div>
-  );
-}
 
 /** Subscribe: the plan on one side (what you get), the order on the other (voucher, total, confirm). */
 function SubscribePage() {
@@ -59,108 +46,74 @@ function SubscribePage() {
   return (
     <div className="flex min-h-[calc(100dvh-40px)] flex-col desk:min-h-[calc(100dvh-80px)]">
       <Header title="Subscribe" onBack={goBack} />
-      <div className="mx-auto flex w-full max-w-[640px] flex-1 flex-col pt-3 land:max-w-[860px] land:flex-none">
-        <div className="overflow-hidden rounded-[24px] border border-white/[0.07] bg-card land:grid land:grid-cols-2">
+      {/* same content as the live app: what you're subscribing to, a voucher, what will be charged */}
+      <div className="mx-auto flex w-full max-w-[560px] flex-1 flex-col pt-3">
+        <section className="relative overflow-hidden rounded-[24px] border border-white/[0.07] bg-card p-5 land:p-6">
+          <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-36 bg-[radial-gradient(60%_100%_at_50%_0%,color-mix(in_oklab,var(--color-primary)_18%,transparent),transparent_72%)]" />
+          <div className="relative flex flex-col items-center pb-2 pt-2 text-center">
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary text-white shadow-[0_12px_30px_-12px] shadow-primary"><Info className="h-6 w-6" /></span>
+            <h2 className="mt-4 text-[17px] font-semibold tracking-tight">Subscribe to {plan.name}</h2>
+          </div>
 
-        {/* ---------- the plan: what you're getting ---------- */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-[#11203a] to-card p-5 land:p-6">
-          <div aria-hidden className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-primary/20 blur-3xl" />
-          <div aria-hidden className="pointer-events-none absolute -bottom-24 -left-10 h-48 w-48 rounded-full bg-secondary/15 blur-3xl" />
-          <div className="relative flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-secondary text-white shadow-[0_12px_30px_-12px] shadow-primary"><Icon className="h-5 w-5" /></span>
-            <div className="min-w-0">
-              <div className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Subscribe to</div>
-              <h2 className="text-[18px] font-semibold leading-tight tracking-tight">{plan.name}</h2>
+          <div className="relative mt-5">
+            {voucher ? (
+                /* applied: the same ticket as in the picker, tap to change */
+                <div role="button" tabIndex={0} onClick={() => setPicking(true)} onKeyDown={(e) => e.key === "Enter" && setPicking(true)}
+                  className="group relative flex w-full cursor-pointer items-stretch overflow-hidden rounded-[18px] bg-gradient-to-r from-primary/[0.14] to-secondary/[0.05] text-left ring-1 ring-inset ring-primary/40 transition hover:ring-primary/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+                  <span className="flex w-[72px] shrink-0 flex-col items-center justify-center bg-gradient-to-br from-primary to-secondary py-3 text-white">
+                    <span className="text-[19px] font-bold leading-none tracking-tight">{voucher.off.replace(/\s*OFF/i, "")}</span>
+                    <span className="mt-1 text-[9.5px] font-semibold uppercase tracking-[0.2em] opacity-80">Off</span>
+                  </span>
+                  <span className="min-w-0 flex-1 px-3.5 py-2.5">
+                    <span className="block truncate text-[14px] font-semibold">{voucher.name}</span>
+                    <span className="mt-1 flex items-center gap-2">
+                      <span className="rounded-md bg-white/[0.07] px-1.5 py-0.5 font-mono text-[11.5px] font-semibold tracking-wider text-foreground/80">{voucher.code}</span>
+                      <span className="inline-flex items-center gap-1 text-[11.5px] font-medium text-success"><Check className="h-3 w-3" strokeWidth={3} />Applied</span>
+                    </span>
+                  </span>
+                  <span className="flex items-center gap-0.5 pr-2">
+                    <span className="hidden text-[12px] font-semibold text-primary group-hover:inline">Change</span>
+                    <button aria-label="Remove voucher" onClick={(e) => { e.stopPropagation(); setVoucher(null); }}
+                      className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white/[0.08] hover:text-foreground"><X className="h-4 w-4" /></button>
+                  </span>
+                </div>
+              ) : (
+                <button onClick={() => setPicking(true)}
+                  className="group flex w-full items-center gap-3 rounded-[18px] bg-white/[0.035] px-3.5 py-3 text-left ring-1 ring-inset ring-white/[0.08] transition hover:bg-white/[0.05] hover:ring-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/12 text-primary ring-1 ring-inset ring-primary/20"><Ticket className="h-[18px] w-[18px]" /></span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[14px] font-semibold">Select voucher</span>
+                  </span>
+                  <ChevronRight className="h-5 w-5 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground" />
+                </button>
+              )}
+          </div>
+
+          <h3 className="relative mt-6 text-[13px] font-semibold text-muted-foreground">Payment Details</h3>
+          <div className="relative mt-2.5 overflow-hidden rounded-[16px] ring-1 ring-inset ring-white/[0.08]">
+            <div className="flex items-center justify-between px-4 py-3 text-[14px]">
+              <span className="text-muted-foreground">Subscription</span>
+              <span className="font-medium tabular-nums">{vnd(price)}</span>
+            </div>
+            {voucher && (
+              <div className="flex items-center justify-between border-t border-white/[0.06] px-4 py-3 text-[14px] animate-in fade-in duration-300">
+                <span className="text-muted-foreground">Voucher ({voucher.off.replace(/\s*OFF/i, "")})</span>
+                <span className="font-medium tabular-nums text-success">−{vnd(discount)}</span>
+              </div>
+            )}
+            <div className="flex items-center justify-between bg-gradient-to-r from-primary to-secondary px-4 py-3.5 text-white">
+              <span className="text-[14px] font-semibold">Charged amount</span>
+              <span key={charged} className="text-[17px] font-bold tabular-nums animate-in fade-in slide-in-from-bottom-1 duration-300">{vnd(charged)}</span>
             </div>
           </div>
-          {/* what you buy, all in one place: plan, billing cycle, then the price that follows from them */}
-          <div className="relative mt-4 flex gap-2">
-          <Seg value={plan.id} options={[["individual", "Individual"], ["family", "Family"]]}
-            onChange={(v) => navigate({ to: "/subscribe", search: { plan: v as "individual" | "family", cycle }, replace: true })} />
-          <Seg value={cycle} options={[["monthly", "Monthly"], ["annual", "Annual"]]}
-            onChange={(v) => navigate({ to: "/subscribe", search: { plan: plan.id as "individual" | "family", cycle: v as "monthly" | "annual" }, replace: true })} />
-        </div>
-          <div className="relative mt-4 flex items-baseline gap-1.5">
-            <span className="text-[26px] font-bold leading-none tracking-tight">{formatVND(price)}</span>
-            <span className="text-[13px] text-muted-foreground">/ {per}</span>
-          </div>
-          {plan.note && <p className="relative mt-1.5 text-[12.5px] text-muted-foreground">{plan.note}</p>}
-          <ul className="relative mt-4 space-y-2.5 border-t border-white/[0.07] pt-4">
-            {plan.features.map((f) => (
-              <li key={f} className="flex items-center gap-2.5 text-[13px] text-foreground/90">
-                <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-success/15"><Check className="h-2.5 w-2.5 text-success" strokeWidth={3} /></span>{f}
-              </li>
-            ))}
-          </ul>
         </section>
 
-        {/* ---------- the order: voucher, payment details, confirm ---------- */}
-          <section className="border-t border-white/[0.07] p-5 land:border-l land:border-t-0 land:p-6">
-            {voucher ? (
-              /* applied: the same ticket as in the picker, tap to change */
-              <div role="button" tabIndex={0} onClick={() => setPicking(true)} onKeyDown={(e) => e.key === "Enter" && setPicking(true)}
-                className="group relative flex w-full cursor-pointer items-stretch overflow-hidden rounded-[18px] bg-gradient-to-r from-primary/[0.14] to-secondary/[0.05] text-left ring-1 ring-inset ring-primary/40 transition hover:ring-primary/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
-                <span className="flex w-[72px] shrink-0 flex-col items-center justify-center bg-gradient-to-br from-primary to-secondary py-3 text-white">
-                  <span className="text-[19px] font-bold leading-none tracking-tight">{voucher.off.replace(/\s*OFF/i, "")}</span>
-                  <span className="mt-1 text-[9.5px] font-semibold uppercase tracking-[0.2em] opacity-80">Off</span>
-                </span>
-                <span className="min-w-0 flex-1 px-3.5 py-2.5">
-                  <span className="block truncate text-[14px] font-semibold">{voucher.name}</span>
-                  <span className="mt-1 flex items-center gap-2">
-                    <span className="rounded-md bg-white/[0.07] px-1.5 py-0.5 font-mono text-[11.5px] font-semibold tracking-wider text-foreground/80">{voucher.code}</span>
-                    <span className="inline-flex items-center gap-1 text-[11.5px] font-medium text-success"><Check className="h-3 w-3" strokeWidth={3} />Applied</span>
-                  </span>
-                </span>
-                <span className="flex items-center gap-0.5 pr-2">
-                  <span className="hidden text-[12px] font-semibold text-primary group-hover:inline">Change</span>
-                  <button aria-label="Remove voucher" onClick={(e) => { e.stopPropagation(); setVoucher(null); }}
-                    className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white/[0.08] hover:text-foreground"><X className="h-4 w-4" /></button>
-                </span>
-              </div>
-            ) : (
-              <button onClick={() => setPicking(true)}
-                className="group flex w-full items-center gap-3 rounded-[18px] bg-white/[0.035] px-3.5 py-3 text-left ring-1 ring-inset ring-white/[0.08] transition hover:bg-white/[0.05] hover:ring-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/12 text-primary ring-1 ring-inset ring-primary/20"><Ticket className="h-[18px] w-[18px]" /></span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-[14px] font-semibold">Select voucher</span>
-                </span>
-                <ChevronRight className="h-5 w-5 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground" />
-              </button>
-            )}
-
-            <h3 className="mt-6 text-[13px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Payment Details</h3>
-            <dl className="mt-3 space-y-3 text-[14px]">
-              <div className="flex items-center justify-between">
-                <dt className="text-muted-foreground">Subscription</dt>
-                <dd className="font-medium tabular-nums">{vnd(price)}</dd>
-              </div>
-              {voucher && (
-                <div className="flex items-center justify-between animate-in fade-in duration-300">
-                  <dt className="text-muted-foreground">Voucher ({voucher.off.replace(/\s*OFF/i, "")})</dt>
-                  <dd className="font-medium tabular-nums text-success">−{vnd(discount)}</dd>
-                </div>
-              )}
-            </dl>
-            <div className="mt-4 flex items-end justify-between border-t border-white/[0.07] pt-4">
-              <span className="text-[14px] font-semibold">Charged amount</span>
-              <span key={charged} className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-[26px] font-bold leading-none tracking-tight text-transparent tabular-nums animate-in fade-in slide-in-from-bottom-1 duration-300">{vnd(charged)}</span>
-            </div>
-
-            {/* wide screens: the actions finish the order card */}
-            <div className="mt-6 hidden flex-col gap-2 land:flex">
-              <button className={cn(primaryBtn, "flex-none")} onClick={confirm}>Confirm</button>
-              <button onClick={goBack} className="h-11 rounded-2xl text-[14px] font-semibold text-muted-foreground transition hover:bg-white/[0.05] hover:text-foreground">Cancel</button>
-            </div>
-          </section>
+        <div className="sticky bottom-0 z-20 mt-auto pt-4 land:static land:mt-5 land:pt-0">
+          <Actions>
+            <button onClick={goBack} className={outlineBtn}>Cancel</button>
+            <button className={primaryBtn} onClick={confirm}>Confirm</button>
+          </Actions>
         </div>
-
-          {/* phones: actions stay at the bottom of the screen */}
-          <div className="sticky bottom-0 z-20 mt-auto pt-4 land:hidden">
-            <Actions>
-              <button onClick={goBack} className={outlineBtn}>Cancel</button>
-              <button className={primaryBtn} onClick={confirm}>Confirm</button>
-            </Actions>
-          </div>
       </div>
       <VoucherPicker open={picking} planId={plan.id} price={price} empty={!!novouchers} selected={voucher}
         onClose={() => setPicking(false)} onDone={(v) => { setVoucher(v); setPicking(false); }} />
