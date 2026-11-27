@@ -26,20 +26,23 @@ export function SubscribeSheet({ planId, cycle, open, onOpenChange, emptyVoucher
   const [codeOpen, setCodeOpen] = useState(false);
   const [code, setCode] = useState("");
   const [err, setErr] = useState("");
-  useEffect(() => { if (open) { setVoucher(null); setCodeOpen(false); setCode(""); setErr(""); } }, [open, planId]);
+  const [showAll, setShowAll] = useState(false);
+  // only vouchers this plan can use, biggest discount first
+  const list = !planId || emptyVouchers ? [] : VOUCHERS
+    .filter((v) => v.status === "Active" && voucherFits(v, planId))
+    .sort((a, b) => voucherRate(b) - voucherRate(a));
+  // opening the sheet pre-applies the best voucher; tap another to swap, tap it again to remove
+  useEffect(() => { if (open) { setVoucher(list[0] ?? null); setCodeOpen(false); setCode(""); setErr(""); setShowAll(false); } }, [open, planId, emptyVouchers]);
   if (!plan) return null;
   const Icon = ICONS[plan.id];
   const price = priceFor(plan, cycle);
   const discount = voucher ? Math.round(price * voucherRate(voucher)) : 0;
   const charged = price - discount;
-  // vouchers that fit this plan first; ones that don't stay visible but disabled
-  const list = emptyVouchers ? [] : VOUCHERS.filter((v) => v.status === "Active")
-    .sort((a, b) => Number(voucherFits(b, plan.id)) - Number(voucherFits(a, plan.id)));
   const applyCode = () => {
     const v = VOUCHERS.find((x) => x.code.toLowerCase() === code.trim().toLowerCase());
     if (!v || v.status !== "Active") return setErr("This code isn't valid or has expired.");
     if (!voucherFits(v, plan.id)) return setErr("This code can't be used with this plan.");
-    setErr(""); setCode(""); setCodeOpen(false); setVoucher(v);
+    setErr(""); setCode(""); setCodeOpen(false); setShowAll(true); setVoucher(v);
   };
   const confirm = () => {
     onOpenChange(false);
@@ -49,7 +52,7 @@ export function SubscribeSheet({ planId, cycle, open, onOpenChange, emptyVoucher
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={sheetClass}>
+      <DialogContent className={sheetClass} onOpenAutoFocus={(e) => e.preventDefault()}>
         {/* grabber: reads as a sheet on phones */}
         <span aria-hidden className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-white/20 min-[600px]:hidden" />
         <div className="flex items-center gap-3 px-5 pb-1 pt-4 min-[600px]:pt-5">
@@ -88,38 +91,38 @@ export function SubscribeSheet({ planId, cycle, open, onOpenChange, emptyVoucher
             )}
 
             {list.length ? (
-              <div role="radiogroup" aria-label="Vouchers"
-                className="flex snap-x gap-2 overflow-x-auto scroll-px-5 px-5 pb-1 pt-2 [mask-image:linear-gradient(90deg,#000_calc(100%-28px),transparent)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {list.map((v) => {
-                  const ok = voucherFits(v, plan.id);
+              <div role="radiogroup" aria-label="Vouchers" className="grid grid-cols-3 gap-2 px-5 pt-2">
+                {(showAll || list.length <= 3 ? list : list.slice(0, 2)).map((v) => {
                   const on = voucher?.code === v.code;
                   return (
-                    <button key={v.code} role="radio" aria-checked={on} disabled={!ok} onClick={() => setVoucher(on ? null : v)}
-                      title={ok ? `${v.name} · valid until ${voucherUntil(v)}` : "Individual plan only"}
-                      className={cn("group relative flex h-[50px] shrink-0 snap-start items-stretch overflow-hidden rounded-[14px] text-left transition active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
-                        on ? "bg-gradient-to-r from-primary/[0.18] to-secondary/[0.06]" : "bg-white/[0.035] enabled:hover:bg-white/[0.06]",
-                        !ok && "cursor-not-allowed opacity-45 saturate-50")}>
-                      <span className={cn("flex w-[46px] items-center justify-center text-[14px] font-bold tracking-tight transition",
-                        on ? "bg-gradient-to-br from-primary to-secondary text-white" : "bg-gradient-to-br from-primary/35 via-primary/15 to-secondary/25")}>
-                        {v.off.replace(/\s*OFF/i, "")}
-                      </span>
-                      <span aria-hidden className="w-0 border-l-[1.5px] border-dashed border-white/15" />
-                      <span className="flex min-w-0 flex-col justify-center py-1.5 pl-2.5 pr-2">
-                        <span className="font-mono text-[12px] font-semibold tracking-wider">{v.code}</span>
-                        <span className="mt-0.5 text-[10.5px] text-muted-foreground">{ok ? `Until ${voucherUntil(v).replace(/, \d{4}$/, "")}` : "Individual only"}</span>
-                      </span>
-                      <span className="flex items-center pr-2.5">
-                        <span className={cn("flex h-[18px] w-[18px] items-center justify-center rounded-full transition",
-                          on ? "bg-primary shadow-[0_0_0_3px] shadow-primary/20" : "ring-[1.5px] ring-inset ring-white/20 group-enabled:group-hover:ring-white/40")}>
-                          {on && <Check className="h-3 w-3 text-white animate-in zoom-in-50 duration-200" strokeWidth={3.5} />}
+                    <div key={v.code} className="relative min-w-0 animate-in fade-in duration-200">
+                      <button role="radio" aria-checked={on} onClick={() => setVoucher(on ? null : v)}
+                        title={`${v.name} · ${v.code} · valid until ${voucherUntil(v)}`}
+                        className={cn("group relative flex h-11 w-full items-stretch overflow-hidden rounded-xl text-left transition active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
+                          on ? "bg-primary/[0.12]" : "bg-white/[0.03] hover:bg-white/[0.06]")}>
+                        <span className={cn("flex w-[34px] shrink-0 items-center justify-center text-[11.5px] font-bold tracking-tight transition",
+                          on ? "bg-gradient-to-b from-primary to-secondary text-white" : "bg-primary/[0.14] text-primary")}>
+                          {v.off.replace(/\s*OFF/i, "")}
                         </span>
-                      </span>
-                      {/* outline above the stub so it runs unbroken round the ticket */}
-                      <span aria-hidden className={cn("pointer-events-none absolute inset-0 rounded-[14px] transition",
-                        on ? "ring-[1.5px] ring-inset ring-primary" : "ring-1 ring-inset ring-white/[0.08] group-enabled:group-hover:ring-white/20")} />
-                    </button>
+                        {/* perforation */}
+                        <span aria-hidden className={cn("w-0 border-l border-dashed transition", on ? "border-white/30" : "border-white/[0.12]")} />
+                        <span className="flex min-w-0 flex-1 flex-col justify-center px-2">
+                          <span className="truncate font-mono text-[11px] font-semibold tracking-wide">{v.code}</span>
+                          <span className="truncate text-[10px] text-muted-foreground">{v.name}</span>
+                        </span>
+                        <span aria-hidden className={cn("pointer-events-none absolute inset-0 rounded-xl transition",
+                          on ? "ring-[1.5px] ring-inset ring-primary" : "ring-1 ring-inset ring-white/[0.08] group-hover:ring-white/20")} />
+                      </button>
+                      {on && <span aria-hidden className="pointer-events-none absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary ring-2 ring-[#0e1524] animate-in zoom-in-50 duration-200"><Check className="h-2.5 w-2.5 text-white" strokeWidth={3.5} /></span>}
+                    </div>
                   );
                 })}
+                {!showAll && list.length > 3 && (
+                  <button onClick={() => setShowAll(true)}
+                    className="flex h-11 items-center justify-center rounded-xl border border-dashed border-white/[0.14] text-[12px] font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+                    +{list.length - 2} more
+                  </button>
+                )}
               </div>
             ) : (
               !codeOpen && <p className="px-5 pt-1.5 text-[12.5px] text-muted-foreground/80">No vouchers available</p>
