@@ -18,7 +18,7 @@ import { ExerciseDetail } from "@/components/ExerciseDetail";
 import { NEXT_WORKOUT, TODAYS_WORKOUTS, TODAY_TIME } from "@/lib/todays-workouts";
 
 export const Route = createFileRoute("/workout")({
-  validateSearch: z.object({ session: z.string().optional(), exercise: z.string().optional(), schedule: z.enum(["none"]).optional(), evaluate: z.string().optional(), score: z.coerce.number().optional(), empty: z.coerce.string().optional(), new: z.coerce.string().optional(), history: z.enum(["none"]).optional(), view: z.enum(["program"]).optional() }),
+  validateSearch: z.object({ session: z.string().optional(), exercise: z.string().optional(), schedule: z.enum(["none"]).optional(), evaluate: z.string().optional(), score: z.coerce.number().optional(), empty: z.coerce.string().optional(), new: z.coerce.string().optional(), history: z.enum(["none"]).optional(), view: z.enum(["program"]).optional(), point: z.coerce.number().optional() }),
   component: WorkoutPage,
 });
 
@@ -47,7 +47,7 @@ type View =
   | { kind: "program" };
 
 function WorkoutPage() {
-  const { session, exercise, schedule, evaluate, score, empty, new: fresh, history, view: inner } = Route.useSearch();
+  const { session, exercise, schedule, evaluate, score, empty, new: fresh, history, view: inner, point } = Route.useSearch();
   const program = inner === "program";
   const desk = useDesk();
   const [view, setView] = useState<View>(program ? { kind: "program" } : evaluate ? { kind: "evaluation", name: evaluate, score: score ?? 88, recordedUrl: null, when: "Today, 16:45" } : session ? { kind: "intro", name: session } : exercise ? { kind: "exercise", name: exercise } : { kind: "list" });
@@ -121,9 +121,10 @@ function WorkoutPage() {
     const pn = oi > 0 ? order[oi - 1] : undefined, nn = oi >= 0 ? order[oi + 1] : order[0];
     const pw = pn ? { name: pn } : undefined, nw = nn && nn !== view.name ? { name: nn } : undefined;
     return <ExerciseDetail key={`${view.name}|${schedule ?? ""}`} exerciseName={view.name} badge={done ? "Completed" : "Main"} sessionLabel={w ? `${w.done}/${w.sessions}` : "2/2"} onClose={toList} onStart={() => go({ kind: "intro", name: view.name })} scheduled={schedule !== "none"}
-      onPrev={pw ? () => go({ kind: "exercise", name: pw.name }) : undefined} onNext={nw ? () => go({ kind: "exercise", name: nw.name }) : undefined} prevName={pw?.name} nextName={nw?.name} />;
+      onPrev={pw ? () => go({ kind: "exercise", name: pw.name }) : undefined} onNext={nw ? () => go({ kind: "exercise", name: nw.name }) : undefined} prevName={pw?.name} nextName={nw?.name}
+      point={point} onPoint={(i) => navigate({ to: "/workout", search: { exercise: view.name, ...(i != null ? { point: i } : {}) } as never })} />;
   }
-  if (view.kind === "program") return <WorkoutProgramDetail exercise={exercise} onExercise={(name) => navigate({ to: "/workout", search: { view: "program", ...(name ? { exercise: name } : {}) } as never })} onClose={() => go({ kind: "list" })} onStartSession={(name) => go({ kind: "intro", name })} />;
+  if (view.kind === "program") return <WorkoutProgramDetail exercise={exercise} point={point} onPoint={(i) => navigate({ to: "/workout", search: { view: "program", exercise: exercise!, ...(i != null ? { point: i } : {}) } as never })} onExercise={(name) => navigate({ to: "/workout", search: { view: "program", ...(name ? { exercise: name } : {}) } as never })} onClose={() => go({ kind: "list" })} onStartSession={(name) => go({ kind: "intro", name })} />;
   // never scanned: no plan yet, monitoring creates it
   if (fresh) return desk ? <Page><PageHead title="Workout" subtitle="Personalized workout plans" /><NoWorkoutPlan /></Page> : (
     <div className="space-y-4">

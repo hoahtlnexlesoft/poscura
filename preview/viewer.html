@@ -201,6 +201,7 @@
       var qs = new URLSearchParams((p.split("?")[1] || "").replace(/%22|"/g, ""));
       if (qs.get("evaluate")) name = "Session evaluation · " + qs.get("evaluate");
       else if (qs.get("session")) name = qs.get("session") + " · Start";
+      else if (qs.get("exercise") && qs.get("point") != null) name = "Session evaluation · " + qs.get("exercise");
       else if (qs.get("exercise")) name = qs.get("exercise");
       else if (qs.get("view") === "program") name = "Program";
       else if (qs.get("post")) name = "Post";

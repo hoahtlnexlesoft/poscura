@@ -34,6 +34,9 @@ interface Props {
   /** names of the neighbouring exercises, shown on Back / Next so it's clear where they go */
   prevName?: string;
   nextName?: string;
+  /** chart point whose evaluation is open — kept in the URL by the page (?point=) */
+  point?: number;
+  onPoint?: (i: number | null) => void;
   /** start today's session of this exercise */
   onStart?: () => void;
   /** false when the exercise has no AI evaluation yet (never done): shows the plain detail layout */
@@ -85,7 +88,7 @@ function ShareToggle({ label, checked, onChange }: { label: string; checked: boo
   );
 }
 
-export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, prevName, nextName, onStart, evaluated = hasEvaluation(exerciseName), sessionLabel = "0/2", scheduled = true }: Props) {
+export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, prevName, nextName, point, onPoint, onStart, evaluated = hasEvaluation(exerciseName), sessionLabel = "0/2", scheduled = true }: Props) {
   const [sched, setSched] = useState(scheduled);
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => { window.scrollTo(0, 0); }, []);
@@ -100,7 +103,9 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, p
   const [phase, setPhase] = useState<Phase>("main");
   const [chartOpen, setChartOpen] = useState(true);
   const [detailsOpen, setDetailsOpen] = useState(false);
-  const [sessionDetail, setSessionDetail] = useState<{ date: string; time: string; score: number } | null>(null);
+  const [localPoint, setLocalPoint] = useState<number | null>(null);
+  const openPoint = onPoint ? (point ?? null) : localPoint;
+  const setPoint = (i: number | null) => (onPoint ? onPoint(i) : setLocalPoint(i));
   const [shareOpen, setShareOpen] = useState(false);
   const [composerOpen, setComposerOpen] = useState(false);
   const [postText, setPostText] = useState("");
@@ -132,8 +137,8 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, p
     navigate({ to: "/community" });
   };
 
-  if (sessionDetail) {
-    return <SessionEvaluation exerciseName={exerciseName} score={sessionDetail.score} when={sessionDetail.date} onBack={() => setSessionDetail(null)} />;
+  if (openPoint != null && accuracySeries[openPoint] != null) {
+    return <SessionEvaluation exerciseName={exerciseName} score={accuracySeries[openPoint]} when={sessionWhen(openPoint, accuracySeries.length)} onBack={() => setPoint(null)} />;
   }
 
   return (
@@ -270,7 +275,7 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, p
           </button>
           {chartOpen && (
             <div className="mt-4">
-              <AccuracyChart data={accuracySeries} onPointClick={(i, v) => setSessionDetail({ date: sessionWhen(i, accuracySeries.length), time: "", score: v })} />
+              <AccuracyChart data={accuracySeries} onPointClick={(i) => setPoint(i)} />
               <p className="mt-2 text-[11.5px] text-muted-foreground">Tap a point to see that session's evaluation.</p>
             </div>
           )}

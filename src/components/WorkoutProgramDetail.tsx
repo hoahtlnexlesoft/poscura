@@ -37,6 +37,8 @@ interface Props {
   /** exercise opened inside the program, kept in the URL by the page */
   exercise?: string;
   onExercise?: (name: string | null) => void;
+  point?: number;
+  onPoint?: (i: number | null) => void;
 }
 
 const WEEK_DAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
@@ -69,7 +71,7 @@ function startOfWeek(d: Date): Date {
   return date;
 }
 
-export function WorkoutProgramDetail({ onClose, onStartSession, exercise, onExercise }: Props) {
+export function WorkoutProgramDetail({ onClose, onStartSession, exercise, onExercise, point, onPoint }: Props) {
   useImmersive();
   const [tab, setTab] = useState<"today" | "all">("today");
   const selectedExercise = exercise ? exerciseList.find((x) => x.name === exercise) ?? null : null;
@@ -106,7 +108,7 @@ export function WorkoutProgramDetail({ onClose, onStartSession, exercise, onExer
     const i = exerciseList.findIndex((x) => x.name === selectedExercise.name);
     const prev = exerciseList[i - 1], nxt = exerciseList[i + 1];
     return <ExerciseDetail key={selectedExercise.name} exerciseName={selectedExercise.name} badge={selectedExercise.badge} onClose={() => setSelectedExercise(null)}
-      onPrev={prev ? () => setSelectedExercise(prev) : undefined} onNext={nxt ? () => setSelectedExercise(nxt) : undefined} prevName={prev?.name} nextName={nxt?.name} />;
+      onPrev={prev ? () => setSelectedExercise(prev) : undefined} onNext={nxt ? () => setSelectedExercise(nxt) : undefined} prevName={prev?.name} nextName={nxt?.name} point={point} onPoint={onPoint} />;
   }
 
   const next = todaySessions[0];
