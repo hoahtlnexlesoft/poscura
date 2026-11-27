@@ -114,10 +114,10 @@ export function PlanCards({ cycle, className, currentId, onSubscribe }: { cycle:
 
 /** Monthly/annual toggle + plan cards. */
 /** currentId marks which card is the user's plan (defaults to the one flagged in PLANS) */
-export function PlanPicker({ className, currentId, heading, subscribe, emptyVouchers }: {
+export function PlanPicker({ className, currentId, heading, subscribe, emptyVouchers, manyVouchers }: {
   className?: string; currentId?: string; heading?: React.ReactNode;
   /** open the checkout sheet for this plan right away (deep links / preview screens) */
-  subscribe?: string; emptyVouchers?: boolean;
+  subscribe?: string; emptyVouchers?: boolean; manyVouchers?: boolean;
 }) {
   const [cycle, setCycle] = useState<BillingCycle>("monthly");
   const [sheet, setSheet] = useState<string | null>(subscribe ?? null);
@@ -132,7 +132,7 @@ export function PlanPicker({ className, currentId, heading, subscribe, emptyVouc
         </div>
       ) : <BillingToggle cycle={cycle} onChange={setCycle} />}
       <PlanCards cycle={cycle} currentId={currentId} onSubscribe={setSheet} />
-      <SubscribeSheet planId={sheet} cycle={cycle} open={!!sheet} onOpenChange={(o) => !o && setSheet(null)} emptyVouchers={emptyVouchers} />
+      <SubscribeSheet planId={sheet} cycle={cycle} open={!!sheet} onOpenChange={(o) => !o && setSheet(null)} emptyVouchers={emptyVouchers} manyVouchers={manyVouchers} />
     </div>
   );
 }

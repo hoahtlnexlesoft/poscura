@@ -8,6 +8,15 @@ export const VOUCHERS: Voucher[] = [
   { name: "Summer Posture", code: "SUMMER26", off: "20% OFF", until: "08/31/2026 23:59", status: "Expired" },
 ];
 
+/** extra sample vouchers for the "many vouchers" preview case */
+export const MORE_VOUCHERS: Voucher[] = [
+  { name: "Lunar New Year", code: "TET2027", off: "30% OFF", until: "02/20/2027 23:59", status: "Active" },
+  { name: "Black Friday", code: "BLACKFRI", off: "25% OFF", until: "11/30/2026 23:59", status: "Active" },
+  { name: "Refer a friend", code: "FRIEND15", off: "15% OFF", until: "03/31/2027 23:59", status: "Active" },
+  { name: "Desk Health Week", code: "DESK20", off: "20% OFF", until: "12/20/2026 23:59", status: "Active" },
+  { name: "Student", code: "STUDENT5", off: "5% OFF", until: "06/30/2027 23:59", status: "Active" },
+];
+
 /** "80% OFF" → 0.8 */
 export const voucherRate = (v: Voucher) => (parseInt(v.off, 10) || 0) / 100;
 /** vouchers named "… Individual Only" only apply to the Individual plan */

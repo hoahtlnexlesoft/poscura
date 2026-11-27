@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Check, X, User, Users, Zap } from "lucide-react";
+import { Check, X, User, Users, Zap, TicketX } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { primaryBtn } from "@/components/CheckoutBits";
 import { getPlan, priceFor, formatVND, type BillingCycle } from "@/lib/plans";
-import { VOUCHERS, voucherFits, voucherRate, voucherUntil, type Voucher } from "@/lib/vouchers";
+import { VOUCHERS, MORE_VOUCHERS, voucherFits, voucherRate, voucherUntil, type Voucher } from "@/lib/vouchers";
 
 const ICONS = { freemium: Zap, individual: User, family: Users } as const;
 const vnd = (n: number) => `${n.toLocaleString("vi-VN")}đ`;
@@ -17,8 +17,8 @@ export const sheetClass = "flex max-h-[min(680px,calc(100dvh-32px))] max-w-[440p
 /** Subscribe as a checkout sheet over the plan list: same content as the live app —
  *  Subscribe to <plan>, vouchers, payment details, Confirm. Vouchers apply in place (tap a ticket),
  *  so there is only ever one sheet. Closing it leaves you on the plans. */
-export function SubscribeSheet({ planId, cycle, open, onOpenChange, emptyVouchers = false }: {
-  planId: string | null; cycle: BillingCycle; open: boolean; onOpenChange: (v: boolean) => void; emptyVouchers?: boolean;
+export function SubscribeSheet({ planId, cycle, open, onOpenChange, emptyVouchers = false, manyVouchers = false }: {
+  planId: string | null; cycle: BillingCycle; open: boolean; onOpenChange: (v: boolean) => void; emptyVouchers?: boolean; manyVouchers?: boolean;
 }) {
   const navigate = useNavigate();
   const plan = planId ? getPlan(planId) : undefined;
@@ -28,11 +28,11 @@ export function SubscribeSheet({ planId, cycle, open, onOpenChange, emptyVoucher
   const [err, setErr] = useState("");
   const [showAll, setShowAll] = useState(false);
   // only vouchers this plan can use, biggest discount first
-  const list = !planId || emptyVouchers ? [] : VOUCHERS
+  const list = !planId || emptyVouchers ? [] : (manyVouchers ? [...VOUCHERS, ...MORE_VOUCHERS] : VOUCHERS)
     .filter((v) => v.status === "Active" && voucherFits(v, planId))
     .sort((a, b) => voucherRate(b) - voucherRate(a));
   // opening the sheet pre-applies the best voucher; tap another to swap, tap it again to remove
-  useEffect(() => { if (open) { setVoucher(list[0] ?? null); setCodeOpen(false); setCode(""); setErr(""); setShowAll(false); } }, [open, planId, emptyVouchers]);
+  useEffect(() => { if (open) { setVoucher(list[0] ?? null); setCodeOpen(false); setCode(""); setErr(""); setShowAll(false); } }, [open, planId, emptyVouchers, manyVouchers]);
   if (!plan) return null;
   const Icon = ICONS[plan.id];
   const price = priceFor(plan, cycle);
@@ -68,7 +68,10 @@ export function SubscribeSheet({ planId, cycle, open, onOpenChange, emptyVoucher
           {/* vouchers: tap a ticket to apply, tap again to remove */}
           <div className="pt-4">
             <div className="flex items-center justify-between px-5">
-              <h3 className="text-[12.5px] font-semibold text-muted-foreground">Vouchers</h3>
+              <h3 className="flex items-center gap-1.5 text-[12.5px] font-semibold text-muted-foreground">
+                Vouchers{list.length > 0 && <span className="rounded-full bg-white/[0.06] px-1.5 text-[10.5px] tabular-nums leading-4">{list.length}</span>}
+                {showAll && list.length > 3 && <button onClick={() => setShowAll(false)} className="ml-1 rounded text-[12px] font-medium text-muted-foreground/80 underline-offset-2 hover:text-foreground hover:underline">Show less</button>}
+              </h3>
               <button onClick={() => { setCodeOpen((o) => !o); setErr(""); }}
                 className="rounded-md text-[12.5px] font-semibold text-primary transition hover:brightness-125 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
                 {codeOpen ? "Cancel" : "Enter code"}
@@ -91,7 +94,7 @@ export function SubscribeSheet({ planId, cycle, open, onOpenChange, emptyVoucher
             )}
 
             {list.length ? (
-              <div role="radiogroup" aria-label="Vouchers" className="grid grid-cols-3 gap-2 px-5 pt-2">
+              <div role="radiogroup" aria-label="Vouchers" className={cn("grid grid-cols-3 gap-2 px-5 pt-2", showAll && list.length > 9 && "mac-scroll max-h-[132px] overflow-y-auto pb-1 pr-4")}>
                 {(showAll || list.length <= 3 ? list : list.slice(0, 2)).map((v) => {
                   const on = voucher?.code === v.code;
                   return (
@@ -125,7 +128,15 @@ export function SubscribeSheet({ planId, cycle, open, onOpenChange, emptyVoucher
                 )}
               </div>
             ) : (
-              !codeOpen && <p className="px-5 pt-1.5 text-[12.5px] text-muted-foreground/80">No vouchers available</p>
+              !codeOpen && (
+                <div className="px-5 pt-2">
+                  <button onClick={() => setCodeOpen(true)}
+                    className="group flex h-9 w-full items-center gap-2.5 rounded-[10px] border border-dashed border-white/[0.12] px-3 text-left transition hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+                    <TicketX className="h-4 w-4 shrink-0 text-muted-foreground/70" />
+                    <span className="flex-1 text-[12.5px] text-muted-foreground">No vouchers available</span>
+                  </button>
+                </div>
+              )
             )}
           </div>
 
