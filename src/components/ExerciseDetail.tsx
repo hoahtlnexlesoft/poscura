@@ -250,9 +250,8 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, p
               <div className="mt-1 inline-flex items-center gap-1.5 text-[13px] font-semibold" style={{ color: band.ring }}>
                 <span className="h-1.5 w-1.5 rounded-full" style={{ background: band.ring }} />{band.label}
               </div>
-              <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2">
+              <div className="mt-3">
                 <Stat label="Best" value={`${best}`} />
-                <Stat label="Trend" value={`${trend >= 0 ? "+" : ""}${trend}`} tone={trend >= 0 ? "text-success" : "text-destructive"} />
               </div>
             </div>
           </div>
@@ -331,23 +330,15 @@ export function ExerciseDetail({ exerciseName, badge, onClose, onPrev, onNext, p
       {/* ---------- move through the exercises in order: Back / Next, as on the session screen ---------- */}
       {(onPrev || onNext) && (
         /* floating capsule at the bottom centre: always in reach, covers almost nothing */
-        <nav aria-label="Exercises" className="sticky bottom-4 z-30 mx-auto grid w-[min(380px,100%)] grid-cols-[1fr_auto_1fr] items-center rounded-full border border-white/[0.1] bg-[#121a2a]/90 p-1 shadow-[0_18px_40px_-12px_rgba(0,0,0,.75)] backdrop-blur-xl land:col-start-2">
+        <nav aria-label="Exercises" className="sticky bottom-4 z-30 mx-auto grid w-[min(240px,100%)] grid-cols-[1fr_auto_1fr] items-center rounded-full border border-white/[0.1] bg-[#121a2a]/90 p-1 shadow-[0_18px_40px_-12px_rgba(0,0,0,.75)] backdrop-blur-xl land:col-start-2">
           <button onClick={onPrev ?? onClose} title={onPrev ? `Previous: ${prevName ?? ""}` : "Back to the list"}
-            className="inline-flex h-12 min-w-0 items-center gap-1.5 rounded-full pl-2.5 pr-4 text-left transition hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
-            <ChevronLeft className="h-[18px] w-[18px] shrink-0 text-foreground/70" />
-            <span className="min-w-0">
-              <span className="block text-[10.5px] font-medium uppercase tracking-[0.12em] text-muted-foreground">{onPrev ? "Previous" : "Back"}</span>
-              <span className="block truncate text-[13px] font-semibold text-foreground/90">{onPrev ? prevName : "All exercises"}</span>
-            </span>
+            className="inline-flex h-11 items-center justify-center gap-1 rounded-full px-3 text-[14px] font-semibold text-foreground/85 transition hover:bg-white/[0.07] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+            <ChevronLeft className="h-[18px] w-[18px] shrink-0" /> {onPrev ? "Previous" : "Back"}
           </button>
-          <span aria-hidden className="mx-0.5 h-7 w-px bg-white/[0.12]" />
+          <span aria-hidden className="mx-0.5 h-6 w-px bg-white/[0.12]" />
           <button onClick={onNext} disabled={!onNext} title={nextName ? `Next: ${nextName}` : undefined}
-            className="inline-flex h-12 min-w-0 items-center justify-end gap-1.5 rounded-full pl-4 pr-2.5 text-right transition enabled:hover:bg-primary/10 disabled:opacity-45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
-            <span className="min-w-0">
-              <span className="block text-[10.5px] font-medium uppercase tracking-[0.12em] text-muted-foreground">Next</span>
-              <span className="block truncate text-[13px] font-semibold text-primary">{nextName ?? "Last exercise"}</span>
-            </span>
-            <ChevronRight className="h-[18px] w-[18px] shrink-0 text-primary" />
+            className="inline-flex h-11 items-center justify-center gap-1 rounded-full px-3 text-[14px] font-semibold text-primary transition enabled:hover:bg-primary/10 disabled:opacity-45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+            Next <ChevronRight className="h-[18px] w-[18px] shrink-0" />
           </button>
         </nav>
       )}
@@ -426,7 +417,10 @@ function StepAccuracy({ exerciseName }: { exerciseName: string }) {
   return (
     <section className="rounded-[22px] border border-white/[0.06] bg-card p-5">
       <h2 className="text-[14px] font-semibold">Accuracy, step by step</h2>
-      <p className="mt-0.5 text-[12px] text-muted-foreground">Last session · Today, 16:00</p>
+      <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[12px] ring-1 ring-inset ring-primary/25">
+        <span className="relative flex h-1.5 w-1.5"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" /><span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" /></span>
+        <span className="font-semibold text-primary">Last session</span><span className="text-foreground/70">· Today, 16:00</span>
+      </p>
       <ol className="mt-4">
         {items.map((it, i) => {
           const b = stepBand(it.score);

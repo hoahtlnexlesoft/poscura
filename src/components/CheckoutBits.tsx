@@ -15,11 +15,12 @@ export function Actions({ children, note }: { children: React.ReactNode; note?: 
 export const primaryBtn = "h-12 flex-1 rounded-2xl bg-gradient-to-r from-primary to-secondary text-[15px] font-semibold text-white shadow-[0_12px_28px_-14px] shadow-primary transition hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-50";
 export const outlineBtn = "h-12 flex-1 rounded-2xl border border-white/[0.12] text-[15px] font-semibold text-foreground/85 transition hover:border-white/25 hover:bg-white/[0.04] hover:text-foreground active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60";
 
-export function Header({ title, onBack }: { title: string; onBack: () => void }) {
+export function Header({ title, onBack, action }: { title: string; onBack: () => void; action?: React.ReactNode }) {
   return (
-    <header className="page-head flex items-center gap-3">
+    <header className="page-head flex flex-wrap items-center gap-x-3 gap-y-2">
       <BackButton onClick={onBack} />
       <h1 className="text-[17px] font-semibold">{title}</h1>
+      {action && <div className="w-full land:ml-auto land:w-auto">{action}</div>}
     </header>
   );
 }

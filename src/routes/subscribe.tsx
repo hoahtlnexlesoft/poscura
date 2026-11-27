@@ -23,6 +23,19 @@ export const Route = createFileRoute("/subscribe")({
 const ICONS = { freemium: Zap, individual: User, family: Users } as const;
 const vnd = (n: number) => `${n.toLocaleString("vi-VN")}đ`;
 
+/** small two-way switch used in the Subscribe header */
+function Seg({ value, options, onChange }: { value: string; options: [string, string][]; onChange: (v: string) => void }) {
+  return (
+    <div role="radiogroup" className="inline-flex flex-1 rounded-full border border-white/[0.08] bg-white/[0.03] p-0.5 land:flex-none">
+      {options.map(([v, label]) => (
+        <button key={v} role="radio" aria-checked={value === v} onClick={() => value !== v && onChange(v)}
+          className={cn("h-8 flex-1 rounded-full px-3.5 text-[12.5px] font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
+            value === v ? "bg-gradient-to-r from-primary to-secondary text-white" : "text-muted-foreground hover:text-foreground")}>{label}</button>
+      ))}
+    </div>
+  );
+}
+
 /** Subscribe: the plan on one side (what you get), the order on the other (voucher, total, confirm). */
 function SubscribePage() {
   const { plan: planId, cycle, novouchers } = Route.useSearch();
@@ -45,7 +58,15 @@ function SubscribePage() {
 
   return (
     <div className="flex min-h-[calc(100dvh-40px)] flex-col desk:min-h-[calc(100dvh-80px)]">
-      <Header title="Subscribe" onBack={goBack} />
+      {/* change the plan or the billing cycle right here, without going back to the plan list */}
+      <Header title="Subscribe" onBack={goBack} action={
+        <div className="flex gap-2">
+          <Seg value={plan.id} options={[["individual", "Individual"], ["family", "Family"]]}
+            onChange={(v) => navigate({ to: "/subscribe", search: { plan: v as "individual" | "family", cycle }, replace: true })} />
+          <Seg value={cycle} options={[["monthly", "Monthly"], ["annual", "Annual"]]}
+            onChange={(v) => navigate({ to: "/subscribe", search: { plan: plan.id as "individual" | "family", cycle: v as "monthly" | "annual" }, replace: true })} />
+        </div>
+      } />
       <div className="mx-auto flex w-full max-w-[640px] flex-1 flex-col gap-4 pt-3 land:grid land:max-w-none land:grid-cols-2 land:items-start land:gap-x-6 hinge-split">
 
         {/* ---------- the plan: what you're getting ---------- */}
@@ -58,7 +79,6 @@ function SubscribePage() {
               <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Subscribe to</div>
               <h2 className="text-[22px] font-semibold leading-tight tracking-tight">{plan.name}</h2>
             </div>
-            <span className="ml-auto rounded-full bg-white/[0.06] px-2.5 py-1 text-[11.5px] font-semibold text-foreground/80 ring-1 ring-inset ring-white/10">{cycle === "annual" ? "Annual" : "Monthly"}</span>
           </div>
           <div className="relative mt-6 flex items-baseline gap-1.5">
             <span className="text-[34px] font-bold leading-none tracking-tight">{formatVND(price)}</span>
