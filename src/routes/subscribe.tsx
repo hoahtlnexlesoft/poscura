@@ -47,15 +47,14 @@ function SubscribePage() {
     <div className="flex min-h-[calc(100dvh-40px)] flex-col desk:min-h-[calc(100dvh-80px)]">
       <Header title="Subscribe" onBack={goBack} />
       {/* same content as the live app: what you're subscribing to, a voucher, what will be charged */}
-      <div className="mx-auto flex w-full max-w-[560px] flex-1 flex-col pt-3">
-        <section className="relative overflow-hidden rounded-[24px] border border-white/[0.07] bg-card p-5 land:p-6">
-          <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-36 bg-[radial-gradient(60%_100%_at_50%_0%,color-mix(in_oklab,var(--color-primary)_18%,transparent),transparent_72%)]" />
-          <div className="relative flex flex-col items-center pb-2 pt-2 text-center">
-            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary text-white shadow-[0_12px_30px_-12px] shadow-primary"><Info className="h-6 w-6" /></span>
-            <h2 className="mt-4 text-[17px] font-semibold tracking-tight">Subscribe to {plan.name}</h2>
+      <div className="mx-auto flex w-full max-w-[480px] flex-1 flex-col pt-2">
+        <section className="relative overflow-hidden rounded-[22px] border border-white/[0.07] bg-card p-4">
+          <div className="flex items-center gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary text-white"><Info className="h-[18px] w-[18px]" /></span>
+            <h2 className="text-[16px] font-semibold tracking-tight">Subscribe to {plan.name}</h2>
           </div>
 
-          <div className="relative mt-5">
+          <div className="relative mt-4">
             {voucher ? (
                 /* applied: the same ticket as in the picker, tap to change */
                 <div role="button" tabIndex={0} onClick={() => setPicking(true)} onKeyDown={(e) => e.key === "Enter" && setPicking(true)}
@@ -79,8 +78,8 @@ function SubscribePage() {
                 </div>
               ) : (
                 <button onClick={() => setPicking(true)}
-                  className="group flex w-full items-center gap-3 rounded-[18px] bg-white/[0.035] px-3.5 py-3 text-left ring-1 ring-inset ring-white/[0.08] transition hover:bg-white/[0.05] hover:ring-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/12 text-primary ring-1 ring-inset ring-primary/20"><Ticket className="h-[18px] w-[18px]" /></span>
+                  className="group flex w-full items-center gap-3 rounded-[16px] bg-white/[0.035] px-3 py-2.5 text-left ring-1 ring-inset ring-white/[0.08] transition hover:bg-white/[0.05] hover:ring-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/12 text-primary ring-1 ring-inset ring-primary/20"><Ticket className="h-[18px] w-[18px]" /></span>
                   <span className="min-w-0 flex-1">
                     <span className="block text-[14px] font-semibold">Select voucher</span>
                   </span>
@@ -89,26 +88,26 @@ function SubscribePage() {
               )}
           </div>
 
-          <h3 className="relative mt-6 text-[13px] font-semibold text-muted-foreground">Payment Details</h3>
-          <div className="relative mt-2.5 overflow-hidden rounded-[16px] ring-1 ring-inset ring-white/[0.08]">
-            <div className="flex items-center justify-between px-4 py-3 text-[14px]">
+          <h3 className="relative mt-4 text-[12.5px] font-semibold text-muted-foreground">Payment Details</h3>
+          <div className="relative mt-2 overflow-hidden rounded-[16px] ring-1 ring-inset ring-white/[0.08]">
+            <div className="flex items-center justify-between px-3.5 py-2.5 text-[13.5px]">
               <span className="text-muted-foreground">Subscription</span>
               <span className="font-medium tabular-nums">{vnd(price)}</span>
             </div>
             {voucher && (
-              <div className="flex items-center justify-between border-t border-white/[0.06] px-4 py-3 text-[14px] animate-in fade-in duration-300">
+              <div className="flex items-center justify-between border-t border-white/[0.06] px-3.5 py-2.5 text-[13.5px] animate-in fade-in duration-300">
                 <span className="text-muted-foreground">Voucher ({voucher.off.replace(/\s*OFF/i, "")})</span>
                 <span className="font-medium tabular-nums text-success">−{vnd(discount)}</span>
               </div>
             )}
-            <div className="flex items-center justify-between bg-gradient-to-r from-primary to-secondary px-4 py-3.5 text-white">
+            <div className="flex items-center justify-between bg-gradient-to-r from-primary to-secondary px-3.5 py-3 text-white">
               <span className="text-[14px] font-semibold">Charged amount</span>
               <span key={charged} className="text-[17px] font-bold tabular-nums animate-in fade-in slide-in-from-bottom-1 duration-300">{vnd(charged)}</span>
             </div>
           </div>
         </section>
 
-        <div className="sticky bottom-0 z-20 mt-auto pt-4 land:static land:mt-5 land:pt-0">
+        <div className="sticky bottom-0 z-20 mt-auto pt-4 land:static land:mt-4 land:pt-0">
           <Actions>
             <button onClick={goBack} className={outlineBtn}>Cancel</button>
             <button className={primaryBtn} onClick={confirm}>Confirm</button>
