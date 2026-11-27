@@ -98,19 +98,19 @@ export function SubscribeSheet({ planId, cycle, open, onOpenChange, emptyVoucher
                     <div key={v.code} className="relative min-w-0 animate-in fade-in duration-200">
                       <button role="radio" aria-checked={on} onClick={() => setVoucher(on ? null : v)}
                         title={`${v.name} · ${v.code} · valid until ${voucherUntil(v)}`}
-                        className={cn("group relative flex h-11 w-full items-stretch overflow-hidden rounded-xl text-left transition active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
+                        className={cn("group relative flex h-9 w-full items-stretch overflow-hidden rounded-[10px] text-left transition active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
                           on ? "bg-primary/[0.12]" : "bg-white/[0.03] hover:bg-white/[0.06]")}>
-                        <span className={cn("flex w-[34px] shrink-0 items-center justify-center text-[11.5px] font-bold tracking-tight transition",
+                        <span className={cn("flex w-[32px] shrink-0 items-center justify-center text-[11px] font-bold tracking-tight transition",
                           on ? "bg-gradient-to-b from-primary to-secondary text-white" : "bg-primary/[0.14] text-primary")}>
                           {v.off.replace(/\s*OFF/i, "")}
                         </span>
                         {/* perforation */}
                         <span aria-hidden className={cn("w-0 border-l border-dashed transition", on ? "border-white/30" : "border-white/[0.12]")} />
                         <span className="flex min-w-0 flex-1 flex-col justify-center px-2">
-                          <span className="truncate font-mono text-[11px] font-semibold tracking-wide">{v.code}</span>
-                          <span className="truncate text-[10px] text-muted-foreground">{v.name}</span>
+                          <span className="truncate font-mono text-[11px] font-semibold leading-[13px] tracking-wide">{v.code}</span>
+                          <span className="truncate text-[9.5px] leading-[12px] text-muted-foreground">{v.name}</span>
                         </span>
-                        <span aria-hidden className={cn("pointer-events-none absolute inset-0 rounded-xl transition",
+                        <span aria-hidden className={cn("pointer-events-none absolute inset-0 rounded-[10px] transition",
                           on ? "ring-[1.5px] ring-inset ring-primary" : "ring-1 ring-inset ring-white/[0.08] group-hover:ring-white/20")} />
                       </button>
                       {on && <span aria-hidden className="pointer-events-none absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary ring-2 ring-[#0e1524] animate-in zoom-in-50 duration-200"><Check className="h-2.5 w-2.5 text-white" strokeWidth={3.5} /></span>}
@@ -119,7 +119,7 @@ export function SubscribeSheet({ planId, cycle, open, onOpenChange, emptyVoucher
                 })}
                 {!showAll && list.length > 3 && (
                   <button onClick={() => setShowAll(true)}
-                    className="flex h-11 items-center justify-center rounded-xl border border-dashed border-white/[0.14] text-[12px] font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+                    className="flex h-9 items-center justify-center rounded-[10px] border border-dashed border-white/[0.14] text-[12px] font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
                     +{list.length - 2} more
                   </button>
                 )}
@@ -142,9 +142,9 @@ export function SubscribeSheet({ planId, cycle, open, onOpenChange, emptyVoucher
                   <span className="font-medium tabular-nums text-success">−{vnd(discount)}</span>
                 </div>
               )}
-              <div className="flex items-center justify-between bg-gradient-to-r from-primary to-secondary px-3.5 py-3 text-white">
+              <div className="flex items-center justify-between border-t border-white/[0.06] bg-white/[0.035] px-3.5 py-3">
                 <span className="text-[14px] font-semibold">Charged amount</span>
-                <span key={charged} className="text-[17px] font-bold tabular-nums animate-in fade-in slide-in-from-bottom-1 duration-300">{vnd(charged)}</span>
+                <span key={charged} className="text-[18px] font-bold tabular-nums tracking-tight animate-in fade-in slide-in-from-bottom-1 duration-300">{vnd(charged)}</span>
               </div>
             </div>
           </div>
