@@ -196,6 +196,15 @@
     var sc = SCREENS.filter(function (x) { return x.path === p; })[0];
     var base = p.split("?")[0];
     var name = sc ? sc.label : (NAMES[base] || (base.indexOf("/body-part") === 0 ? "Body part" : base.indexOf("/support/tickets/") === 0 ? "Ticket" : base));
+    // inner pages (no screen of their own in the list): name them from the URL
+    if (!sc) {
+      var qs = new URLSearchParams((p.split("?")[1] || "").replace(/%22|"/g, ""));
+      if (qs.get("evaluate")) name = "Session evaluation · " + qs.get("evaluate");
+      else if (qs.get("session")) name = qs.get("session") + " · Start";
+      else if (qs.get("exercise")) name = qs.get("exercise");
+      else if (qs.get("view") === "program") name = "Program";
+      else if (qs.get("post")) name = "Post";
+    }
     var url = location.pathname + "?device=" + encodeURIComponent(state.dev) + "#" + p;
     if (location.pathname + location.search + location.hash !== url) { try { history.replaceState(null, "", url); } catch (e) {} }
     document.title = name + " · Poscura";

@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, MessageSquareText, ScanLine, Video, Play, Pause, RotateCcw, AlertCircle, CircleCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScoreRing } from "@/components/SessionResult";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { stepsFor, stepBand, coachFocus, type StepScore } from "@/lib/stepEval";
 
 type Props = {
@@ -22,7 +21,6 @@ type Props = {
 export function SessionEvaluation({ exerciseName, score, when, videoUrl, onBack }: Props) {
   const items = stepsFor(exerciseName, score);
   const focus = coachFocus(items);
-  const [how, setHow] = useState(false);
   useEffect(() => { window.scrollTo(0, 0); }, []);
   useImmersive();
 
@@ -72,7 +70,6 @@ export function SessionEvaluation({ exerciseName, score, when, videoUrl, onBack 
               );
             })}
           </ol>
-          <button onClick={() => setHow(true)} className="mt-4 text-[12.5px] font-semibold text-primary transition hover:underline">How it's measured</button>
         </section>
       </div>
 
@@ -112,22 +109,6 @@ export function SessionEvaluation({ exerciseName, score, when, videoUrl, onBack 
         {focus && <Playback step={items[focus.idx[0]]} videoUrl={videoUrl} />}
       </div>
 
-      <Dialog open={how} onOpenChange={setHow}>
-        <DialogContent className="max-w-[420px] rounded-[24px]">
-          <DialogHeader>
-            <DialogTitle>How it's measured</DialogTitle>
-            <DialogDescription className="leading-relaxed">
-              During each rep, Poscura tracks your body's key points with the camera and compares them with the guide's ideal posture for that step. 100 means a perfect match.
-            </DialogDescription>
-          </DialogHeader>
-          <ul className="space-y-2 text-[13px]">
-            {[95, 80, 65, 40].map((s) => { const b = stepBand(s); return (
-              <li key={b.key} className="flex items-center gap-2.5"><span className={cn("h-2 w-2 rounded-full", b.bar)} /><span className={cn("font-semibold", b.text)}>{b.label}</span>
-                <span className="ml-auto tabular-nums text-muted-foreground">{b.key === "perfect" ? "90–100" : b.key === "almost" ? "75–89" : b.key === "building" ? "60–74" : "below 60"}</span></li>
-            ); })}
-          </ul>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
@@ -155,14 +136,13 @@ function Playback({ step, videoUrl }: { step: StepScore; videoUrl?: string | nul
   const ended = t >= DURATION;
   const rep = Math.min(REPS, Math.floor((t / DURATION) * REPS) + 1);
   const toggle = () => { if (ended) { setT(0); setPlaying(true); } else setPlaying((p) => !p); };
-  const fmt = (s: number) => `0:${String(Math.floor(s)).padStart(2, "0")}`;
   // the figure leans with each rep, so the playback reads as motion
   const phase = Math.sin((t / DURATION) * REPS * Math.PI * 2);
 
   return (
     <section className="rounded-[22px] border border-white/[0.06] bg-card p-5">
       <h2 className="flex items-center gap-2 text-[14px] font-semibold"><Video className="h-4 w-4 text-primary" /> Playback</h2>
-      <div className="relative mt-3 aspect-[16/11] overflow-hidden rounded-[16px] bg-gradient-to-b from-[#0d1422] to-[#05080f] ring-1 ring-inset ring-white/[0.06]">
+      <div onClick={() => playing && toggle()} className="relative mt-3 aspect-[16/11] cursor-pointer overflow-hidden rounded-[16px] bg-gradient-to-b from-[#0d1422] to-[#05080f] ring-1 ring-inset ring-white/[0.06]">
         {videoUrl ? (
           <video src={videoUrl} className="absolute inset-0 h-full w-full object-cover" muted playsInline />
         ) : (
@@ -187,21 +167,6 @@ function Playback({ step, videoUrl }: { step: StepScore; videoUrl?: string | nul
             {ended ? <RotateCcw className="h-5 w-5" /> : <Play className="h-5 w-5 translate-x-px fill-current" />}
           </button>
         )}
-      </div>
-      <div className="mt-3 flex items-center gap-3">
-        <button onClick={toggle} aria-label={playing ? "Pause" : ended ? "Replay" : "Play"} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-foreground/85 transition hover:bg-white/[0.06]">
-          {playing ? <Pause className="h-4 w-4 fill-current" /> : ended ? <RotateCcw className="h-4 w-4" /> : <Play className="h-4 w-4 fill-current" />}
-        </button>
-        {/* scrubber with one tick per rep */}
-        <div className="relative h-5 flex-1 cursor-pointer" onClick={(e) => { const r = e.currentTarget.getBoundingClientRect(); setT(Math.max(0, Math.min(DURATION, ((e.clientX - r.left) / r.width) * DURATION))); }}>
-          <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-white/[0.1]" />
-          <div className="absolute left-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-primary" style={{ width: `${(t / DURATION) * 100}%` }} />
-          {Array.from({ length: REPS - 1 }, (_, i) => (
-            <span key={i} className="absolute top-1/2 h-2.5 w-px -translate-y-1/2 bg-white/25" style={{ left: `${((i + 1) / REPS) * 100}%` }} />
-          ))}
-          <span className="absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow" style={{ left: `${(t / DURATION) * 100}%` }} />
-        </div>
-        <span className="shrink-0 text-[11.5px] tabular-nums text-muted-foreground">{fmt(t)} / {fmt(DURATION)}</span>
       </div>
     </section>
   );

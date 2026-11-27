@@ -1,5 +1,5 @@
 import { ScoreRing } from "@/components/SessionResult";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useImmersive } from "@/hooks/useImmersive";
 import { useAuth } from "@/lib/auth-store";
@@ -22,7 +22,10 @@ type SortKey = "recent" | "popular";
 import { toast } from "sonner";
 import { BackButton } from "@/components/BackButton";
 
-export const Route = createFileRoute("/community")({ component: CommunityPage });
+export const Route = createFileRoute("/community")({
+  validateSearch: (s: Record<string, unknown>) => ({ post: s.post === undefined ? undefined : String(s.post) }),
+  component: CommunityPage,
+});
 
 type Comment = { id: string; user: string; time: string; text: string; likes?: number; liked?: boolean; replies?: Comment[]; image?: string };
 type Post = {
@@ -116,7 +119,10 @@ function Avatar({ name, size = 36 }: { name: string; size?: number }) {
 function CommunityPage() {
   const [posts, setPosts] = useState<Post[]>(SEED_POSTS);
   const [draft, setDraft] = useState("");
-  const [detailId, setDetailId] = useState<string | null>(null);
+  // the open post lives in the URL (?post=id), so the inner page has its own address and Back works
+  const { post: detailId = null } = Route.useSearch();
+  const nav = useNavigate();
+  const setDetailId = (id: string | null) => nav({ to: "/community", search: id ? { post: id } : {}, replace: !id });
   const [sharePost, setSharePost] = useState<Post | null>(null);
   const [searchQ, setSearchQ] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);

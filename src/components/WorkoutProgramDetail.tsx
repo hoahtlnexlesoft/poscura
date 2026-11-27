@@ -34,6 +34,9 @@ export const exerciseList: ExerciseListItem[] = [
 interface Props {
   onClose: () => void;
   onStartSession: (name: string) => void;
+  /** exercise opened inside the program, kept in the URL by the page */
+  exercise?: string;
+  onExercise?: (name: string | null) => void;
 }
 
 const WEEK_DAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
@@ -66,10 +69,11 @@ function startOfWeek(d: Date): Date {
   return date;
 }
 
-export function WorkoutProgramDetail({ onClose, onStartSession }: Props) {
+export function WorkoutProgramDetail({ onClose, onStartSession, exercise, onExercise }: Props) {
   useImmersive();
   const [tab, setTab] = useState<"today" | "all">("today");
-  const [selectedExercise, setSelectedExercise] = useState<ExerciseListItem | null>(null);
+  const selectedExercise = exercise ? exerciseList.find((x) => x.name === exercise) ?? null : null;
+  const setSelectedExercise = (x: ExerciseListItem | null) => onExercise?.(x ? x.name : null);
   const [weekStart, setWeekStart] = useState<Date>(() => startOfWeek(new Date()));
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
   const [startDate, setStartDate] = useState("");

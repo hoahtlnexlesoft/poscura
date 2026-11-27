@@ -18,7 +18,7 @@ import { ExerciseDetail } from "@/components/ExerciseDetail";
 import { NEXT_WORKOUT, TODAYS_WORKOUTS, TODAY_TIME } from "@/lib/todays-workouts";
 
 export const Route = createFileRoute("/workout")({
-  validateSearch: z.object({ session: z.string().optional(), exercise: z.string().optional(), schedule: z.enum(["none"]).optional(), evaluate: z.string().optional(), score: z.coerce.number().optional(), empty: z.coerce.string().optional(), new: z.coerce.string().optional(), history: z.enum(["none"]).optional() }),
+  validateSearch: z.object({ session: z.string().optional(), exercise: z.string().optional(), schedule: z.enum(["none"]).optional(), evaluate: z.string().optional(), score: z.coerce.number().optional(), empty: z.coerce.string().optional(), new: z.coerce.string().optional(), history: z.enum(["none"]).optional(), view: z.enum(["program"]).optional() }),
   component: WorkoutPage,
 });
 
@@ -47,20 +47,31 @@ type View =
   | { kind: "program" };
 
 function WorkoutPage() {
-  const { session, exercise, schedule, evaluate, score, empty, new: fresh, history } = Route.useSearch();
+  const { session, exercise, schedule, evaluate, score, empty, new: fresh, history, view: inner } = Route.useSearch();
+  const program = inner === "program";
   const desk = useDesk();
-  const [view, setView] = useState<View>(evaluate ? { kind: "evaluation", name: evaluate, score: score ?? 88, recordedUrl: null, when: "Today, 16:45" } : session ? { kind: "intro", name: session } : exercise ? { kind: "exercise", name: exercise } : { kind: "list" });
+  const [view, setView] = useState<View>(program ? { kind: "program" } : evaluate ? { kind: "evaluation", name: evaluate, score: score ?? 88, recordedUrl: null, when: "Today, 16:45" } : session ? { kind: "intro", name: session } : exercise ? { kind: "exercise", name: exercise } : { kind: "list" });
   // deep links (?exercise= / ?session=) also work when the page is already open
   useEffect(() => {
-    setView(evaluate ? { kind: "evaluation", name: evaluate, score: score ?? 88, recordedUrl: null, when: "Today, 16:45" } : session ? { kind: "intro", name: session } : exercise ? { kind: "exercise", name: exercise } : { kind: "list" });
-  }, [session, exercise, evaluate, score]);
+    setView(program ? { kind: "program" } : evaluate ? { kind: "evaluation", name: evaluate, score: score ?? 88, recordedUrl: null, when: "Today, 16:45" } : session ? { kind: "intro", name: session } : exercise ? { kind: "exercise", name: exercise } : { kind: "list" });
+  }, [session, exercise, evaluate, score, program]);
   const navigate = useNavigate();
+  // inner pages get their own address: exercise, intro, evaluation and program are written to the URL as you open them
+  const keep = { ...(empty ? { empty } : {}), ...(history ? { history } : {}) };
+  const urlFor = (v: View): Record<string, string | number> | null =>
+    v.kind === "list" ? {} : v.kind === "exercise" ? { exercise: v.name } : v.kind === "intro" ? { session: v.name }
+    : v.kind === "program" ? { view: "program" } : v.kind === "evaluation" && v.from !== "result" ? { evaluate: v.name, score: v.score } : null;
+  const go = (v: View) => {
+    setView(v);
+    const q = urlFor(v);
+    if (q) navigate({ to: "/workout", search: { ...(v.kind === "list" ? keep : {}), ...q } as never });
+  };
   // leaving a deep-linked screen also clears the ?exercise= / ?session= from the URL
-  const toList = () => { setView({ kind: "list" }); if (session || exercise || evaluate) navigate({ to: "/workout", search: {}, replace: true }); };
+  const toList = () => go({ kind: "list" });
 
   if (view.kind === "intro") {
     const w = TODAYS_WORKOUTS.find((x) => x.name === view.name);
-    return <ExerciseIntro name={view.name} session={(w?.done ?? 0) + 1} sessions={w?.sessions ?? 1} onBack={toList} onStart={() => setView({ kind: "session", name: view.name })} />;
+    return <ExerciseIntro name={view.name} session={(w?.done ?? 0) + 1} sessions={w?.sessions ?? 1} onBack={toList} onStart={() => go({ kind: "session", name: view.name })} />;
   }
   if (view.kind === "session") {
     const idx = TODAYS_WORKOUTS.findIndex((x) => x.name === view.name);
@@ -71,10 +82,10 @@ function WorkoutPage() {
         workoutName={view.name}
         session={(w?.done ?? 0) + 1}
         sessions={w?.sessions ?? 1}
-        onClose={() => setView({ kind: "list" })}
+        onClose={() => go({ kind: "list" })}
         // form tracking is simulated in the prototype: a plausible accuracy score for the finished session
-        onFinish={(url) => setView({ kind: "result", name: view.name, score: 58 + Math.floor(Math.random() * 40), recordedUrl: url })}
-        onNext={next ? () => setView({ kind: "intro", name: next.name }) : undefined}
+        onFinish={(url) => go({ kind: "result", name: view.name, score: 58 + Math.floor(Math.random() * 40), recordedUrl: url })}
+        onNext={next ? () => go({ kind: "intro", name: next.name }) : undefined}
       />
     );
   }
@@ -89,17 +100,17 @@ function WorkoutPage() {
         sessions={w?.sessions ?? 1}
         score={view.score}
         next={nw ? { name: nw.name, session: nw.done + 1, sessions: nw.sessions } : undefined}
-        onEvaluation={() => setView({ kind: "evaluation", name: view.name, score: view.score, recordedUrl: view.recordedUrl, when: `Today, ${new Date().toTimeString().slice(0, 5)}`, from: "result" })}
-        onContinue={nw ? () => setView({ kind: "intro", name: nw.name }) : undefined}
-        onDone={() => setView({ kind: "list" })}
+        onEvaluation={() => go({ kind: "evaluation", name: view.name, score: view.score, recordedUrl: view.recordedUrl, when: `Today, ${new Date().toTimeString().slice(0, 5)}`, from: "result" })}
+        onContinue={nw ? () => go({ kind: "intro", name: nw.name }) : undefined}
+        onDone={() => go({ kind: "list" })}
       />
     );
   }
   if (view.kind === "evaluation") {
-    const back = view.from === "result" ? () => setView({ kind: "result", name: view.name, score: view.score, recordedUrl: view.recordedUrl }) : toList;
+    const back = view.from === "result" ? () => go({ kind: "result", name: view.name, score: view.score, recordedUrl: view.recordedUrl }) : toList;
     return <SessionEvaluation exerciseName={view.name} score={view.score} when={view.when} videoUrl={view.recordedUrl} onBack={back} />;
   }
-  if (view.kind === "assessment") return <WorkoutAssessment workoutName={view.name} recordedVideoUrl={view.recordedUrl} onClose={() => setView({ kind: "result", name: view.name, score: view.score, recordedUrl: view.recordedUrl })} />;
+  if (view.kind === "assessment") return <WorkoutAssessment workoutName={view.name} recordedVideoUrl={view.recordedUrl} onClose={() => go({ kind: "result", name: view.name, score: view.score, recordedUrl: view.recordedUrl })} />;
   if (view.kind === "exercise") {
     const wi = TODAYS_WORKOUTS.findIndex((x) => x.name === view.name);
     const w = TODAYS_WORKOUTS[wi];
@@ -109,10 +120,10 @@ function WorkoutPage() {
     const oi = order.indexOf(view.name);
     const pn = oi > 0 ? order[oi - 1] : undefined, nn = oi >= 0 ? order[oi + 1] : order[0];
     const pw = pn ? { name: pn } : undefined, nw = nn && nn !== view.name ? { name: nn } : undefined;
-    return <ExerciseDetail key={`${view.name}|${schedule ?? ""}`} exerciseName={view.name} badge={done ? "Completed" : "Main"} sessionLabel={w ? `${w.done}/${w.sessions}` : "2/2"} onClose={toList} onStart={() => setView({ kind: "intro", name: view.name })} scheduled={schedule !== "none"}
-      onPrev={pw ? () => setView({ kind: "exercise", name: pw.name }) : undefined} onNext={nw ? () => setView({ kind: "exercise", name: nw.name }) : undefined} prevName={pw?.name} nextName={nw?.name} />;
+    return <ExerciseDetail key={`${view.name}|${schedule ?? ""}`} exerciseName={view.name} badge={done ? "Completed" : "Main"} sessionLabel={w ? `${w.done}/${w.sessions}` : "2/2"} onClose={toList} onStart={() => go({ kind: "intro", name: view.name })} scheduled={schedule !== "none"}
+      onPrev={pw ? () => go({ kind: "exercise", name: pw.name }) : undefined} onNext={nw ? () => go({ kind: "exercise", name: nw.name }) : undefined} prevName={pw?.name} nextName={nw?.name} />;
   }
-  if (view.kind === "program") return <WorkoutProgramDetail onClose={() => setView({ kind: "list" })} onStartSession={(name) => setView({ kind: "intro", name })} />;
+  if (view.kind === "program") return <WorkoutProgramDetail exercise={exercise} onExercise={(name) => navigate({ to: "/workout", search: { view: "program", ...(name ? { exercise: name } : {}) } as never })} onClose={() => go({ kind: "list" })} onStartSession={(name) => go({ kind: "intro", name })} />;
   // never scanned: no plan yet, monitoring creates it
   if (fresh) return desk ? <Page><PageHead title="Workout" subtitle="Personalized workout plans" /><NoWorkoutPlan /></Page> : (
     <div className="space-y-4">
@@ -120,7 +131,7 @@ function WorkoutPage() {
       <NoWorkoutPlan />
     </div>
   );
-  if (desk) return <DeskWorkoutHome empty={!!empty} noHistory={history === "none"} onProgram={() => setView({ kind: "program" })} onExercise={(name) => setView({ kind: "exercise", name })} onStart={(name) => setView({ kind: "intro", name })} />;
+  if (desk) return <DeskWorkoutHome empty={!!empty} noHistory={history === "none"} onProgram={() => go({ kind: "program" })} onExercise={(name) => go({ kind: "exercise", name })} onStart={(name) => go({ kind: "intro", name })} />;
 
   return (
     <div className="space-y-4 fold:grid fold:grid-cols-2 fold:gap-4 land:gap-x-6 hinge-split fold:space-y-0 fold:items-start">
@@ -147,7 +158,7 @@ function WorkoutPage() {
             return (
               <div key={w.name} className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
                 <div className="min-w-0 flex-1">
-                  <button onClick={() => setView({ kind: "exercise", name: w.name })} className="text-left text-sm font-semibold leading-snug transition hover:text-primary">{w.name}</button>
+                  <button onClick={() => go({ kind: "exercise", name: w.name })} className="text-left text-sm font-semibold leading-snug transition hover:text-primary">{w.name}</button>
                   <div className="mt-0.5 text-[11px] text-muted-foreground">Scheduled at {TODAY_TIME}</div>
                   <div className="mt-1.5 flex flex-wrap items-center gap-2">
                     <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-medium ${completed ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive"}`}>
@@ -160,7 +171,7 @@ function WorkoutPage() {
                   </div>
                 </div>
                 <button
-                  onClick={() => (completed ? setView({ kind: "exercise", name: w.name }) : setView({ kind: "intro", name: w.name }))}
+                  onClick={() => (completed ? go({ kind: "exercise", name: w.name }) : go({ kind: "intro", name: w.name }))}
                   className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-border bg-background px-3.5 text-xs font-semibold transition hover:border-primary/50 hover:text-primary"
                 >
                   {completed ? <Eye className="h-3.5 w-3.5" /> : <Play className="h-3 w-3 fill-current" />}
@@ -180,11 +191,11 @@ function WorkoutPage() {
             <Calendar className="h-4 w-4 text-primary" />
             <h2 className="text-sm font-semibold">Current Program</h2>
           </div>
-          <button onClick={() => setView({ kind: "program" })} className="text-xs text-primary font-medium flex items-center gap-1">
+          <button onClick={() => go({ kind: "program" })} className="text-xs text-primary font-medium flex items-center gap-1">
             Details <ChevronRight className="h-3 w-3" />
           </button>
         </div>
-        <button onClick={() => setView({ kind: "program" })}
+        <button onClick={() => go({ kind: "program" })}
           className="w-full text-left rounded-xl border border-border bg-card p-4">
           <h3 className="text-sm font-semibold">Shoulder &amp; Neck Relief</h3>
           <div className="mt-2 grid grid-cols-2 gap-2 text-[11px]">
@@ -216,7 +227,7 @@ function WorkoutPage() {
         </div>
         {history === "none" ? <NoHistory /> : <div className="space-y-2">
           {[1, 2].map((i) => (
-            <button key={i} onClick={() => setView({ kind: "program" })}
+            <button key={i} onClick={() => go({ kind: "program" })}
               className="w-full rounded-xl border border-border bg-card p-3 text-left flex items-center justify-between">
               <div className="min-w-0">
                 <h3 className="text-sm font-semibold truncate">Neck Mobility</h3>
